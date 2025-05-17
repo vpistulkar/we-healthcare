@@ -190,6 +190,7 @@ async function renderWBDataLayer() {
     pageInfo: {
       pageCategory: getMetadata('pagecategory'),
       channel: getMetadata('channel'),
+      themecfreference: getMetadata('theme_cf_reference'),
       contentType: getMetadata('content_type'),
       pageUid: getMetadata('pageuid'),
       pageName: getMetadata('pagename'),
