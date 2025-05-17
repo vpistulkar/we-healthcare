@@ -353,6 +353,56 @@ async function addLogoLink() {
 }
 
 
+async function applyCFTheme(themeCFReference) {
+  if(themeCFReference){
+      const decodedThemeCFReference = decodeURIComponent(themeCFReference);
+
+      const hostname = getMetadata('hostname');	
+      const aemauthorurl = getMetadata('authorurl') || '';
+      const aempublishurl = hostname?.replace('author', 'publish')?.replace(/\/$/, '');
+      const persistedQueryForTheme = '/graphql/execute.json/wknd-universal/BrandThemeByPath';
+
+      const url = window?.location?.origin?.includes('author')
+      ? `${aemauthorurl}${persistedQueryForTheme};path=${decodedThemeCFReference};ts=${
+          Math.random() * 1000
+        }`
+      : `${aempublishurl}${persistedQueryForTheme};path=${decodedThemeCFReference};ts=${
+          Math.random() * 1000
+        }`;
+
+      const cfReq = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+        .then((response) => response.json())
+        .then((contentfragment) => {
+          if (contentfragment.data) {
+            if (contentfragment.data?.brandThemeByPath?.item) {
+              const themeColors = contentfragment.data.brandThemeByPath.item;
+              const styleElement = document.createElement('style');
+              const excludedKeys = new Set(['brandSite', 'brandLogo']);
+              const cssVariables = Object.entries(themeColors)
+                .filter(([key, value]) => 
+                  value !== null && 
+                  value !== undefined && 
+                  !excludedKeys.has(key)
+                )
+                .map(([key, value]) => `  --brand-${key.replace(/([A-Z])/g, '-$1').toLowerCase()}: ${value};`)
+                .join('\n');
+
+              if (cssVariables) {
+                styleElement.textContent = `:root {\n${cssVariables}\n}`;
+                document.head.appendChild(styleElement);
+              }
+            }
+          }
+        });
+    }
+}
+
+
 /**
  * loads and decorates the header, mainly the nav
  * @param {Element} block The header block element
@@ -361,6 +411,11 @@ export default async function decorate(block) {
   // load nav as fragment
   //const locale = getMetadata('nav');
 
+  const themeCFReference = getMetadata('theme_cf_reference');
+  applyCFTheme(themeCFReference);
+  
+
+  
   const navMeta = getMetadata('nav');
   const langCode = getLanguage();
   const navPath = navMeta

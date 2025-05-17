@@ -20,10 +20,15 @@
     {
       "id": "contentfragment",
       "fields": [
-        {
+        {          
           "component": "aem-content",
           "name": "reference",
-          "label": "Reference"
+          "label": "Reference",
+          "valueType": "string",
+          "required": true,
+          "validation": {
+              "rootPath": "/content/dam"
+          }
         }
       ]
     }
