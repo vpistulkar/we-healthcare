@@ -1,0 +1,17 @@
+{
+  "mappings": [
+    "/content/wknd-universal-site/language-masters/en:/",
+    "/content/wknd-universal-site/language-masters/en:/en",
+    "/content/wknd-universal-site/language-masters/en/:/language-masters/en/",
+    "/content/wknd-universal-site/language-masters/en:/language-masters/en",
+    "/content/wknd-universal-site/configuration:/.helix/config.json",
+    "/content/wknd-universal-site/metadata:/metadata.json",
+    "/content/wknd-universal-site/redirects:/redirects.json",
+    "/content/wknd-universal-site/language-masters/en/placeholders:/language-masters/en/placeholders.json",
+    "/content/wknd-universal-site.resource/language-masters/en/query-index.json:/en/query-index.json",
+    "/content/wknd-universal-site.resource/language-masters/fr/query-index.json:/fr/query-index.json"
+  ],
+  "includes": [
+    "/content/wknd-universal-site/"
+  ]
+}
