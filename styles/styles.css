@@ -9,18 +9,29 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+/*
+ :root {
+  --brand-theme-color: #ff0000;
+  --brand-dark-color: #131313;
+  --brand-light-color: #dcdcdc;
+  --brand-link-color: #131313;
+  --brand-link-hover-color: #ff0000;
+  --brand-text-color: #131313;
+  --brand-light-text-color: #ffffff;
+}
+*/
 
 :root {
   /* colors */
   --background-color: #ffffff;
-  --dark-color: #131313;
-  --light-color: #dcdcdc;
-  --text-color: #131313;
-  --text-light: #ffffff;
+  --dark-color: var(--brand-dark-color, #131313);
+  --light-color: var(--brand-light-color, #dcdcdc);
+  --text-color: var(--brand-text-color, #131313);
+  --text-light: var(--brand-light-text-color, #ffffff);
   --text-disabled:rgb(113, 113, 113);
-  --link-color: #131313;
-  --link-hover-color: #ffc719;
-  --main-accent-color: #ffc719;
+  --link-color: var(--brand-link-color, #131313);
+  --link-hover-color: var(--brand-link-hover-color, #ffc719);
+  --main-accent-color: var(--brand-theme-color, #ffc719);
   --dark-color-opacity: rgba(0, 0, 0, 0.55);
   --light-color-opacity: rgba(255, 255, 255, 0.5);
 
