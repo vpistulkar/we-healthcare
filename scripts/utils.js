@@ -10,6 +10,7 @@ export const SUPPORTED_LANGUAGES = ['en'];
 export const INTERNAL_PAGES = ['/footer', '/nav', '/fragments', '/data', '/drafts'];
 let lang;
 import { fetchPlaceholders } from './placeholders.js';
+import { isAuthorEnvironment } from './scripts/scripts.js';
 
 /**
  * Extracts the site name from the current URL pathname
@@ -21,20 +22,21 @@ import { fetchPlaceholders } from './placeholders.js';
  */
   export async function getSiteName() {
     try {
-      const listOfAllPlaceholdersData = await fetchPlaceholders();
-      const siteName = listOfAllPlaceholdersData?.siteName;
-      
-      if (siteName) {
-        return siteName;
+      if(isAuthorEnvironment()){
+          // Fallback to extracting from pathname
+          const { pathname } = window.location;
+          const siteNameFromPath = pathname.split('/content/')[1]?.split('/')[0] || '';
+          return siteNameFromPath;
+      } else {
+        const listOfAllPlaceholdersData = await fetchPlaceholders();
+        const siteName = listOfAllPlaceholdersData?.siteName;
+        if (siteName) {
+          return siteName;
+        }
       }
     } catch (error) {
       console.warn('Error fetching placeholders for siteName:', error);
     }
-    
-    // Fallback to extracting from pathname
-    const { pathname } = window.location;
-    const siteNameFromPath = pathname.split('/content/')[1]?.split('/')[0] || '';
-    return siteNameFromPath;
 }
 
 
