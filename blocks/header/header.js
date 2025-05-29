@@ -369,10 +369,10 @@ async function applyCFTheme(themeCFReference) {
     const hostname = getMetadata('hostname');
     const aemauthorurl = getMetadata('authorurl') || '';
     const aempublishurl = hostname?.replace('author', 'publish')?.replace(/\/$/, '');
-    const isAuthorEnvironment = isAuthorEnvironment;
+    const isAuthor = isAuthorEnvironment();
 
     // Prepare request configuration based on environment
-    const requestConfig = isAuthorEnvironment 
+    const requestConfig = isAuthor 
       ? {
           url: `${aemauthorurl}${CONFIG.GRAPHQL_QUERY};path=${decodedThemeCFReference};ts=${Date.now()}`,
           method: 'GET',
