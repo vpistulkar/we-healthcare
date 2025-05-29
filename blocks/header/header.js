@@ -399,7 +399,15 @@ async function applyCFTheme(themeCFReference) {
     if (!response.ok) {
        console.error(`HTTP error! status: ${response.status}`);
     }
-    const themeCFRes = await response.json();
+
+    let themeCFRes;
+    try {
+      // Clone the response to avoid "body stream already read" error
+      const responseClone = response.clone();
+      themeCFRes = await responseClone.json();
+    } catch (jsonError) {
+      console.error('Error parsing JSON response:', jsonError);
+    }
     const themeColors = themeCFRes?.data?.brandThemeByPath?.item;
 
     if (!themeColors) {
