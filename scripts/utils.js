@@ -10,7 +10,7 @@ export const SUPPORTED_LANGUAGES = ['en'];
 export const INTERNAL_PAGES = ['/footer', '/nav', '/fragments', '/data', '/drafts'];
 let lang;
 import { fetchPlaceholders } from './placeholders.js';
-import { isAuthorEnvironment } from './scripts/scripts.js';
+import { isAuthorEnvironment } from './scripts.js';
 
 /**
  * Extracts the site name from the current URL pathname
