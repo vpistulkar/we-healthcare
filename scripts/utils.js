@@ -5,10 +5,25 @@ import {
 
 export const PATH_PREFIX = '/language-masters';
 export const TAG_ROOT = 'wknd-universal:';
-export const SITE_NAME = 'wknd-universal';
+//export const SITE_NAME = 'wknd-universal';
 export const SUPPORTED_LANGUAGES = ['en'];
 export const INTERNAL_PAGES = ['/footer', '/nav', '/fragments', '/data', '/drafts'];
 let lang;
+
+/**
+ * Extracts the site name from the current URL pathname
+ * @description Extracts the site name from paths following the pattern /content/site-name/...
+ * For example:
+ * - From "/content/wknd-universal/language-masters/en/path" returns "wknd-universal"
+ * - From "/content/wknd-universal/language-masters/en/path/to/content.html" returns "wknd-universal"
+ * @returns {string} The site name extracted from the path, or empty string if not found
+ */
+  export function getSiteName() {
+    const { pathname } = window.location;
+    const siteName = pathname.split('/content/')[1]?.split('/')[0] || '';
+    return siteName;
+  }
+
 
 /**
  * Get Inherited Page Properties
