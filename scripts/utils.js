@@ -9,8 +9,7 @@ export const TAG_ROOT = 'wknd-universal:';
 export const SUPPORTED_LANGUAGES = ['en'];
 export const INTERNAL_PAGES = ['/footer', '/nav', '/fragments', '/data', '/drafts'];
 let lang;
-
-import { fetchPlaceholders, fetchLanguagePlaceholders } from './scripts.js';
+import { fetchPlaceholders } from './placeholders.js';
 
 /**
  * Extracts the site name from the current URL pathname
