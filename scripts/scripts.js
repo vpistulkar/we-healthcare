@@ -47,7 +47,7 @@ export function moveAttributes(from, to, attributes) {
 }
 
 export function isAuthorEnvironment() {
-  return document.querySelector('*[data-aue-resource]') !== null;
+  return window?.location?.origin?.includes('author') || document.querySelector('*[data-aue-resource]') !== null;
 }
 
 /**
