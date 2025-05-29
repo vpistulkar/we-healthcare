@@ -399,8 +399,8 @@ async function applyCFTheme(themeCFReference) {
     if (!response.ok) {
        console.error(`HTTP error! status: ${response.status}`);
     }
-
-    const themeColors = response?.data?.brandThemeByPath?.item;
+    const themeCFRes = await response.json();
+    const themeColors = themeCFRes?.data?.brandThemeByPath?.item;
 
     if (!themeColors) {
       console.warn('No theme data found in the response');
