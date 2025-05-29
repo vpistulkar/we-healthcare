@@ -400,8 +400,7 @@ async function applyCFTheme(themeCFReference) {
        console.error(`HTTP error! status: ${response.status}`);
     }
 
-    const contentfragment = await response.json();
-    const themeColors = contentfragment?.data?.brandThemeByPath?.item;
+    const themeColors = response?.data?.brandThemeByPath?.item;
 
     if (!themeColors) {
       console.warn('No theme data found in the response');
