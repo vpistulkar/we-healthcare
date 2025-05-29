@@ -401,10 +401,18 @@ async function applyCFTheme(themeCFReference) {
     }
 
     let themeCFRes;
+
+    
     try {
-      // Clone the response to avoid "body stream already read" error
-      const responseClone = response.clone();
-      themeCFRes = await responseClone.json();
+
+
+       const responseText = await response.text();
+      
+      if (!responseText || responseText.trim() === '') {
+        console.warn('Empty response received from server');
+        return;
+      }
+      themeCFRes = JSON.parse(responseText);
     } catch (jsonError) {
       console.error('Error parsing JSON response:', jsonError);
     }
