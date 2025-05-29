@@ -2,7 +2,7 @@ import { getMetadata } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
 
 import {
-  getLanguage, TAG_ROOT, SITE_NAME, PATH_PREFIX, fetchLanguageNavigation,
+  getLanguage, getSiteName, TAG_ROOT, PATH_PREFIX, fetchLanguageNavigation,
 } from '../../scripts/utils.js';
 
 /**
@@ -14,7 +14,7 @@ export default async function decorate(block) {
   const langCode = getLanguage();
   const footerPath = footerMeta
     ? new URL(footerMeta, window.location).pathname
-    : `/content/${SITE_NAME}${PATH_PREFIX}/footer`;
+    : `/content/${getSiteName()}${PATH_PREFIX}/footer`;
 
   /*
   // load footer as fragment
