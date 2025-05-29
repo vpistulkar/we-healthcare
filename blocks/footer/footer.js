@@ -12,6 +12,7 @@ import {
 export default async function decorate(block) {
   const footerMeta = getMetadata('footer');
   const langCode = getLanguage();
+  const siteName = getSiteName();
   const footerPath = footerMeta
     ? new URL(footerMeta, window.location).pathname
     : `/content/${getSiteName()}${PATH_PREFIX}/footer`;
