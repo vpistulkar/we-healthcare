@@ -54,14 +54,17 @@ export default async function decorate(block) {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        console.error(`error making cf graphql request: ${response.status}`);
       }
-      const cfReq = await response.json();
+
+			const offer = await response.json();
+
+			const cfReq = offer?.data?.ctaByPath?.item;
 
       if (!cfReq) {
-        throw new Error('No data received from the server');
+				 console.error('error parsing response from graphql request');
       }
-
+			
             // Set up block attributes
       const itemId = `urn:aemconnection:${contentPath}/jcr:content/data/${variationname}`;
       block.setAttribute('data-aue-type', 'container');
