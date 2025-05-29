@@ -10,6 +10,8 @@ export const SUPPORTED_LANGUAGES = ['en'];
 export const INTERNAL_PAGES = ['/footer', '/nav', '/fragments', '/data', '/drafts'];
 let lang;
 
+import { fetchPlaceholders, fetchLanguagePlaceholders } from '../../scripts/scripts.js';
+
 /**
  * Extracts the site name from the current URL pathname
  * @description Extracts the site name from paths following the pattern /content/site-name/...
@@ -18,11 +20,23 @@ let lang;
  * - From "/content/wknd-universal/language-masters/en/path/to/content.html" returns "wknd-universal"
  * @returns {string} The site name extracted from the path, or empty string if not found
  */
-  export function getSiteName() {
+  export async function getSiteName() {
+    try {
+      const listOfAllPlaceholdersData = await fetchPlaceholders();
+      const siteName = listOfAllPlaceholdersData?.siteName;
+      
+      if (siteName) {
+        return siteName;
+      }
+    } catch (error) {
+      console.warn('Error fetching placeholders for siteName:', error);
+    }
+    
+    // Fallback to extracting from pathname
     const { pathname } = window.location;
-    const siteName = pathname.split('/content/')[1]?.split('/')[0] || '';
-    return siteName;
-  }
+    const siteNameFromPath = pathname.split('/content/')[1]?.split('/')[0] || '';
+    return siteNameFromPath;
+}
 
 
 /**
