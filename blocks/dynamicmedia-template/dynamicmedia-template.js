@@ -29,13 +29,20 @@ export default function decorate(block) {
       paramPairs.forEach(pair => {
         const indexOfEqual = pair.indexOf('=');
         const key = pair.slice(0, indexOfEqual).trim();
-        const value = pair.slice(indexOfEqual + 1).trim();
+        let value = pair.slice(indexOfEqual + 1).trim();
+      
+        // 🧹 Remove trailing comma (if any)
+        if (value.endsWith(',')) {
+          value = value.slice(0, -1);
+        }
+      
         paramObject[key] = value;
       });
-
       // Manually construct the query string (preserving `$` in keys)
-      const queryString = Object.entries(paramObject).map(([key, value]) => `${key}=${value}`).join('&');
-
+      const queryString = Object.entries(paramObject)
+      .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+      .join('&');
+    
       // Combine with template URL (already includes ? or not)
       let finalUrl = templateURL.includes('?') 
         ? `${templateURL}&${queryString}` 
