@@ -34,7 +34,7 @@ export default function decorate(block) {
       });
 
       // Manually construct the query string (preserving `$` in keys)
-      const queryString = Object.entries(paramObject).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
+      const queryString = Object.entries(paramObject).map(([key, value]) => `${key}=${value}`).join('&');
 
       // Combine with template URL (already includes ? or not)
       let finalUrl = templateURL.includes('?') 
