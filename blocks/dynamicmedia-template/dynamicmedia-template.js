@@ -7,7 +7,7 @@ export default function decorate(block) {
 
   let deliveryType = Array.from(block.children)[2]?.textContent?.trim();
   let inputs = block.querySelectorAll('.dynamicmedia-template > div');
-      
+  /*
   let inputsArray = Array.from(inputs);
   if(inputsArray.length < 2) {
     console.log("Missing inputs, expecting 2, ensure both the image and DM URL are set in the dialog");
@@ -50,7 +50,7 @@ export default function decorate(block) {
       
         //s7responsiveImage(imageEl);
         //dmUrlEl.remove();
-      
+  */
   block.children[6]?.remove();
   block.children[5]?.remove();
   block.children[4]?.remove();
