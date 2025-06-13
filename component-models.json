@@ -844,7 +844,7 @@
         },
         {
           "component": "text",
-          "valueType": "number",
+          "valueType": "string",
           "name": "dm_width",
           "value": "1000",
           "label": "Width"
