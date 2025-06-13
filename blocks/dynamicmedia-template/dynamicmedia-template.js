@@ -46,7 +46,7 @@ export default function decorate(block) {
           src: finaldmurl.toString(),
           alt: 'dm-template-image',
         });
-        
+        block.innerHTML = '';
         block.append(finalImg);
       }
     }
@@ -55,9 +55,5 @@ export default function decorate(block) {
     
    
   }
-  block.children[0]?.remove();
-  block.children[1]?.remove();
-  block.children[2]?.remove();
-  block.children[3]?.remove();
-  block.children[4]?.remove();  
+   
 }
