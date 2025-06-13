@@ -50,10 +50,11 @@ export default function decorate(block) {
       
         //s7responsiveImage(imageEl);
         //dmUrlEl.remove();
-  */
+ 
   block.children[6]?.remove();
   block.children[5]?.remove();
   block.children[4]?.remove();
   block.children[3]?.remove();
   block.children[2]?.remove();  
+   */
 }
