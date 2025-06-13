@@ -1,3 +1,5 @@
+import { getMetadata } from '../../scripts/aem.js';
+import { isAuthorEnvironment, moveInstrumentation } from '../../scripts/scripts.js';
 
 /**
  * @param {HTMLElement} $block
