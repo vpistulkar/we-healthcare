@@ -22,6 +22,27 @@
       "id": "dm-template",
       "fields": [
         {
+          "component": "select",
+          "name": "config_source",
+          "value": "inline",
+          "label": "Template Config Source",
+          "description": "Choose the source to provide the template path and variable configurations.",
+          "valueType": "string",
+          "options": [
+            {
+              "name": "Content Fragment",
+              "value": "cf"
+            },
+            {
+              "name": "Inline",
+              "value": "inline"
+            }
+          ]
+        },
+        {
+          "condition": {
+            "===": [{ "var": "config_source" }, "inline"]
+          },
           "component": "text",
           "name": "dm_template_url",
           "label": "Template Path",
@@ -29,43 +50,29 @@
           "valueType": "string"
         },
         {
+          "condition": {
+            "===": [{ "var": "config_source" }, "inline"]
+          },          
           "component": "text",
           "valueType": "string",
-          "name": "dm_image1",
-          "label": "Left Image",
-          "multi": false,
-          "description": "Image which will be mapped to $leftImage",
-          "required": true
+          "name": "var_mapping",
+          "multi": true,
+          "value": "",
+          "label": "Variable Mappings",
+          "description": "Provide variable values in 'variablename=value' format where variablename is the variable name and value is the variable value. These values should be exposed in the DM template inorder to get replaced e.g. $leftImage=DynamicMediaNA/adobestock-167833331"
         },
         {
-          "component": "text",
+          "condition": {
+            "===": [{ "var": "config_source" }, "cf"]
+          },
+          "component": "aem-content",
+          "name": "reference",
+          "label": "Reference",
           "valueType": "string",
-          "name": "dm_image2",
-          "label": "Right Image",
-          "multi": false,
-          "description": "Image which will be mapped to $rightImage",
-          "required": true
-        },
-        {
-          "component": "text",
-          "name": "dm_title",
-          "label": "Title",
-          "description": "Provide a title that will be populated in the $title variable of Dynamic Media Template.",
-          "valueType": "string"
-        },
-        {
-          "component": "text",
-          "name": "dm_description",
-          "label": "Description",
-          "description": "Provide a title that will be populated in the $description variable of Dynamic Media Template.",
-          "valueType": "string"
-        },
-        {
-          "component": "text",
-          "valueType": "string",
-          "name": "dm_width",
-          "value": "1000",
-          "label": "Width"
+          "required": true,
+          "validation": {
+              "rootPath": "/content/dam"
+          }
         }
       ]
     }
