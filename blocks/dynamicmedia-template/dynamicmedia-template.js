@@ -22,20 +22,19 @@ export default function decorate(block) {
 
     if (variablemapping) {
       // Step 1: Convert to key-value object
-      const paramPairs = variablemapping.split(',');
+      const paramPairs = variablemapping.match(/[^,]+=[^$]+(?:,?[^,$=][^,]*)*/g);
+
       const paramObject = {};
 
       paramPairs.forEach(pair => {
-        const [key, value] = pair.split('=');
-        if (key && value) {
-          paramObject[key.trim()] = decodeURIComponent(value.trim());
-        }
+        const indexOfEqual = pair.indexOf('=');
+        const key = pair.slice(0, indexOfEqual).trim();
+        const value = pair.slice(indexOfEqual + 1).trim();
+        paramObject[key] = value;
       });
 
       // Manually construct the query string (preserving `$` in keys)
-      const queryString = Object.entries(paramObject)
-        .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
-        .join('&');
+      const queryString = Object.entries(paramObject).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
 
       // Combine with template URL (already includes ? or not)
       let finalUrl = templateURL.includes('?') 
