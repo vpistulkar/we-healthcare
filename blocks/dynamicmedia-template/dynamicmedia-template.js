@@ -38,17 +38,18 @@ export default function decorate(block) {
         finaldmurl.searchParams.append(key, value);
       });
 
-      console.log("Final URL:", finaldmurl.toString());
+      console.log("Final URL:", finaldmurl?.toString());
+      if(finaldmurl){
+        const finalImg = document.createElement('img');
+        Object.assign(finalImg, {
+          className: 'dm-template-image',
+          src: finaldmurl.toString(),
+          alt: 'dm-template-image',
+        });
+        
+        block.append(finalImg);
+      }
     }
-
-    const finalImg = document.createElement('img');
-    Object.assign(finalImg, {
-      className: 'dm-template-image',
-      src: finaldmurl.toString(),
-      alt: 'dm-template-image',
-    });
-    
-    block.append(finalImg);
   } if(configSrc === 'cf'){
 
     
