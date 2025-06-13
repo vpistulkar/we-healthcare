@@ -32,18 +32,23 @@ export default function decorate(block) {
         }
       });
 
-      // Step 2: Append as query params to templateURL
-      const finaldmurl = new URL(templateURL);
-      Object.entries(paramObject).forEach(([key, value]) => {
-        finaldmurl.searchParams.append(key, value);
-      });
+      // Manually construct the query string (preserving `$` in keys)
+      const queryString = Object.entries(paramObject)
+        .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+        .join('&');
 
-      console.log("Final URL:", finaldmurl?.toString());
-      if(finaldmurl){
+      // Combine with template URL (already includes ? or not)
+      let finalUrl = templateURL.includes('?') 
+        ? `${templateURL}&${queryString}` 
+        : `${templateURL}?${queryString}`;
+
+      console.log("Final URL:", finalUrl);
+
+      if (finalUrl) {
         const finalImg = document.createElement('img');
         Object.assign(finalImg, {
           className: 'dm-template-image',
-          src: finaldmurl.toString(),
+          src: finalUrl,
           alt: 'dm-template-image',
         });
         block.innerHTML = '';
