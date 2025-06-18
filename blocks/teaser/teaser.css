@@ -1,3 +1,8 @@
+
+.teaser-wrapper {
+    width: 100%;
+}
+
 .teaser-wrapper .teaser-container {
     display: flex;
     flex-direction: row-reverse;
