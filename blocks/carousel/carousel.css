@@ -16,6 +16,7 @@
 }
 .carousel-container .carousel-wrapper .carousel {
   padding: 5%;
+  position: relative;
 }
 .carousel-container .carousel-wrapper .carousel > ul {
   list-style: none;
