@@ -1,0 +1,20 @@
+
+.separator-container {
+    padding: 10px 0;
+}
+
+.separator-container .separator-line {
+    background-color: #000;
+    height: 1px;
+    width: 100%;
+    background-color: #dddddd;
+}
+.separator-container .separator-line.light {
+    background-color: #F5f5f5;
+}
+.separator-container .separator-line.dark {
+    background-color: #000;
+}
+.separator-container .separator-line.hidden {
+    background-color: #F5f5f5;
+}
