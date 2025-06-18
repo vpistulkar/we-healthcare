@@ -15,7 +15,7 @@
   max-width: initial;
 }
 .carousel-container .carousel-wrapper .carousel {
-  padding: 0 5%;
+  padding: 5%;
 }
 .carousel-container .carousel-wrapper .carousel > ul {
   list-style: none;
