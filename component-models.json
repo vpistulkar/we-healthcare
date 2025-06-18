@@ -812,6 +812,29 @@
             "value": "hidden"
           }
         ]
+      },
+      {
+        "component": "select",
+        "name": "spaceing",
+        "label": "Spaceing",
+        "options": [
+          {
+            "name": "default",
+            "value": ""
+          },
+          {
+            "name": "Small",
+            "value": "small"
+          },
+          {
+            "name": "Medium",
+            "value": "medium"
+          },
+          {
+            "name": "Large",
+            "value": "large"
+          }
+        ]
       }
     ]
   },
