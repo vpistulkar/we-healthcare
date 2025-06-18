@@ -23,7 +23,8 @@
       "teaser",
       "text",
       "title",
-      "video"
+      "video",
+      "separator"
     ]
   },
   {
@@ -53,7 +54,8 @@
       "image",
       "text",      
       "title",
-      "video"
+      "video",
+      "separator"
     ]
   }
 ]

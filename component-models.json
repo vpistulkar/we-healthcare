@@ -788,6 +788,34 @@
     ]
   },
   {
+    "id": "separator",
+    "fields": [
+      {
+        "component": "select",
+        "name": "style",
+        "label": "Style",
+        "options": [
+          {
+            "name": "default",
+            "value": ""
+          },
+          {
+            "name": "Light",
+            "value": "light"
+          },
+          {
+            "name": "Dark",
+            "value": "dark"
+          },
+          {
+            "name": "Hidden",
+            "value": "hidden"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "id": "iframe",
     "fields": [
       {
