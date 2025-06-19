@@ -9,14 +9,14 @@ export default function decorate(block) {
   //block.querySelectorAll('.separator > div');
 
   // Create separator line with classes
-  const separatorClasses = ['separator-line'];
-  if (style) separatorClasses.push(style);
-  if (spacing) separatorClasses.push(spacing);
-
+  //const separatorClasses = ['separator-line'];
+  
   // Create wrapper div and add separator line
   const wrapper = document.createElement('div');
   wrapper.className = 'separator-block';
-  wrapper.innerHTML = `<div class="${separatorClasses.join(' ')}"></div>`;
+  if (style) wrapper.classList.add(style);
+  if (spacing) wrapper.classList.add(spacing);
+  wrapper.innerHTML = `<div class="separator-line"></div>`;
 
   // Replace block content with wrapper
   block.textContent = '';
