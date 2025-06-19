@@ -12,7 +12,7 @@ export default function decorate(block) {
 
   // Create wrapper div and add separator line
   const wrapper = document.createElement('div');
-  wrapper.className = 'separator-wrapper';
+  wrapper.className = 'separator-block';
   wrapper.innerHTML = `<div class="${separatorClasses.join(' ')}"></div>`;
 
   // Replace block content with wrapper

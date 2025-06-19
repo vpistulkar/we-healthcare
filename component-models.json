@@ -794,6 +794,7 @@
         "component": "select",
         "name": "style",
         "label": "Style",
+        "valueType": "string",
         "options": [
           {
             "name": "default",
@@ -817,6 +818,7 @@
         "component": "select",
         "name": "spaceing",
         "label": "Spaceing",
+        "valueType": "string",
         "options": [
           {
             "name": "default",
