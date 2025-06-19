@@ -2,8 +2,11 @@
 
 export default function decorate(block) {
   // Get style and spacing values from block data
-  const style = block.querySelector('select[data-style]')?.value || '';
-  const spacing = block.querySelector('select[data-spacing]')?.value || '';
+  //const style = block.querySelector('select[data-style]')?.value || '';
+  //const spacing = block.querySelector('select[data-spacing]')?.value || '';
+  const style = block.querySelectorAll('.separator > div')[0]?.textContent?.trim();
+  const spacing = block.querySelectorAll('.separator > div')[1]?.textContent?.trim();
+  //block.querySelectorAll('.separator > div');
 
   // Create separator line with classes
   const separatorClasses = ['separator-line'];
