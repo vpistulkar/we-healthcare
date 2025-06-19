@@ -816,8 +816,8 @@
       },
       {
         "component": "select",
-        "name": "spaceing",
-        "label": "Spaceing",
+        "name": "spacing",
+        "label": "Spacing",
         "valueType": "string",
         "options": [
           {
