@@ -1,5 +1,4 @@
 
-
 .separator-container .separator-wrapper {
     padding: 10px 0;
     width: 100%;
@@ -14,7 +13,7 @@
     display: block;
     height: 1px;
     width: 100%;
-    background-color: #dddddd;
+    background-color: #c1c1c1;
 }
 
 .separator-wrapper .separator-block.light .separator-line {
