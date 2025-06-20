@@ -13,6 +13,7 @@ export default function decorate(block) {
     return;
   }
   // Get DM Url input
+  let altText = inputs[0].textContent?.trim();
   let dmUrlEl = inputs[3]?.getElementsByTagName("a")[0];
   let rotate = inputs[4]?.textContent?.trim();
   let flip = inputs[5]?.textContent?.trim();
@@ -48,6 +49,7 @@ export default function decorate(block) {
         imageEl.setAttribute("data-src", dmUrl + (dmUrl.endsWith('/') ? "" : "/") + imageName);
         //imageEl.setAttribute("src", dmUrl + (dmUrl.endsWith('/') ? "" : "/") + imageName);
         imageEl.setAttribute("src", dmUrl + (dmUrl.endsWith('/') ? "" : "/") + imageName);
+        imageEl.setAttribute("alt", altText ? altText : 'dynamic media image');
         imageEl.setAttribute("data-mode", "smartcrop");
       
         s7responsiveImage(imageEl);
@@ -58,6 +60,7 @@ export default function decorate(block) {
     
    
   }
+  block.children[0]?.remove();
   block.children[6]?.remove();
   block.children[5]?.remove();
   block.children[4]?.remove();
