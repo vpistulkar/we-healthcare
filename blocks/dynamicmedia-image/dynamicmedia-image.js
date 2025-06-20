@@ -17,7 +17,7 @@ export default function decorate(block) {
   let dmUrlEl = inputs[3]?.getElementsByTagName("a")[0];
   let rotate = inputs[4]?.textContent?.trim();
   let flip = inputs[5]?.textContent?.trim();
-  
+  /*
   if(deliveryType === 'dm' && dmUrlEl){
       // Ensure S7 is loaded
       if (typeof s7responsiveImage !== 'function') {
@@ -66,4 +66,5 @@ export default function decorate(block) {
   block.children[3]?.remove();
   block.children[2]?.remove();  
   block.children[0]?.remove();
+  */
 }
