@@ -57,7 +57,7 @@
         "condition": {
           "===": [{ "var": "delivery_Type" }, "dm"]
         },
-          "component": "text-input",
+          "component": "text",
           "name": "dmUrl",
           "value": "https://smartimaging.scene7.com/is/image/DynamicMediaNA",
           "label": "Dynamic Media URL",
