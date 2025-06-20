@@ -408,34 +408,6 @@
       {
         "component": "boolean",
         "valueType": "boolean",
-        "name": "sec-inside-container",
-        "label": "Show background color inside container.",
-        "condition": {
-          "!=": [
-            {
-              "var": "style"
-            },
-            "bg-image"
-          ]
-        }
-      },
-      {
-        "component": "boolean",
-        "valueType": "boolean",
-        "name": "sec-width",
-        "label": "Reduce section width.",
-        "condition": {
-          "!=": [
-            {
-              "var": "style"
-            },
-            "bg-image"
-          ]
-        }
-      },
-      {
-        "component": "boolean",
-        "valueType": "boolean",
         "name": "sec-full-width",
         "label": "Full section width.",
         "condition": {
