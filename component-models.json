@@ -824,7 +824,7 @@
         "id": "teaser",
         "fields": [
           {
-            "component": "richtext",
+            "component": "text",
             "valueType": "string",
             "value": "Your text will show here.",
             "name": "teaserBlurb",
