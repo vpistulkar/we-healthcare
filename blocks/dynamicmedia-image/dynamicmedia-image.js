@@ -60,16 +60,15 @@ export default function decorate(block) {
         
        
       }
+      /*
+      block.children[6]?.remove();
+      block.children[5]?.remove();
+      block.children[4]?.remove();
+      block.children[3]?.remove();
+      block.children[2]?.remove();  
+      block.children[0]?.remove();
+      */
   }else{
-    //remove everthing from here.
+    block.innerHTML = '';
   }
-  /*
-  block.children[6]?.remove();
-  block.children[5]?.remove();
-  block.children[4]?.remove();
-  block.children[3]?.remove();
-  block.children[2]?.remove();  
-  block.children[0]?.remove();
-  */
-  
 }
