@@ -14,7 +14,7 @@ export default function decorate(block) {
   }
   // Get DM Url input
   let altText = inputs[6].textContent?.trim();
-  let dmUrlEl = inputs[3]?.getElementsByTagName("a")[0];
+  let dmUrlEl = inputs[2]?.getElementsByTagName("a")[0];
   let rotate = inputs[4]?.textContent?.trim();
   let flip = inputs[5]?.textContent?.trim();
   
