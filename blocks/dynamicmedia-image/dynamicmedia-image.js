@@ -12,11 +12,13 @@ export default function decorate(block) {
     console.log("Missing inputs, expecting 2, ensure both the image and DM URL are set in the dialog");
     return;
   }
+  let imageEl = inputs[1]?.getElementsByTagName("img")[0];
   // Get DM Url input
-  let altText = inputs[6].textContent?.trim();
   let dmUrlEl = inputs[2]?.getElementsByTagName("a")[0];
   let rotate = inputs[4]?.textContent?.trim();
   let flip = inputs[5]?.textContent?.trim();
+  let altText = inputs[6].textContent?.trim();
+
   if(deliveryType != "na"){  
       if(deliveryType === 'dm'){
           // Ensure S7 is loaded
@@ -26,7 +28,7 @@ export default function decorate(block) {
           }
         
           // Get image
-          let imageEl = inputs[1]?.getElementsByTagName("img")[0];
+         
           if(!imageEl) {
             console.error("Image element not found, ensure it is defined in the dialog");
             return;
@@ -56,8 +58,8 @@ export default function decorate(block) {
           //dmUrlEl.remove();
       }
       if(deliveryType === 'dm-openapi'){
-        
-       
+          block.innerHTML = '';
+          block.appendChild(imageEl);         
       }
       /*
       block.children[6]?.remove();
