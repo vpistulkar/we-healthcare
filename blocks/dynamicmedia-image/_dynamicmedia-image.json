@@ -29,6 +29,10 @@
           "valueType": "string",
           "options": [
             {
+              "name": "--Select Delivery Type--",
+              "value": "na"
+            },
+            {
               "name": "Dynamic Media",
               "value": "dm"
             },
