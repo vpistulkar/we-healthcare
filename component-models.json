@@ -786,7 +786,7 @@
           "component": "text",
           "name": "dm_template_url",
           "label": "Template Path",
-          "description": "Provide full URL for the Dynamic Media Template. Template should have 3 image, width, title and description",
+          "description": "Provide full URL for the Dynamic Media Template. Templates should have variables which can be configured in Variable Mappings field.",
           "valueType": "string"
         },
         {
