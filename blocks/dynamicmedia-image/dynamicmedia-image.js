@@ -4,7 +4,7 @@
 export default function decorate(block) {
   console.log(block);
 
-  let deliveryType = Array.from(block.children)[2]?.textContent?.trim();
+  let deliveryType = Array.from(block.children)[0]?.textContent?.trim();
   let inputs = block.querySelectorAll('.dynamicmedia-image > div');
       
   let inputsArray = Array.from(inputs);
@@ -13,7 +13,7 @@ export default function decorate(block) {
     return;
   }
   // Get DM Url input
-  let altText = inputs[0].textContent?.trim();
+  let altText = inputs[5].textContent?.trim();
   let dmUrlEl = inputs[3]?.getElementsByTagName("a")[0];
   let rotate = inputs[4]?.textContent?.trim();
   let flip = inputs[5]?.textContent?.trim();
