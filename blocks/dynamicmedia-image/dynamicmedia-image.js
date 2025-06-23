@@ -58,17 +58,15 @@ export default function decorate(block) {
           //dmUrlEl.remove();
       }
       if(deliveryType === 'dm-openapi'){
-          block.innerHTML = '';
-          block.appendChild(imageEl);         
+         
+          block.children[6]?.remove();
+          block.children[5]?.remove();
+          block.children[4]?.remove();
+          block.children[3]?.remove();
+          block.children[2]?.remove();  
+          block.children[0]?.remove();       
       }
-      /*
-      block.children[6]?.remove();
-      block.children[5]?.remove();
-      block.children[4]?.remove();
-      block.children[3]?.remove();
-      block.children[2]?.remove();  
-      block.children[0]?.remove();
-      */
+      
   }else{
     block.innerHTML = '';
   }
