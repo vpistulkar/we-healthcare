@@ -51,7 +51,7 @@ export default function decorate(block) {
           imageEl.setAttribute("src", dmUrl + (dmUrl.endsWith('/') ? "" : "/") + imageName);
           imageEl.setAttribute("alt", altText ? altText : 'dynamic media image');
           imageEl.setAttribute("data-mode", "smartcrop");
-          //block.innerHTML = '';
+          block.innerHTML = '';
           block.appendChild(imageEl);
           s7responsiveImage(imageEl);
         
