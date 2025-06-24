@@ -511,7 +511,7 @@
         {
           "component": "select",
           "name": "delivery_Type",
-          "value": "dm",
+          "value": "na",
           "label": "Delivery Type",
           "description": "'Dynamic Media' will be rendered by providing dynamic media server URL. 'Dynamic Media with OpenAPI' will use openAPI delivery with additional options to manipulate the image rendering on the fly.",
           "valueType": "string",
