@@ -140,7 +140,7 @@ export default function decorate(block) {
     ),
   );
 
-  teaser.querySelector('.teaser-title').innerHTML = properties.teaserblurb ? rteContent : 'Authorable Title';
+  teaser.querySelector('.teaser-title').innerHTML = properties.teaserblurb ? rteContent : 'Title';
   block.innerHTML = '';
   block.appendChild(teaser);
 
