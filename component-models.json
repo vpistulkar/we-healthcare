@@ -796,10 +796,9 @@
           "component": "text",
           "valueType": "string",
           "name": "var_mapping",
-          "multi": true,
           "value": "",
           "label": "Variable Mappings",
-          "description": "Provide variable values in 'variablename=value' format where variablename is the variable name and value is the variable value. These values should be exposed in the DM template inorder to get replaced e.g. $leftImage=DynamicMediaNA/adobestock-167833331"
+          "description": "Provide variable values. These values should be exposed in the DM template inorder to get replaced e.g. $leftImage=DynamicMediaNA/adobestock-167833331"
         },
         {
           "condition": {
