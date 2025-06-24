@@ -797,6 +797,7 @@
           "valueType": "string",
           "name": "var_mapping",
           "value": "",
+          "multi": true,
           "label": "Variable Mappings",
           "description": "Provide variable values. These values should be exposed in the DM template inorder to get replaced e.g. $leftImage=DynamicMediaNA/adobestock-167833331"
         },
