@@ -96,7 +96,7 @@ export default async function decorate(block) {
         body: JSON.stringify({
           graphQLPath: `${aempublishurl}${CONFIG.GRAPHQL_QUERY}`,
           cfPath: contentPath,
-          variation: variationname
+          variation: 'master'
         })
       };
   
