@@ -2,8 +2,8 @@
 
 
 ## Environments
-- Preview: https://main--{repo}--{owner}.aem.page/
-- Live: https://main--{repo}--{owner}.aem.live/
+- Preview: https://main--wknd--aemxsc.aem.page/
+- Live: https://main--wknd--aemxsc.aem.live/
 
 ## Documentation
 
