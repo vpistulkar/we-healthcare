@@ -1,4 +1,4 @@
-# WKND Universal Demo
+# WKND Universal Demo - For DEVELOPMENT Purpose
 
 
 ## Environments
