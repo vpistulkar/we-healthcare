@@ -65,6 +65,13 @@ export default async function decorate(block) {
         src: finalUrl,
         alt: 'dm-template-image',
       });
+       // Add error handling for image load failure
+       finalImg.onerror = function() {
+        console.warn('Failed to load image:', finalUrl);
+        // Set fallback image
+        this.src = 'https://smartimaging.scene7.com/is/image/DynamicMediaNA/WKND%20Template?wid=2000&hei=2000&qlt=100&fit=constrain'; // Replace with your fallback image path
+        this.alt = 'Fallback image - template image not correctly authored';
+      };
       block.innerHTML = '';
       block.append(finalImg);
     }
@@ -164,6 +171,14 @@ export default async function decorate(block) {
             src: finalUrl,
             alt: 'dm-template-image',
           });
+          
+          // Add error handling for image load failure
+          finalImg.onerror = function() {
+            console.warn('Failed to load image:', finalUrl);
+            // Set fallback image
+            this.src = 'https://smartimaging.scene7.com/is/image/DynamicMediaNA/WKND%20Template?wid=2000&hei=2000&qlt=100&fit=constrain'; // Replace with your fallback image path
+            this.alt = 'Fallback image - template image not correctly authored';
+          };
           
           block.innerHTML = '';
           block.append(finalImg);
