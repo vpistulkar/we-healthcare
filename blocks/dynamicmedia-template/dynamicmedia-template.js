@@ -27,24 +27,35 @@ export default async function decorate(block) {
     }
 
     // Step 1: Convert to key-value object
-    const paramPairs = variablemapping.match(/[^,]+=[^$]+(?:,?[^,$=][^,]*)*/g);
-
+    // First split by & to get the main parameter pairs
+    const paramPairs = variablemapping.split('&');
+    
     const paramObject = {};
 
-		if (paramPairs) {
-		  paramPairs.forEach(pair => {
-		    const indexOfEqual = pair.indexOf('=');
-		    const key = pair.slice(0, indexOfEqual).trim();
-		    let value = pair.slice(indexOfEqual + 1).trim();
-		
-		    // 🧹 Remove trailing comma (if any)
-		    if (value.endsWith(',')) {
-		      value = value.slice(0, -1);
-		    }
-		
-		    paramObject[key] = value;
-		  });
-		}
+    if (paramPairs) {
+      paramPairs.forEach(pair => {
+        // Handle cases where there might be ; separators within a pair
+        const subPairs = pair.split(';');
+        
+        subPairs.forEach(subPair => {
+          const indexOfEqual = subPair.indexOf('=');
+          if (indexOfEqual !== -1) {
+            const key = subPair.slice(0, indexOfEqual).trim();
+            let value = subPair.slice(indexOfEqual + 1).trim();
+            
+            // Remove trailing comma (if any)
+            if (value.endsWith(',')) {
+              value = value.slice(0, -1);
+            }
+            
+            // Only add if key is not empty
+            if (key) {
+              paramObject[key] = value;
+            }
+          }
+        });
+      });
+    }
 		
     // Manually construct the query string (preserving `$` in keys)
     const queryString = Object.entries(paramObject)
@@ -153,8 +164,8 @@ export default async function decorate(block) {
 
         // Construct the query string (preserving `$` in keys)
         const queryString = Object.entries(paramObject)
-		    .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
-		    .join('&');
+          .map(([key, value]) => `${key}=${value}`)
+          .join('&');
 
         // Combine with template URL
         let finalUrl = templateURL.includes('?') 
