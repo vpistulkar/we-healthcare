@@ -27,29 +27,26 @@ export default async function decorate(block) {
     }
 
     // Step 1: Convert to key-value object
-    const paramPairs = variablemapping.match(/[^,]+=[^$]+(?:,?[^,$=][^,]*)*/g);
+		const paramPairs = variablemapping.match(/[^,]+=[^$]+(?:,?[^,$=][^,]*)*/g);
 
-    const paramObject = {};
+		const paramObject = {};
 
-		if (paramPairs) {
-		  paramPairs.forEach(pair => {
-		    const indexOfEqual = pair.indexOf('=');
-		    const key = pair.slice(0, indexOfEqual).trim();
-		    let value = pair.slice(indexOfEqual + 1).trim();
+		paramPairs.forEach(pair => {
+			const indexOfEqual = pair.indexOf('=');
+			const key = pair.slice(0, indexOfEqual).trim();
+			let value = pair.slice(indexOfEqual + 1).trim();
 		
-		    // 🧹 Remove trailing comma (if any)
-		    if (value.endsWith(',')) {
-		      value = value.slice(0, -1);
-		    }
+			// 🧹 Remove trailing comma (if any)
+			if (value.endsWith(',')) {
+				value = value.slice(0, -1);
+			}
 		
-		    paramObject[key] = value;
-		  });
-		}
-		
-    // Manually construct the query string (preserving `$` in keys)
-    const queryString = Object.entries(paramObject)
-    .map(([key, value]) => `${key}=${value}`)
-    .join('&');
+			paramObject[key] = value;
+		});
+		// Manually construct the query string (preserving `$` in keys)
+		const queryString = Object.entries(paramObject)
+		.map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+		.join('&');
   
     // Combine with template URL (already includes ? or not)
     let finalUrl = templateURL.includes('?') 
@@ -138,7 +135,7 @@ export default async function decorate(block) {
         // Create parameter object
         const paramObject = {};
 
-        // Process each parameter pair
+         // Process each parameter pair
         paramPairs.forEach(pair => {
           const indexOfEqual = pair.indexOf('=');
           const key = pair.slice(0, indexOfEqual).trim();
