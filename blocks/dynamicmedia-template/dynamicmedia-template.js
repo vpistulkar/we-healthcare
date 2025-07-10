@@ -31,18 +31,21 @@ export default async function decorate(block) {
 
     const paramObject = {};
 
-    paramPairs.forEach(pair => {
-      const indexOfEqual = pair.indexOf('=');
-      const key = pair.slice(0, indexOfEqual).trim();
-      let value = pair.slice(indexOfEqual + 1).trim();
-    
-      // 🧹 Remove trailing comma (if any)
-      if (value.endsWith(',')) {
-        value = value.slice(0, -1);
-      }
-    
-      paramObject[key] = value;
-    });
+		if (paramPairs) {
+		  paramPairs.forEach(pair => {
+		    const indexOfEqual = pair.indexOf('=');
+		    const key = pair.slice(0, indexOfEqual).trim();
+		    let value = pair.slice(indexOfEqual + 1).trim();
+		
+		    // 🧹 Remove trailing comma (if any)
+		    if (value.endsWith(',')) {
+		      value = value.slice(0, -1);
+		    }
+		
+		    paramObject[key] = value;
+		  });
+		}
+		
     // Manually construct the query string (preserving `$` in keys)
     const queryString = Object.entries(paramObject)
     .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
