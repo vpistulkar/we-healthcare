@@ -18,51 +18,54 @@ export default async function decorate(block) {
     let variablemapping = inputs[2]?.textContent?.trim();
 
     if(!templateURL) {
-      console.log("Missing mandatory template URL");
+      console.error('Missing mandatory template URL', {
+        error: error.message,
+        stack: error.stack
+      });
+      block.innerHTML = '';
       return;
     }
 
-    if (variablemapping) {
-      // Step 1: Convert to key-value object
-      const paramPairs = variablemapping.match(/[^,]+=[^$]+(?:,?[^,$=][^,]*)*/g);
+    // Step 1: Convert to key-value object
+    const paramPairs = variablemapping.match(/[^,]+=[^$]+(?:,?[^,$=][^,]*)*/g);
 
-      const paramObject = {};
+    const paramObject = {};
 
-      paramPairs.forEach(pair => {
-        const indexOfEqual = pair.indexOf('=');
-        const key = pair.slice(0, indexOfEqual).trim();
-        let value = pair.slice(indexOfEqual + 1).trim();
-      
-        // 🧹 Remove trailing comma (if any)
-        if (value.endsWith(',')) {
-          value = value.slice(0, -1);
-        }
-      
-        paramObject[key] = value;
-      });
-      // Manually construct the query string (preserving `$` in keys)
-      const queryString = Object.entries(paramObject)
-      .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
-      .join('&');
+    paramPairs.forEach(pair => {
+      const indexOfEqual = pair.indexOf('=');
+      const key = pair.slice(0, indexOfEqual).trim();
+      let value = pair.slice(indexOfEqual + 1).trim();
     
-      // Combine with template URL (already includes ? or not)
-      let finalUrl = templateURL.includes('?') 
-        ? `${templateURL}&${queryString}` 
-        : `${templateURL}?${queryString}`;
-
-      console.log("Final URL:", finalUrl);
-
-      if (finalUrl) {
-        const finalImg = document.createElement('img');
-        Object.assign(finalImg, {
-          className: 'dm-template-image',
-          src: finalUrl,
-          alt: 'dm-template-image',
-        });
-        block.innerHTML = '';
-        block.append(finalImg);
+      // 🧹 Remove trailing comma (if any)
+      if (value.endsWith(',')) {
+        value = value.slice(0, -1);
       }
+    
+      paramObject[key] = value;
+    });
+    // Manually construct the query string (preserving `$` in keys)
+    const queryString = Object.entries(paramObject)
+    .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+    .join('&');
+  
+    // Combine with template URL (already includes ? or not)
+    let finalUrl = templateURL.includes('?') 
+      ? `${templateURL}&${queryString}` 
+      : `${templateURL}?${queryString}`;
+
+    console.log("Final URL:", finalUrl);
+
+    if (finalUrl) {
+      const finalImg = document.createElement('img');
+      Object.assign(finalImg, {
+        className: 'dm-template-image',
+        src: finalUrl,
+        alt: 'dm-template-image',
+      });
+      block.innerHTML = '';
+      block.append(finalImg);
     }
+    
   } if(configSrc === 'cf'){
 
     //https://author-p153659-e1620914.adobeaemcloud.com/graphql/execute.json/wknd-universal/DynamicMediaTemplateByPath;path=
@@ -109,7 +112,12 @@ export default async function decorate(block) {
         });
   
         if (!response.ok) {
-          console.error(`error making cf graphql request: ${response.status}`);
+          console.error(`error making cf graphql request:${response.status}`, {
+	          error: error.message,
+	          stack: error.stack
+        	});
+          block.innerHTML = '';
+          return;
         }
   
         const offer = await response.json();
@@ -158,7 +166,11 @@ export default async function decorate(block) {
           block.append(finalImg);
         }
       } catch (error) {
-        console.error('error rendering content fragment:', error);
+        console.error('error rendering content fragment', {
+          error: error.message,
+          stack: error.stack
+        });
+        block.innerHTML = '';
       }
   }
    
