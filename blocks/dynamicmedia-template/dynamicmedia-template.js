@@ -48,7 +48,16 @@ export default async function decorate(block) {
 		
     // Manually construct the query string (preserving `$` in keys)
     const queryString = Object.entries(paramObject)
-    .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+    .map(([key, value]) => {
+      // Custom encoding for Dynamic Media - preserve /, \, : while encoding other special chars
+      const encodedValue = value
+        .replace(/%/g, '%25')  // Encode % first
+        .replace(/&/g, '%26')  // Encode &
+        .replace(/=/g, '%3D')  // Encode =
+        .replace(/\+/g, '%2B') // Encode +
+        .replace(/ /g, '%20'); // Encode spaces
+      return `${key}=${encodedValue}`;
+    })
     .join('&');
   
     // Combine with template URL (already includes ? or not)
@@ -153,7 +162,16 @@ export default async function decorate(block) {
 
         // Construct the query string (preserving `$` in keys)
         const queryString = Object.entries(paramObject)
-          .map(([key, value]) => `${key}=${value}`)
+          .map(([key, value]) => {
+            // Custom encoding for Dynamic Media - preserve /, \, : while encoding other special chars
+            const encodedValue = value
+              .replace(/%/g, '%25')  // Encode % first
+              .replace(/&/g, '%26')  // Encode &
+              .replace(/=/g, '%3D')  // Encode =
+              .replace(/\+/g, '%2B') // Encode +
+              .replace(/ /g, '%20'); // Encode spaces
+            return `${key}=${encodedValue}`;
+          })
           .join('&');
 
         // Combine with template URL
