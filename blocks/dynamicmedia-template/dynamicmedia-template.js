@@ -27,10 +27,12 @@ export default async function decorate(block) {
     }
 
     // Step 1: Convert to key-value object
-		const paramPairs = variablemapping.match(/[^,]+=[^$]+(?:,?[^,$=][^,]*)*/g);
-
+		//const paramPairs = variablemapping.match(/[^,]+=[^$]+(?:,?[^,$=][^,]*)*/g);
+		
+		// Split by comma first, then handle each parameter pair
+    const paramPairs = variablemapping.split(',');
 		const paramObject = {};
-
+		/*
 		paramPairs.forEach(pair => {
 			const indexOfEqual = pair.indexOf('=');
 			const key = pair.slice(0, indexOfEqual).trim();
@@ -43,6 +45,28 @@ export default async function decorate(block) {
 		
 			paramObject[key] = value;
 		});
+		*/
+
+		if (paramPairs) {
+      paramPairs.forEach(pair => {
+        const indexOfEqual = pair.indexOf('=');
+        if (indexOfEqual !== -1) {
+          const key = pair.slice(0, indexOfEqual).trim();
+          let value = pair.slice(indexOfEqual + 1).trim();
+          
+          // Remove trailing comma (if any)
+          if (value.endsWith(',')) {
+            value = value.slice(0, -1);
+          }
+          
+          // Only add if key is not empty
+          if (key) {
+            paramObject[key] = value;
+          }
+        }
+      });
+    }
+		
 		// Manually construct the query string (preserving `$` in keys)
 		const queryString = Object.entries(paramObject)
 		.map(([key, value]) => `${key}=${value}`)
