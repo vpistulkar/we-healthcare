@@ -9,7 +9,7 @@
   - Cards (multiple layout style options in UI)
   - Video
   - Content Fragment
-- **Native Mobile Apps (iOS & Android) ** for a true Headless Experience
+- **Native Mobile Apps (iOS & Android)** for a true Headless Experience
   - Create and customize as per your own brand (no code required)
   - Dynamic Media Template
   - Content Fragments
