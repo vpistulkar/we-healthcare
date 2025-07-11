@@ -18,51 +18,85 @@ export default async function decorate(block) {
     let variablemapping = inputs[2]?.textContent?.trim();
 
     if(!templateURL) {
-      console.log("Missing mandatory template URL");
+      console.error('Missing mandatory template URL', {
+        error: error.message,
+        stack: error.stack
+      });
+      block.innerHTML = '';
       return;
     }
 
-    if (variablemapping) {
-      // Step 1: Convert to key-value object
-      const paramPairs = variablemapping.match(/[^,]+=[^$]+(?:,?[^,$=][^,]*)*/g);
+    // Step 1: Convert to key-value object
+		//const paramPairs = variablemapping.match(/[^,]+=[^$]+(?:,?[^,$=][^,]*)*/g);
+		
+		// Split by comma first, then handle each parameter pair
+    const paramPairs = variablemapping.split(',');
+		const paramObject = {};
+		/*
+		paramPairs.forEach(pair => {
+			const indexOfEqual = pair.indexOf('=');
+			const key = pair.slice(0, indexOfEqual).trim();
+			let value = pair.slice(indexOfEqual + 1).trim();
+		
+			// 🧹 Remove trailing comma (if any)
+			if (value.endsWith(',')) {
+				value = value.slice(0, -1);
+			}
+		
+			paramObject[key] = value;
+		});
+		*/
 
-      const paramObject = {};
-
+		if (paramPairs) {
       paramPairs.forEach(pair => {
         const indexOfEqual = pair.indexOf('=');
-        const key = pair.slice(0, indexOfEqual).trim();
-        let value = pair.slice(indexOfEqual + 1).trim();
-      
-        // 🧹 Remove trailing comma (if any)
-        if (value.endsWith(',')) {
-          value = value.slice(0, -1);
+        if (indexOfEqual !== -1) {
+          const key = pair.slice(0, indexOfEqual).trim();
+          let value = pair.slice(indexOfEqual + 1).trim();
+          
+          // Remove trailing comma (if any)
+          if (value.endsWith(',')) {
+            value = value.slice(0, -1);
+          }
+          
+          // Only add if key is not empty
+          if (key) {
+            paramObject[key] = value;
+          }
         }
-      
-        paramObject[key] = value;
       });
-      // Manually construct the query string (preserving `$` in keys)
-      const queryString = Object.entries(paramObject)
-      .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
-      .join('&');
-    
-      // Combine with template URL (already includes ? or not)
-      let finalUrl = templateURL.includes('?') 
-        ? `${templateURL}&${queryString}` 
-        : `${templateURL}?${queryString}`;
-
-      console.log("Final URL:", finalUrl);
-
-      if (finalUrl) {
-        const finalImg = document.createElement('img');
-        Object.assign(finalImg, {
-          className: 'dm-template-image',
-          src: finalUrl,
-          alt: 'dm-template-image',
-        });
-        block.innerHTML = '';
-        block.append(finalImg);
-      }
     }
+		
+		// Manually construct the query string (preserving `$` in keys)
+		const queryString = Object.entries(paramObject)
+		.map(([key, value]) => `${key}=${value}`)
+		.join('&');
+  
+    // Combine with template URL (already includes ? or not)
+    let finalUrl = templateURL.includes('?') 
+      ? `${templateURL}&${queryString}` 
+      : `${templateURL}?${queryString}`;
+
+    console.log("Final URL:", finalUrl);
+
+    if (finalUrl) {
+      const finalImg = document.createElement('img');
+      Object.assign(finalImg, {
+        className: 'dm-template-image',
+        src: finalUrl,
+        alt: 'dm-template-image',
+      });
+       // Add error handling for image load failure
+       finalImg.onerror = function() {
+        console.warn('Failed to load image:', finalUrl);
+        // Set fallback image
+        this.src = 'https://smartimaging.scene7.com/is/image/DynamicMediaNA/WKND%20Template?wid=2000&hei=2000&qlt=100&fit=constrain'; // Replace with your fallback image path
+        this.alt = 'Fallback image - template image not correctly authored';
+      };
+      block.innerHTML = '';
+      block.append(finalImg);
+    }
+    
   } if(configSrc === 'cf'){
 
     //https://author-p153659-e1620914.adobeaemcloud.com/graphql/execute.json/wknd-universal/DynamicMediaTemplateByPath;path=
@@ -109,7 +143,12 @@ export default async function decorate(block) {
         });
   
         if (!response.ok) {
-          console.error(`error making cf graphql request: ${response.status}`);
+          console.error(`error making cf graphql request:${response.status}`, {
+	          error: error.message,
+	          stack: error.stack
+        	});
+          block.innerHTML = '';
+          return;
         }
   
         const offer = await response.json();
@@ -120,7 +159,7 @@ export default async function decorate(block) {
         // Create parameter object
         const paramObject = {};
 
-        // Process each parameter pair
+         // Process each parameter pair
         paramPairs.forEach(pair => {
           const indexOfEqual = pair.indexOf('=');
           const key = pair.slice(0, indexOfEqual).trim();
@@ -154,11 +193,23 @@ export default async function decorate(block) {
             alt: 'dm-template-image',
           });
           
+          // Add error handling for image load failure
+          finalImg.onerror = function() {
+            console.warn('Failed to load image:', finalUrl);
+            // Set fallback image
+            this.src = 'https://smartimaging.scene7.com/is/image/DynamicMediaNA/WKND%20Template?wid=2000&hei=2000&qlt=100&fit=constrain'; // Replace with your fallback image path
+            this.alt = 'Fallback image - template image not correctly authored';
+          };
+          
           block.innerHTML = '';
           block.append(finalImg);
         }
       } catch (error) {
-        console.error('error rendering content fragment:', error);
+        console.error('error rendering content fragment', {
+          error: error.message,
+          stack: error.stack
+        });
+        block.innerHTML = '';
       }
   }
    
