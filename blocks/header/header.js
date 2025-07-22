@@ -81,7 +81,6 @@ function toggleAllNavSections(sections, expanded = false) {
     }
 }
 
-
 async function overlayLoad(navSections) {
   const langCode = getLanguage();
   const placeholdersData = await fetchLanguagePlaceholders();
