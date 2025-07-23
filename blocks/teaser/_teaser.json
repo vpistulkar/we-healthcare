@@ -40,14 +40,6 @@
           ]
         },
         {
-          "component": "boolean",
-          "label": "Enable Swoosh Effect",
-          "description": "Enable Circular effect on the component",
-          "name": "useSwoosh",
-          "value": "true",
-          "valueType": "boolean"
-        },
-        {
           "component": "select",
           "name": "teaserStyle",
           "value": "image",
@@ -131,6 +123,14 @@
               "description": "Path to linked AEM content"
             }
           ]
+        },        
+        {
+          "component": "boolean",
+          "label": "Enable Swoosh Effect",
+          "description": "Enable Circular effect on the component",
+          "name": "useSwoosh",
+          "value": "true",
+          "valueType": "boolean"
         }
       ]
     }
