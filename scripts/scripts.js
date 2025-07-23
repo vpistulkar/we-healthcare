@@ -192,7 +192,7 @@ export function decorateMain(main) {
 
 async function renderWBDataLayer() {
   
-  const config = await fetchPlaceholders(PATH_PREFIX);
+  const config = await fetchPlaceholders();
   const lastPubDateStr = getMetadata('published-time');
   const firstPubDateStr = getMetadata('content_date') || lastPubDateStr;
   window.wbgData.page = {
