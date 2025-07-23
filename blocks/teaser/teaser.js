@@ -117,7 +117,7 @@ export default function decorate(block) {
   var swooshbgClass = 'swoosh-bg';
   var swooshlayersClass = 'swoosh-layers';
 
-  if(properties.useSwoosh && properties.useSwoosh == false){
+  if(properties.useswoosh && properties.useswoosh == false){
     swooshbgClass = 'swoosh-bg-hidden';
     swooshlayersClass = 'swoosh-layers-hidden';
   }
