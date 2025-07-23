@@ -476,9 +476,6 @@ export default async function decorate(block) {
   //console.log("navPath header: ", navPath);
   const fragment = await loadFragment(navPath);
 
-  const placeholdersData = await fetchPlaceholders();
-
-
   // decorate nav DOM
   block.textContent = '';
   const nav = document.createElement('nav');
