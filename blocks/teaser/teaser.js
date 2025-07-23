@@ -113,6 +113,15 @@ export default function decorate(block) {
   const sampleVideo = 'https://publish-p16362-e1620892.adobeaemcloud.com/content/dam/wknd-universal/wknd-banner.mp4';
 
   const properties = readBlockConfig(block);
+
+  var swooshbgClass = 'swoosh-bg';
+  var swooshlayersClass = 'swoosh-layers';
+
+  if(properties.useSwoosh && properties.useSwoosh == false){
+    swooshbgClass = 'swoosh-bg-hidden';
+    swooshlayersClass = 'swoosh-layers-hidden';
+  }
+
   const swooshFirst = `${window.hlx.codeBasePath}/icons/teaser_innerswoosh.svg`;
   const swooshSecond = `${window.hlx.codeBasePath}/icons/teaser_outerswoosh.svg`;
   const isVideo = (properties.teaserstyle && properties.teaserstyle === 'video');
@@ -124,8 +133,8 @@ export default function decorate(block) {
   const teaser = div({ class: 'teaser-container' },
     isVideo ? createVideoPlayer(videoReference) : createBackgroundImage(properties),
     div({ class: 'teaser-swoosh-wrapper' },
-      div({ class: 'swoosh-bg' }),
-      div({ class: 'swoosh-layers' },
+      div({ class: swooshbgClass }),
+      div({ class: swooshlayersClass },
         img({ class: 'swoosh first', src: swooshFirst, alt: 'background swoosh first' }),
         img({ class: 'swoosh second', src: swooshSecond, alt: 'background swoosh second' }),
       ),
