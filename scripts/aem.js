@@ -266,7 +266,8 @@ async function loadScript(src, attrs) {
         }
       }
       script.onload = resolve;
-      script.onerror = reject;
+      // script.onerror = reject;
+      script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
       document.head.append(script);
     } else {
       resolve();
