@@ -101,7 +101,7 @@ export default async function decorate(block) {
           <div class='banner-detail' style="background-image: linear-gradient(90deg,rgba(0,0,0,0.6), rgba(0,0,0,0.1) 80%) ,url(${
             imgUrl
           });" data-aue-prop="bannerimage" data-aue-label="Main Image" data-aue-type="media" >
-                <p data-aue-prop="cftitle" data-aue-label="Title" data-aue-type="text" class='cftitle'>${
+                <p data-aue-prop="title" data-aue-label="Title" data-aue-type="text" class='cftitle'>${
                   cfReq?.title
                 }</p>
                 <p data-aue-prop="cfsubtitle" data-aue-label="SubTitle" data-aue-type="text" class='cfsubtitle'>${
