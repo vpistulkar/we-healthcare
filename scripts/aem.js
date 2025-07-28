@@ -256,6 +256,11 @@ async function loadCSS(href) {
  */
 async function loadScript(src, attrs) {
   return new Promise((resolve, reject) => {
+    if (!src || src.trim() === '') {
+      resolve();
+      return;
+    }
+
     if (!document.querySelector(`head > script[src="${src}"]`)) {
       const script = document.createElement('script');
       script.src = src;
