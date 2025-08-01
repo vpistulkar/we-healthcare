@@ -24,6 +24,8 @@ export default async function decorate(block) {
   const persistedquery = '/graphql/execute.json/wknd-universal/CTAByPath';
   const contentPath = block.querySelector(':scope div:nth-child(1) > div a')?.textContent?.trim();
   const variationname = block.querySelector(':scope div:nth-child(2) > div')?.textContent?.trim()?.toLowerCase()?.replace(' ', '_') || 'master';
+	const displayStyle = block.querySelector(':scope div:nth-child(3) > div')?.textContent?.trim() || '';
+
   block.innerHTML = '';
   const isAuthor = isAuthorEnvironment();
 
@@ -97,7 +99,7 @@ export default async function decorate(block) {
         const imgUrl = isAuthor ? cfReq.bannerimage?._authorUrl : cfReq.bannerimage?._publishUrl;
 
         block.innerHTML = `
-        <div class='banner-content block' data-aue-resource=${itemId} data-aue-label="Offer Content fragment" data-aue-type="reference" data-aue-filter="contentfragment">
+        <div class='banner-content block ${displayStyle}' data-aue-resource=${itemId} data-aue-label="Offer Content fragment" data-aue-type="reference" data-aue-filter="contentfragment">
           <div class='banner-detail' style="background-image: linear-gradient(90deg,rgba(0,0,0,0.6), rgba(0,0,0,0.1) 80%) ,url(${
             imgUrl
           });" data-aue-prop="bannerimage" data-aue-label="Main Image" data-aue-type="media" >
