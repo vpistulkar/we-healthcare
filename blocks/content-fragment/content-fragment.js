@@ -101,6 +101,8 @@ export default async function decorate(block) {
         // Determine the layout style
         const isImageLeft = displayStyle === 'image-left';
         const isImageRight = displayStyle === 'image-right';
+        const isImageTop = displayStyle === 'image-top';
+        const isImageBottom = displayStyle === 'image-bottom';
         
         // Set background image and styles based on layout
         let bannerContentStyle = '';
@@ -111,6 +113,12 @@ export default async function decorate(block) {
           bannerContentStyle = `background-image: url(${imgUrl});`;
         } else if (isImageRight) {
           // Image-right layout: image on right, text on left
+          bannerContentStyle = `background-image: url(${imgUrl});`;
+        } else if (isImageTop) {
+          // Image-top layout: image on top, text on bottom
+          bannerContentStyle = `background-image: url(${imgUrl});`;
+        } else if (isImageBottom) {
+          // Image-bottom layout: text on top, image on bottom
           bannerContentStyle = `background-image: url(${imgUrl});`;
         } else {
           // Default layout: image as background with gradient overlay (original behavior)
