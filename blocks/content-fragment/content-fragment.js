@@ -24,6 +24,8 @@ export default async function decorate(block) {
   const persistedquery = '/graphql/execute.json/wknd-universal/CTAByPath';
   const contentPath = block.querySelector(':scope div:nth-child(1) > div a')?.textContent?.trim();
   const variationname = block.querySelector(':scope div:nth-child(2) > div')?.textContent?.trim()?.toLowerCase()?.replace(' ', '_') || 'master';
+	const displayStyle = block.querySelector(':scope div:nth-child(3) > div')?.textContent?.trim() || '';
+
   block.innerHTML = '';
   const isAuthor = isAuthorEnvironment();
 
@@ -96,11 +98,36 @@ export default async function decorate(block) {
         block.setAttribute('data-aue-type', 'container');
         const imgUrl = isAuthor ? cfReq.bannerimage?._authorUrl : cfReq.bannerimage?._publishUrl;
 
+        // Determine the layout style
+        const isImageLeft = displayStyle === 'image-left';
+        const isImageRight = displayStyle === 'image-right';
+        const isImageTop = displayStyle === 'image-top';
+        const isImageBottom = displayStyle === 'image-bottom';
+        
+        // Set background image and styles based on layout
+        let bannerContentStyle = '';
+        let bannerDetailStyle = '';
+        
+        if (isImageLeft) {
+          // Image-left layout: image on left, text on right
+          bannerContentStyle = `background-image: url(${imgUrl});`;
+        } else if (isImageRight) {
+          // Image-right layout: image on right, text on left
+          bannerContentStyle = `background-image: url(${imgUrl});`;
+        } else if (isImageTop) {
+          // Image-top layout: image on top, text on bottom
+          bannerContentStyle = `background-image: url(${imgUrl});`;
+        } else if (isImageBottom) {
+          // Image-bottom layout: text on top, image on bottom
+          bannerContentStyle = `background-image: url(${imgUrl});`;
+        } else {
+          // Default layout: image as background with gradient overlay (original behavior)
+          bannerDetailStyle = `background-image: linear-gradient(90deg,rgba(0,0,0,0.6), rgba(0,0,0,0.1) 80%) ,url(${imgUrl});`;
+        }
+
         block.innerHTML = `
-        <div class='banner-content block' data-aue-resource=${itemId} data-aue-label="Offer Content fragment" data-aue-type="reference" data-aue-filter="contentfragment">
-          <div class='banner-detail' style="background-image: linear-gradient(90deg,rgba(0,0,0,0.6), rgba(0,0,0,0.1) 80%) ,url(${
-            imgUrl
-          });" data-aue-prop="bannerimage" data-aue-label="Main Image" data-aue-type="media" >
+        <div class='banner-content block ${displayStyle}' data-aue-resource=${itemId} data-aue-label="Offer Content fragment" data-aue-type="reference" data-aue-filter="contentfragment" style="${bannerContentStyle}">
+          <div class='banner-detail' style="${bannerDetailStyle}" data-aue-prop="bannerimage" data-aue-label="Main Image" data-aue-type="media" >
                 <p data-aue-prop="title" data-aue-label="Title" data-aue-type="text" class='cftitle'>${
                   cfReq?.title
                 }</p>
