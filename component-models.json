@@ -483,7 +483,7 @@
       },
       {
         "component": "select",
-        "name": "style",
+        "name": "displaystyle",
         "label": "Style",
         "options": [
           {
