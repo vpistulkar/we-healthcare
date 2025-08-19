@@ -467,21 +467,6 @@
         }
       },
       {
-        "component": "select",
-        "name": "style",
-        "label": "Choose Variation",
-        "options": [
-          {
-            "name": "Master",
-            "value": "master"
-          },
-            {
-            "name": "Mobile",
-            "value": "mobile"
-          }
-        ]
-      },
-      {
          "component": "text",
           "name": "variation",
           "value": "",
