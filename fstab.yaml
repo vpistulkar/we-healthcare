@@ -1,6 +1,5 @@
 mountpoints:
   /:
     url: "https://author-p159983-e1710854.adobeaemcloud.com/bin/franklin.delivery/pansingh/WKND-Dev/main"
-
     type: "markup"
     suffix: ".html"
