@@ -482,6 +482,13 @@
         ]
       },
       {
+         "component": "text",
+          "name": "variation",
+          "value": "",
+          "label": "Variation",
+          "valueType": "string"
+      },
+      {
         "component": "select",
         "name": "displaystyle",
         "label": "Style",
