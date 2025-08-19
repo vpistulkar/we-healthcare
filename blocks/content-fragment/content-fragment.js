@@ -1,5 +1,6 @@
 import { getMetadata } from '../../scripts/aem.js';
 import { isAuthorEnvironment, moveInstrumentation } from '../../scripts/scripts.js';
+import { readBlockConfig } from '../../scripts/aem.js';
 
 /**
  *
@@ -22,8 +23,17 @@ export default async function decorate(block) {
 	//const aempublishurl = getMetadata('publishurl') || '';
 	
   const persistedquery = '/graphql/execute.json/wknd-universal/CTAByPath';
+
+	//const properties = readBlockConfig(block);
+ 
+	
   const contentPath = block.querySelector(':scope div:nth-child(1) > div a')?.textContent?.trim();
-  const variationname = block.querySelector(':scope div:nth-child(2) > div')?.textContent?.trim()?.toLowerCase()?.replace(' ', '_') || 'master';
+  //const variationname = block.querySelector(':scope div:nth-child(2) > div')?.textContent?.trim()?.toLowerCase()?.replace(' ', '_') || 'master';
+	
+	//console.log("variation : "+properties.variation);
+	//let variationname = properties.variation ? properties.variation : 'master';
+	
+	const variationname = block.querySelector(':scope div:nth-child(2) > div')?.textContent?.trim()?.toLowerCase()?.replace(' ', '_') || 'master';
 	const displayStyle = block.querySelector(':scope div:nth-child(3) > div')?.textContent?.trim() || '';
 
   block.innerHTML = '';

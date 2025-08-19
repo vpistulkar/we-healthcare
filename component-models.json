@@ -467,19 +467,12 @@
         }
       },
       {
-        "component": "select",
-        "name": "style",
-        "label": "Choose Variation",
-        "options": [
-          {
-            "name": "Master",
-            "value": "master"
-          },
-            {
-            "name": "Mobile",
-            "value": "mobile"
-          }
-        ]
+         "component": "text",
+          "name": "variation",
+          "value": "",
+          "label": "Variation",
+          "valueType": "string",
+          "description": "Provide variation name to retrieve the CF content. If left empty, by default master variation will be used."
       },
       {
         "component": "select",
