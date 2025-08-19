@@ -168,7 +168,7 @@ function handleEnterKey(event) {
   const inputValue = document.querySelector('.search-container input').value;
   //const url = (listOfAllPlaceholdersData.searchRedirectUrl || 'https://wknd.site/en/search?q=') + inputValue;
   
-  const url = `/content/${siteName}/language-masters/search-results.html?q=`+ inputValue;
+  const url = `/content/${siteName}/search-results.html?q=`+ inputValue;
 
   if (inputValue) window.location.href = url;
 }
@@ -227,7 +227,7 @@ function createSearchBox() {
     searchIcon.addEventListener('click', () => {
       if (searchInputBox.value) {
         ///window.location.href = (listOfAllPlaceholdersData.searchRedirectUrl || '<sitename>/en/search?q=') + searchInputBox.value;
-        window.location.href = `/content/${siteName}/language-masters/search-results.html?q=` + searchInputBox.value;
+        window.location.href = `/content/${siteName}/search-results.html?q=` + searchInputBox.value;
       }
     });
 
