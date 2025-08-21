@@ -26,6 +26,12 @@ export default function decorate(block) {
     buttonContainer.classList.add(`cta-${ctaStyle}`);
   }
   
+  // Hide the CTA style configuration paragraph
+  const ctaStyleParagraph = block.querySelector('p[data-aue-prop="ctastyle"]');
+  if (ctaStyleParagraph) {
+    ctaStyleParagraph.style.display = 'none';
+  }
+  
   // Optional: Remove the configuration divs after reading them to keep the DOM clean
   const underlineDiv = block.querySelector(':scope div:nth-child(3)');
   if (underlineDiv && underlineDiv.textContent.trim() === enableUnderline) {
