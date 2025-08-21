@@ -42,7 +42,7 @@
   text-align: center;
   font-family: var(--black-font-family);
 }
-.hero h2::after {
+/*.hero h2::after {
   background-color: var(--main-accent-color);
   content: "";
   display: block;
@@ -51,7 +51,7 @@
   transition: width .4s ease-in-out;
   width: 128px;
   margin: 20px auto 30px;
-}
+}*/
 .hero h3 {
   width: 100%;
   max-width: 1200px;
@@ -62,16 +62,7 @@
   text-shadow: 1px 1px #333;
   font-family: var(--black-font-family);
 }
-.hero h3::after {
-  background-color: var(--main-accent-color);
-  content: "";
-  display: block;
-  height: 5px;
-  margin: auto;
-  transition: width .4s ease-in-out;
-  width: 128px;
-  margin: 20px auto 30px;
-}
+
 .hero h4 {
   width: 100%;
   max-width: 1200px;
@@ -82,16 +73,7 @@
   text-shadow: 1px 1px #333;
   font-family: var(--black-font-family);
 }
-.hero h4::after {
-  background-color: var(--main-accent-color);
-  content: "";
-  display: block;
-  height: 5px;
-  margin: auto;
-  transition: width .4s ease-in-out;
-  width: 128px;
-  margin: 20px auto 30px;
-}
+
 .hero h5 {
   width: 100%;
   max-width: 1200px;
@@ -102,16 +84,7 @@
   text-shadow: 1px 1px #333;
   font-family: var(--black-font-family);
 }
-.hero h5::after {
-  background-color: var(--main-accent-color);
-  content: "";
-  display: block;
-  height: 5px;
-  margin: auto;
-  transition: width .4s ease-in-out;
-  width: 128px;
-  margin: 20px auto 30px;
-}
+
 .hero h6 {
   width: 100%;
   max-width: 1200px;
@@ -122,16 +95,7 @@
   text-shadow: 1px 1px #333;
   font-family: var(--black-font-family);
 }
-.hero h6::after {
-  background-color: var(--main-accent-color);
-  content: "";
-  display: block;
-  height: 5px;
-  margin: auto;
-  transition: width .4s ease-in-out;
-  width: 128px;
-  margin: 20px auto 30px;
-}
+
 .hero p {
   width: 100%;
   max-width: 1200px;
