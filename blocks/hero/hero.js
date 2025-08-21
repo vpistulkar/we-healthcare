@@ -6,11 +6,35 @@ import { readBlockConfig } from '../../scripts/aem.js';
  *
  * @param {Element} block
  */
-export default async function decorate(block) {
-
-//	const enableunderline = block.querySelector(':scope div:nth-child(3) > div')?.textContent?.trim() || 'true';
-//	const ctastyle = block.querySelector(':scope div:nth-child(4) > div')?.textContent?.trim() || 'link';
-
-	//button container : block.querySelector('p.button-container'), append class cta-${ctastyle}
+export default function decorate(block) {
+  // Get the enable underline setting from the block content (3rd div)
+  const enableUnderline = block.querySelector(':scope div:nth-child(3) > div')?.textContent?.trim() || 'true';
+  
+  // Get the CTA style from the block content (4th div)
+  const ctaStyle = block.querySelector(':scope div:nth-child(4) > div')?.textContent?.trim() || 'default';
+  
+  // Add removeunderline class if underline is disabled
+  if (enableUnderline.toLowerCase() === 'false') {
+    block.classList.add('removeunderline');
+  }
+  
+  // Find the button container within the hero block
+  const buttonContainer = block.querySelector('p.button-container');
+  
+  if (buttonContainer) {
+    // Add the CTA style class to the button container
+    buttonContainer.classList.add(`cta-${ctaStyle}`);
+  }
+  
+  // Optional: Remove the configuration divs after reading them to keep the DOM clean
+  const underlineDiv = block.querySelector(':scope div:nth-child(3)');
+  if (underlineDiv && underlineDiv.textContent.trim() === enableUnderline) {
+    underlineDiv.remove();
+  }
+  
+  const styleDiv = block.querySelector(':scope div:nth-child(4)');
+  if (styleDiv && styleDiv.textContent.trim() === ctaStyle) {
+    styleDiv.remove();
+  }
 }
 
