@@ -528,6 +528,14 @@
         "valueType": "string"
       },
       {
+            "component": "boolean",
+            "label": "Enable Underline in Title",
+            "description": "Enable underline in title",
+            "name": "enableunderline",
+            "value": "true",
+            "valueType": "boolean"
+      },
+      {
         "component": "select",
         "name": "ctastyle",
         "label": "CTA Style",
