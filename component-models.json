@@ -549,6 +549,10 @@
             "value": "button"
           },
           {
+            "name": "Button secondary",
+            "value": "button-secondary"
+          },
+          {
             "name": "Link",
             "value": "link"
           }
