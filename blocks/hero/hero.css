@@ -155,10 +155,115 @@
   width: 100%;
   height: 100%;
 }
+.hero-wrapper .button-container a.button {
+
+  color: var(--text-light);
+}
+.hero-wrapper .button-container a.button::after {
+  color: var(--text-light);
+}
+/* Button styling within hero-wrapper */
+.hero-wrapper .button-container.cta-button a.button {
+  display: inline-block;
+  padding: 12px 24px;
+  margin: 10px 5px;
+  background-color: var(--main-accent-color);
+  color: var(--text-light);
+  text-decoration: none;
+  border: 2px solid var(--main-accent-color);
+  border-radius: 4px;
+  font-family: var(--heading-font-family);
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 1.2;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.hero-wrapper .button-container.cta-button a.button::after {
+  content: "\f105";
+  font-family: 'Font Awesome 5 Solid';
+  color: var(--text-light);
+  font-size: 20px;
+  margin-left: 8px;
+  transition: all 0.3s ease;
+}
+
+.hero-wrapper .button-container.cta-button a.button:hover {
+  background-color: transparent;
+  color: var(--main-accent-color);
+  border-color: var(--main-accent-color);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.hero-wrapper .button-container.cta-button a.button:hover::after {
+  color: var(--main-accent-color);
+  transform: translateX(2px);
+}
+
+.hero-wrapper .button-container.cta-button a.button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.hero-wrapper .button-container.cta-button a.button:active::after {
+  transform: translateX(0);
+}
+
+/* Secondary button variant */
+.hero-wrapper .button-container.cta-button-secondary a.button {
+  background-color: transparent;
+  color: var(--text-light);
+  border-color: var(--text-light);
+}
+
+.hero-wrapper .button-container.cta-button-secondary a.button::after {
+  color: var(--text-light);
+}
+
+.hero-wrapper .button-container.cta-button-secondary a.button:hover {
+  background-color: var(--text-light);
+  color: var(--text-dark);
+  border-color: var(--text-light);
+}
+
+.hero-wrapper .button-container.cta-button-secondary a.button:hover::after {
+  color: var(--text-dark);
+  transform: translateX(2px);
+}
+
+/* Button focus state for accessibility */
+.hero-wrapper .button-container.cta-button a.button:focus {
+  outline: 2px solid var(--main-accent-color);
+  outline-offset: 2px;
+}
+
+.hero .button-container.cta-minimal a.button::after {
+  margin-left: 4px;
+}
+
+/* Remove underline styles when removeunderline class is present */
+.hero.removeunderline h1::after,
+.hero.removeunderline h2::after,
+.hero.removeunderline h3::after,
+.hero.removeunderline h4::after,
+.hero.removeunderline h5::after,
+.hero.removeunderline h6::after {
+  display: none;
+}
 
 @media (width >= 900px) {
   .hero {
     padding: 40px 32px;
+  }
+  
+  .hero-wrapper a.button {
+    padding: 14px 28px;
+    font-size: 18px;
   }
 }
 
