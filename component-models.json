@@ -1020,18 +1020,22 @@
         "component": "select",
         "name": "ctastyle",
         "label": "CTA Style",
-        "options": [
+         "options": [
           {
-            "name": "default",
-            "value": ""
+            "name": "Default Button",
+            "value": "default"
           },
           {
-            "name": "Button",
+            "name": "Primary Button",
             "value": "button"
           },
           {
-            "name": "Link",
-            "value": "link"
+            "name": "Secondary Button",
+            "value": "button-secondary"
+          },
+          {
+            "name": "Dark Button",
+            "value": "button-dark"
           }
         ]
       }
