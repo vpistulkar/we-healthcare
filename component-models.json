@@ -526,6 +526,37 @@
         "value": "",
         "label": "Text",
         "valueType": "string"
+      },
+      {
+            "component": "boolean",
+            "label": "Enable Underline in Title",
+            "description": "Enable underline in title",
+            "name": "enableunderline",
+            "value": "true",
+            "valueType": "boolean"
+      },
+      {
+        "component": "select",
+        "name": "ctastyle",
+        "label": "CTA Style",
+        "options": [
+          {
+            "name": "default",
+            "value": ""
+          },
+          {
+            "name": "Button",
+            "value": "button"
+          },
+          {
+            "name": "Button secondary",
+            "value": "button-secondary"
+          },
+          {
+            "name": "Link",
+            "value": "link"
+          }
+        ]
       }
     ]
   },
@@ -966,6 +997,25 @@
             "name": "useSwoosh",
             "value": "true",
             "valueType": "boolean"
+          }
+        ]
+      },
+      {
+        "component": "select",
+        "name": "ctastyle",
+        "label": "CTA Style",
+        "options": [
+          {
+            "name": "default",
+            "value": ""
+          },
+          {
+            "name": "Button",
+            "value": "button"
+          },
+          {
+            "name": "Link",
+            "value": "link"
           }
         ]
       }
