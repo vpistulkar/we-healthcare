@@ -419,8 +419,15 @@
           {
             "name": "Teaser Card",
             "value": "teaser-card"
-          },
-           {
+          }
+        ]
+      },
+      {
+        "component": "select",
+        "name": "ctastyle",
+        "label": "CTA Style",
+        "options": [
+         {
             "name": "Default Button",
             "value": "cta-default"
           },
