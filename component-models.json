@@ -419,6 +419,22 @@
           {
             "name": "Teaser Card",
             "value": "teaser-card"
+          },
+           {
+            "name": "Default Button",
+            "value": "default"
+          },
+          {
+            "name": "Primary Button",
+            "value": "button"
+          },
+          {
+            "name": "Secondary Button",
+            "value": "button-secondary"
+          },
+          {
+            "name": "Dark Button",
+            "value": "button-dark"
           }
         ]
       }
