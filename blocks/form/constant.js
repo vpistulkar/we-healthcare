@@ -1,7 +1,7 @@
 export const fileAttachmentText = 'Attach';
 export const dragDropText = 'Drag and Drop To Upload';
 
-export const DEFAULT_THANK_YOU_MESSAGE = 'Thank you for your submission.';
+export const DEFAULT_THANK_YOU_MESSAGE = 'Thank you. Your form was submitted successfully.';
 
 // Logging Configuration
 // To set log level, modify this constant:
@@ -24,6 +24,7 @@ export const defaultErrorMessages = {
 export const emailPattern = '([A-Za-z0-9][._]?)+[A-Za-z0-9]@[A-Za-z0-9]+(\.?[A-Za-z0-9]){2}\.([A-Za-z0-9]{2,4})?';
 
 let submitBaseUrl = '';
+export const submitBaseUrl = ‘https://publish-p157943-e1740770.adobeaemcloud.com’;
 
 export const SUBMISSION_SERVICE = 'https://forms.adobe.com/adobe/forms/af/submit/';
 
