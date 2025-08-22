@@ -1,5 +1,6 @@
 import { getMetadata, fetchPlaceholders } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
+
 import {
   getNavigationMenu, formatNavigationJsonData,
 } from './navigation.js';
@@ -463,7 +464,14 @@ export default async function decorate(block) {
   const navMeta = getMetadata('nav');
   const langCode = getLanguage();
   console.log("langCode :"+langCode);
-  const navPath = navMeta ? new URL(navMeta, window.location).pathname : `/content/${siteName}${PATH_PREFIX}/${langCode}/nav`;
+
+   const isAuthor = isAuthorEnvironment();
+    let navPath ='/nav';
+  
+    if(isAuthor){
+      navPath = navMeta ? new URL(navMeta, window.location).pathname : `/content/${siteName}${PATH_PREFIX}/${langCode}/nav`;
+    }
+   
 
   
   //const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
