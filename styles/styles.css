@@ -829,7 +829,9 @@ table {
 
 /*common button css*/
 /* Button styling within */
- .button-container.cta-button a.button {
+ /*common button css*/
+/* Button styling within */
+.cta-button a.button {
   display: inline-block;
   padding: 12px 24px;
   margin: 10px 5px;
@@ -849,7 +851,7 @@ table {
   position: relative;
 }
 
- .button-container.cta-button a.button::after {
+ .cta-button a.button::after {
   content: "\f105";
   font-family: 'Font Awesome 5 Solid';
   color: var(--text-light);
@@ -858,7 +860,7 @@ table {
   transition: all 0.3s ease;
 }
 
-.button-container.cta-button a.button:hover {
+.cta-button a.button:hover {
   background-color: transparent;
   color: var(--main-accent-color);
   border-color: var(--main-accent-color);
@@ -866,22 +868,22 @@ table {
   transform: translateY(-1px);
 }
 
- .button-container.cta-button a.button:hover::after {
+ .cta-button a.button:hover::after {
   color: var(--main-accent-color);
   transform: translateX(2px);
 }
 
- .button-container.cta-button a.button:active {
+ .cta-button a.button:active {
   transform: translateY(0);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
- .button-container.cta-button a.button:active::after {
+ .cta-button a.button:active::after {
   transform: translateX(0);
 }
 
 /* Secondary button variant */
- .button-container.cta-button-secondary a.button {
+.cta-button-secondary a.button {
   display: inline-block;
   padding: 12px 24px;
   margin: 10px 5px;
@@ -904,7 +906,7 @@ table {
  
 }
 
- .button-container.cta-button-secondary a.button::after {
+ .cta-button-secondary a.button::after {
   
     content: "\f105";
     font-family: 'Font Awesome 5 Solid';
@@ -914,14 +916,14 @@ table {
     transition: all 0.3s ease;
 }
 
-.button-container.cta-button-secondary a.button:hover {
+.cta-button-secondary a.button:hover {
   background-color: var(--main-accent-color);
   color: var(--text-light);
   
   text-decoration: none;;
 }
 
- .button-container.cta-button-secondary a.button:hover::after {
+.cta-button-secondary a.button:hover::after {
   color: var(--text-dark);
   transform: translateX(2px);
 }
@@ -932,12 +934,12 @@ table {
   outline-offset: 2px;
 }
 */
- .button-container.cta-minimal a.button::after {
+.cta-minimal a.button::after {
   margin-left: 4px;
 }
 
 /*dark mode*/
-.button-container.cta-button-dark a.button {
+.cta-button-dark a.button {
   display: inline-block;
   padding: 12px 24px;
   margin: 10px 5px;
@@ -957,7 +959,7 @@ table {
   position: relative;
 }
 
- .button-container.cta-button-dark a.button::after {
+ .cta-button-dark a.button::after {
   content: "\f105";
   font-family: 'Font Awesome 5 Solid';
   color: var(--dark-color);
@@ -966,7 +968,7 @@ table {
   transition: all 0.3s ease;
 }
 
-.button-container.cta-button-dark a.button:hover {
+.cta-button-dark a.button:hover {
   background-color: var(--dark-color);
   color: var(--text-light);
   border-color: var(--dark-color);
@@ -974,16 +976,16 @@ table {
   transform: translateY(-1px);
 }
 
- .button-container.cta-button-dark a.button:hover::after {
+ .cta-button-dark a.button:hover::after {
   color:var(--text-light);
   transform: translateX(2px);
 }
 
- .button-container.cta-button-dark a.button:active {
+ .cta-button-dark a.button:active {
   transform: translateY(0);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
- .button-container.cta-button-dark a.button:active::after {
+.cta-button-dark a.button:active::after {
   transform: translateX(0);
 }
