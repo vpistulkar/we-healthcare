@@ -122,6 +122,12 @@ export default function decorate(block) {
     swooshlayersClass = 'swoosh-layers-hidden';
   }
 
+  // Get CTA style and set button container class
+  var buttonContainerClass = 'button-container';
+  if(properties.ctastyle){
+    buttonContainerClass = `cta-${properties.ctastyle}`;
+  }
+
   const swooshFirst = `${window.hlx.codeBasePath}/icons/teaser_innerswoosh.svg`;
   const swooshSecond = `${window.hlx.codeBasePath}/icons/teaser_outerswoosh.svg`;
   const isVideo = (properties.teaserstyle && properties.teaserstyle === 'video');
@@ -140,7 +146,7 @@ export default function decorate(block) {
       ),
       div({ class: 'teaser-title-wrapper' },
         h1({ class: 'teaser-title' }),
-        div({ class: 'button-container' },
+        div({ class: buttonContainerClass },
           a({ id: 'button', href: buttonLink, class: `button ${buttonStyle}` },
             span({ class: 'button-text' }, buttonText),
           ),
