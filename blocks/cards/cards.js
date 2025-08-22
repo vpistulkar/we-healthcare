@@ -30,6 +30,11 @@ export default function decorate(block) {
     if (ctaStyleParagraph) {
       ctaStyleParagraph.style.display = 'none';
     }
+   const styleParagraph = row.querySelector('p[data-aue-prop="style"]');
+    if (styleParagraph) {
+      styleParagraph.style.display = 'none';
+    }
+    
     moveInstrumentation(row, li);
     while (row.firstElementChild) li.append(row.firstElementChild);
     [...li.children].forEach((div) => {
