@@ -121,6 +121,31 @@
               "valueType": "string",
               "rootPath": "",
               "description": "Path to linked AEM content"
+            },
+            {
+              "component": "select",
+              "name": "ctastyle",
+              "label": "CTA Style",
+              "valueType": "string",
+              "value": "button",
+              "options": [
+                {
+                  "name": "Default Button",
+                  "value": "default"
+                },
+                {
+                  "name": "Primary Button",
+                  "value": "button"
+                },
+                {
+                  "name": "Secondary Button",
+                  "value": "button-secondary"
+                },
+                {
+                  "name": "Dark Button",
+                  "value": "button-dark"
+                }
+              ]
             }
           ]
         },        
