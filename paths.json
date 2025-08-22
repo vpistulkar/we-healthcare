@@ -2,7 +2,6 @@
   "mappings": [
     "/content/securbank/language-masters/en:/",
     "/content/securbank/language-masters/en/:/",
-    "/content/securbank/language-masters/en/:/en/",
     "/content/securbank/configuration:/.helix/config.json",
     "/content/securbank/metadata:/metadata.json",
     "/content/securbank/redirects:/redirects.json",
