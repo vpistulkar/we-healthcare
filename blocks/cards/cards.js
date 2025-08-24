@@ -19,6 +19,21 @@ export default function decorate(block) {
       li.className = style;
       row.lastElementChild?.remove();
     }
+     
+    const ctaStyle = row.querySelector('p[data-aue-prop="ctastyle"]')?.textContent?.trim() || 'default';
+    const buttonContainers = li.querySelectorAll('p.button-container');
+    buttonContainers.forEach(buttonContainer => {
+      buttonContainer.classList.add(`cta-${ctaStyle}`);
+    });
+  
+    const ctaStyleParagraph = row.querySelector('p[data-aue-prop="ctastyle"]');
+    if (ctaStyleParagraph) {
+      ctaStyleParagraph.style.display = 'none';
+    }
+   const styleParagraph = row.querySelector('p[data-aue-prop="style"]');
+    if (styleParagraph) {
+      styleParagraph.style.display = 'none';
+    }
     
     moveInstrumentation(row, li);
     while (row.firstElementChild) li.append(row.firstElementChild);

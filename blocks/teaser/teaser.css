@@ -187,7 +187,18 @@ html[lang="ru"] .teaser-wrapper .button-container > a {
     display: none;
 }
 
-
+/*button style*/
+.teaser-wrapper .teaser-swoosh-wrapper .cta-button-dark a.button{
+    color: var(--dark-color);
+}
+.teaser-wrapper .teaser-swoosh-wrapper .cta-button-dark a.button::after {
+    content: "\f105";
+    font-family: 'Font Awesome 5 Solid';
+    color: var(--dark-color);
+    font-size: 20px;
+    margin-left: 8px;
+    transition: all 0.3s ease;
+}
 
 /* Responsive Styles */
 @media (width < 1024px) {

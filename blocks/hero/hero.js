@@ -31,6 +31,11 @@ export default function decorate(block) {
   if (ctaStyleParagraph) {
     ctaStyleParagraph.style.display = 'none';
   }
+
+  const styleDiv = block.querySelector(':scope div:nth-child(4)');
+  if (styleDiv && styleDiv.textContent.trim() === ctaStyle) {
+    styleDiv.remove();
+  }
   
   // Optional: Remove the configuration divs after reading them to keep the DOM clean
   const underlineDiv = block.querySelector(':scope div:nth-child(3)');
@@ -38,9 +43,7 @@ export default function decorate(block) {
     underlineDiv.remove();
   }
   
-  const styleDiv = block.querySelector(':scope div:nth-child(4)');
-  if (styleDiv && styleDiv.textContent.trim() === ctaStyle) {
-    styleDiv.remove();
-  }
+  
 }
+
 

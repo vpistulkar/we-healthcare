@@ -421,6 +421,29 @@
             "value": "teaser-card"
           }
         ]
+      },
+      {
+        "component": "select",
+        "name": "ctastyle",
+        "label": "CTA Style",
+        "options": [
+         {
+            "name": "Default Button",
+            "value": "cta-default"
+          },
+          {
+            "name": "Primary Button",
+            "value": "cta-button"
+          },
+          {
+            "name": "Secondary Button",
+            "value": "cta-button-secondary"
+          },
+          {
+            "name": "Dark Button",
+            "value": "cta-button-dark"
+          }
+        ]
       }
     ]
   },
@@ -1004,18 +1027,22 @@
         "component": "select",
         "name": "ctastyle",
         "label": "CTA Style",
-        "options": [
+         "options": [
           {
-            "name": "default",
-            "value": ""
+            "name": "Default Button",
+            "value": "default"
           },
           {
-            "name": "Button",
+            "name": "Primary Button",
             "value": "button"
           },
           {
-            "name": "Link",
-            "value": "link"
+            "name": "Secondary Button",
+            "value": "button-secondary"
+          },
+          {
+            "name": "Dark Button",
+            "value": "button-dark"
           }
         ]
       }
