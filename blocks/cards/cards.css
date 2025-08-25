@@ -394,8 +394,12 @@
   object-position: center;
 }
 
-
-
+.cards > ul > li.teaser-overlay  a.button{
+  padding: 14px 15px !important;
+}
+.cards > ul > li.teaser-card .cards-card-body a.button{
+   padding: 14px 15px !important;
+}
 
 
 /* Responsive Styles */
