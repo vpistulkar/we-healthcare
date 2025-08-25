@@ -24,6 +24,14 @@ export default function decorate(block) {
       const ctaStyleParagraph = row.querySelector('p[data-aue-prop="ctastyle"]');
       const ctaStyle = ctaStyleParagraph?.textContent?.trim() || 'default';
 
+      
+      if (styleParagraph) {
+        styleParagraph.style.display = 'none';
+      }
+      if (ctaStyleParagraph) {
+        ctaStyleParagraph.style.display = 'none';
+      }
+
       moveInstrumentation(row, li);
       while (row.firstElementChild) li.append(row.firstElementChild);
       [...li.children].forEach((div) => {
