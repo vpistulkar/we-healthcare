@@ -13,24 +13,24 @@ export default function decorate(block) {
   const ul = document.createElement('ul');
   [...block.children].forEach((row) => {
     const li = document.createElement('li');
-    const style = row.lastElementChild?.querySelector('p')?.textContent;
-    //const style = row.querySelector('p[data-aue-label="Style"]')?.textContent;
-    if(style){
-      li.className = style;
-      row.lastElementChild?.remove();
+    
+    const styleParagraph = row.querySelector('p[data-aue-prop="style"]');
+    const cardStyle = styleParagraph?.textContent?.trim() || 'default';
+    if (cardStyle && cardStyle !== 'default') {
+      li.className = cardStyle;
     }
-     
-    const ctaStyle = row.querySelector('p[data-aue-prop="ctastyle"]')?.textContent?.trim() || 'default';
+  
+    const ctaStyleParagraph = row.querySelector('p[data-aue-prop="ctastyle"]');
+    const ctaStyle = ctaStyleParagraph?.textContent?.trim() || 'default';
     const buttonContainers = li.querySelectorAll('p.button-container');
     buttonContainers.forEach(buttonContainer => {
       buttonContainer.classList.add(`cta-${ctaStyle}`);
     });
   
-    const ctaStyleParagraph = row.querySelector('p[data-aue-prop="ctastyle"]');
+   
     if (ctaStyleParagraph) {
       ctaStyleParagraph.style.display = 'none';
     }
-   const styleParagraph = row.querySelector('p[data-aue-prop="style"]');
     if (styleParagraph) {
       styleParagraph.style.display = 'none';
     }
