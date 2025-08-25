@@ -833,7 +833,7 @@ table {
 /* Button styling within */
 .cta-button a.button {
   display: inline-block;
-  padding: 12px 24px;
+  padding: 12px 24px !important;
   margin: 10px 5px;
   background-color: var(--main-accent-color) !important;
   color: var(--text-light) !important;
@@ -885,7 +885,7 @@ table {
 /* Secondary button variant */
 .cta-button-secondary a.button {
   display: inline-block;
-  padding: 12px 24px;
+  padding: 12px 24px !important;
   margin: 10px 5px;
   text-decoration: none;
   border-radius: 4px;
@@ -938,7 +938,7 @@ table {
 /*dark mode*/
 .cta-button-dark a.button {
   display: inline-block;
-  padding: 12px 24px;
+  padding: 12px 24px !important;
   margin: 10px 5px;
   background-color: var(--text-light) !important;
   color: var(--dark-color) !important;
