@@ -366,6 +366,8 @@
   bottom: 40px;
   left: 0;
   right: 0;
+  display: block;
+    align-content: center;
 }
 .cards > ul > li.teaser-card .cards-card-body p.button-container a {
   color: var(--text-light);
