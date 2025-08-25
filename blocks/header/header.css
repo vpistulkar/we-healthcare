@@ -2,8 +2,7 @@
 
 /* header and nav layout */
 header .nav-wrapper {
-/*  background-color: var(--dark-color-opacity);*/
-    background-color: white;
+  background-color: var(--dark-color-opacity);
   width: 100%;
   z-index: 2;
   position: fixed;
@@ -192,7 +191,7 @@ header nav .nav-sections ul > li {
 
 header nav .nav-sections ul > li > a {  
   font-size: 18px;
-  color: #2c2c2c;
+  color: #ffffff;
   text-decoration: none;
   font-family: var(--body-font-family);
 }

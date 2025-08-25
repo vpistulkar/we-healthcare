@@ -306,14 +306,13 @@ body {
 body.appear {
   display: block;
   overflow-x: hidden;
-  padding-top: var(--nav-height); /* Add padding to body to prevent header overlap */
 }
 body.gray-theme {
   filter: grayscale(100%);
 }
 body.red-theme {
-  --link-hover-color: #026169;
-  --main-accent-color:#026169;
+  --link-hover-color: #ff0000;
+  --main-accent-color: #ff0000;
 }
 body.blue-theme {
   --link-hover-color: #0000ff;
@@ -548,18 +547,23 @@ main picture:hover::before {
 
 
 
-/* Parallax effect - Disabled for better UX */
+/* Parallax effect - Start */
 main {
+  height: 100vh;
   overflow-x: hidden;
-  -webkit-perspective: none;
-  perspective: none;
+  overflow-y: auto;
+  -webkit-perspective: 1px;
+  perspective: 1px;
 }
 main .hero-container {
+  -webkit-transform: translateZ(-1px) scale(2);
+  transform: translateZ(-1px) scale(2);
   padding: 0;
-  margin: 0;
+  margin: -180px 0 180px !important;
 }
 main .cards-container {
-  /* No transform needed */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
 .adobe-ue-edit header, .adobe-ue-preview header {
   position: initial;
@@ -593,12 +597,8 @@ main > .section > div {
   padding: 0 24px;
 }
 
-/* Add spacer for fixed header */
-main::before {
-  content: '';
-  display: block;
-  height: var(--nav-height);
-  width: 100%;
+main > .section:first-of-type {
+  margin-top: 0;
 }
 
 @media (width >= 900px) {
