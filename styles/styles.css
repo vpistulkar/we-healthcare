@@ -861,7 +861,7 @@ table {
 }
 
 .cta-button a.button:hover {
-  background-color: transparent;
+  background-color: transparent !important;
   color: var(--main-accent-color) !important;
   border-color: var(--main-accent-color) !important;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
