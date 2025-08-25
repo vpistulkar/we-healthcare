@@ -394,7 +394,11 @@
   object-position: center;
 }
 
+.cards > ul > li.teaser-overlay .cta-button a.button{
+  
+  padding: 14px 15px;
 
+}
 
 
 
