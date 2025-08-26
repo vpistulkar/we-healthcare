@@ -10,9 +10,16 @@ export default function decorate(block) {
   // Get the enable underline setting from the block content (3rd div)
   const enableUnderline = block.querySelector(':scope div:nth-child(3) > div')?.textContent?.trim() || 'true';
   
-  // Get the CTA style from the block content (4th div)
-  const ctaStyle = block.querySelector(':scope div:nth-child(4) > div')?.textContent?.trim() || 'default';
+  // Get the layout Style from the block content (4th div)
+  const layoutStyle = block.querySelector(':scope div:nth-child(4) > div')?.textContent?.trim() || '';
+
+  // Get the CTA style from the block content (5th div)
+  const ctaStyle = block.querySelector(':scope div:nth-child(5) > div')?.textContent?.trim() || 'default';
   
+  if(layoutStyle){
+     block.classList.add(`${layoutStyle}`);
+  }
+
   // Add removeunderline class if underline is disabled
   if (enableUnderline.toLowerCase() === 'false') {
     block.classList.add('removeunderline');
