@@ -436,6 +436,12 @@
     padding: 0;
     font-size: 20px;
   }
+  .cards > ul > li.teaser-overlay .cards-card-body{
+    width:100%;
+  }
+  .cards-container .cards-wrapper .cards > ul > li.teaser-overlay img{
+    min-height: 270px;
+  }
 }
 
 
