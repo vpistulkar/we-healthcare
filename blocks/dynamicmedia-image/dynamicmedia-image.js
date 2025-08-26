@@ -61,7 +61,9 @@ export default function decorate(block) {
           //dmUrlEl.remove();
       }
       if(deliveryType === 'dm-openapi'){
-         
+
+          //block.children[1].querySelectorAll('picture > img')[0];
+        
           block.children[6]?.remove();
           block.children[5]?.remove();
           block.children[4]?.remove();

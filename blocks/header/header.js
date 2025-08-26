@@ -1,5 +1,6 @@
 import { getMetadata, fetchPlaceholders } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
+
 import {
   getNavigationMenu, formatNavigationJsonData,
 } from './navigation.js';
@@ -168,7 +169,7 @@ function handleEnterKey(event) {
   const inputValue = document.querySelector('.search-container input').value;
   //const url = (listOfAllPlaceholdersData.searchRedirectUrl || 'https://wknd.site/en/search?q=') + inputValue;
   
-  const url = `/content/${siteName}/language-masters/search-results.html?q=`+ inputValue;
+  const url = `/content/${siteName}/search-results.html?q=`+ inputValue;
 
   if (inputValue) window.location.href = url;
 }
@@ -227,7 +228,7 @@ function createSearchBox() {
     searchIcon.addEventListener('click', () => {
       if (searchInputBox.value) {
         ///window.location.href = (listOfAllPlaceholdersData.searchRedirectUrl || '<sitename>/en/search?q=') + searchInputBox.value;
-        window.location.href = `/content/${siteName}/language-masters/search-results.html?q=` + searchInputBox.value;
+        window.location.href = `/content/${siteName}/search-results.html?q=` + searchInputBox.value;
       }
     });
 
@@ -462,7 +463,15 @@ export default async function decorate(block) {
   
   const navMeta = getMetadata('nav');
   const langCode = getLanguage();
-  const navPath = navMeta ? new URL(navMeta, window.location).pathname : `/content/${siteName}${PATH_PREFIX}/nav`;
+  console.log("langCode :"+langCode);
+
+   const isAuthor = isAuthorEnvironment();
+    let navPath ='/nav';
+  
+    if(isAuthor){
+      navPath = navMeta ? new URL(navMeta, window.location).pathname : `/content/${siteName}${PATH_PREFIX}/${langCode}/nav`;
+    }
+   
 
   
   //const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';

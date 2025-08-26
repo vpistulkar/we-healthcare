@@ -1,5 +1,6 @@
 import { getMetadata } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
+import { isAuthorEnvironment } from '../../scripts/scripts.js';
 
 import {
   getLanguage, getSiteName, TAG_ROOT, PATH_PREFIX, fetchLanguageNavigation,
@@ -13,9 +14,14 @@ export default async function decorate(block) {
   const footerMeta = getMetadata('footer');
   const langCode = getLanguage();
   const siteName = await getSiteName();
-  const footerPath = footerMeta
+  const isAuthor = isAuthorEnvironment();
+  let footerPath ='/footer';
+
+  if(isAuthor){
+    footerPath = footerMeta
     ? new URL(footerMeta, window.location).pathname
-    : `/content/${siteName}${PATH_PREFIX}/footer`;
+    : `/content/${siteName}${PATH_PREFIX}/${langCode}/footer`;
+  }
 
   /*
   // load footer as fragment

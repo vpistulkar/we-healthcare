@@ -555,12 +555,12 @@ main {
   -webkit-perspective: 1px;
   perspective: 1px;
 }
-main .hero-container {
+/*main .hero-container {
   -webkit-transform: translateZ(-1px) scale(2);
   transform: translateZ(-1px) scale(2);
   padding: 0;
   margin: -180px 0 180px !important;
-}
+}*/
 main .cards-container {
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
@@ -826,3 +826,163 @@ table {
 }
 
 /* Responsive styles- end */
+
+/*common button css*/
+/* Button styling within */
+ /*common button css*/
+/* Button styling within */
+.cta-button a.button {
+  display: inline-block;
+  padding: 12px 24px !important;
+  margin: 10px 5px;
+  background-color: var(--main-accent-color) !important;
+  color: var(--text-light) !important;
+  text-decoration: none;
+  border: 2px solid var(--main-accent-color) !important;
+  border-radius: 4px;
+  font-family: var(--heading-font-family);
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 1.2;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+ .cta-button a.button::after {
+  content: "\f105";
+  font-family: 'Font Awesome 5 Solid';
+  color: var(--text-light) !important;
+  font-size: 20px;
+  margin-left: 8px;
+  transition: all 0.3s ease;
+}
+
+.cta-button a.button:hover {
+  background-color: transparent !important;
+  color: var(--main-accent-color) !important;
+  border-color: var(--main-accent-color) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+ .cta-button a.button:hover::after {
+  color: var(--main-accent-color) !important  ;
+  transform: translateX(2px);
+}
+
+ .cta-button a.button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+ .cta-button a.button:active::after {
+  transform: translateX(0);
+}
+
+/* Secondary button variant */
+.cta-button-secondary a.button {
+  display: inline-block;
+  padding: 12px 24px !important;
+  margin: 10px 5px;
+  text-decoration: none;
+  border-radius: 4px;
+  font-family: var(--heading-font-family);
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 1.2;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  transform: translateY(-1px);
+  background-color: transparent;
+  color: var(--main-accent-color)!important;
+  border:2px solid var(--main-accent-color) !important;
+  border-color: var(--main-accent-color) !important;
+ 
+}
+
+ .cta-button-secondary a.button::after {
+  
+    content: "\f105";
+    font-family: 'Font Awesome 5 Solid';
+    color: var(--main-accent-color) !important;
+    font-size: 20px;
+    margin-left: 8px;
+    transition: all 0.3s ease;
+}
+
+.cta-button-secondary a.button:hover {
+  background-color: var(--main-accent-color)!important;
+  color: var(--text-light) !important;
+  
+  text-decoration: none;;
+}
+
+.cta-button-secondary a.button:hover::after {
+  color: var(--text-dark) !important;
+  transform: translateX(2px);
+}
+
+/* Button focus state for accessibility 
+ .button-container.cta-button a.button:focus {
+  outline: 2px solid var(--main-accent-color);
+  outline-offset: 2px;
+}
+*/
+
+/*dark mode*/
+.cta-button-dark a.button {
+  display: inline-block;
+  padding: 12px 24px !important;
+  margin: 10px 5px;
+  background-color: var(--text-light) !important;
+  color: var(--dark-color) !important;
+  text-decoration: none;
+  border: 2px solid var(--dark-color) !important;
+  border-radius: 4px;
+  font-family: var(--heading-font-family);
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 1.2;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+ .cta-button-dark a.button::after {
+  content: "\f105";
+  font-family: 'Font Awesome 5 Solid';
+  color: var(--dark-color) !important;
+  font-size: 20px;
+  margin-left: 8px;
+  transition: all 0.3s ease;
+}
+
+.cta-button-dark a.button:hover {
+  background-color: var(--dark-color) !important;
+  color: var(--text-light) !important;
+  border-color: var(--dark-color) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+ .cta-button-dark a.button:hover::after {
+  color:var(--text-light) !important;
+  transform: translateX(2px);
+}
+
+ .cta-button-dark a.button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cta-button-dark a.button:active::after {
+  transform: translateX(0);
+}
