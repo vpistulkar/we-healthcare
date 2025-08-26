@@ -445,6 +445,9 @@
   .cards > ul > li.teaser-overlay .cards-card-body div {
     width: 100%;
   }
+  .cards > ul > li.teaser-overlay .cards-card-body div[data-aue-type="richtext"]{
+    width: 100%;
+  }
 }
 
 
