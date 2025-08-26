@@ -442,6 +442,9 @@
   .cards-container .cards-wrapper .cards > ul > li.teaser-overlay img{
     min-height: 270px;
   }
+  .cards > ul > li.teaser-overlay .cards-card-body div {
+    width: 100%;
+  }
 }
 
 
