@@ -39,9 +39,14 @@ export default function decorate(block) {
     ctaStyleParagraph.style.display = 'none';
   }
 
-  const styleDiv = block.querySelector(':scope div:nth-child(4)');
+  const styleDiv = block.querySelector(':scope div:nth-child(5)');
   if (styleDiv && styleDiv.textContent.trim() === ctaStyle) {
     styleDiv.remove();
+  }
+
+  const layoutStyleDiv = block.querySelector(':scope div:nth-child(4)');
+  if (layoutStyleDiv) {
+    layoutStyleDiv.remove();
   }
   
   // Optional: Remove the configuration divs after reading them to keep the DOM clean
