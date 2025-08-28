@@ -1,23 +1,26 @@
-import { readBlockConfig } from '../../scripts/aem.js';
 import { div, a, span } from '../../scripts/dom-helpers.js';
 
 export default function decorate(block) {
-  // Read configuration from the block
-  const properties = readBlockConfig(block);
+  const children = [...block.children];
   
-  // Extract properties with defaults
-  const buttonLink = properties.link || '#';
-  const buttonLabel = properties.label || 'Button';
-  const buttonStyle = properties.style || 'default-button';
+  const linkDiv = children[0];
+  const linkElement = linkDiv?.querySelector('a');
+  const buttonLink = linkElement?.href || '#';
   
-  // Create the button element
+  const labelDiv = children[1];
+  const labelElement = labelDiv?.querySelector('p');
+  const buttonLabel = labelElement?.textContent?.trim() || 'Button';
+  
+  const styleDiv = children[2];
+  const styleElement = styleDiv?.querySelector('p');
+  const buttonStyle = styleElement?.textContent?.trim() || 'default-button';
+  
   const buttonElement = div({ class: 'button-container' },
     a({ href: buttonLink, class: `button ${buttonStyle}` },
       span({ class: 'button-text' }, buttonLabel)
     )
   );
   
-  // Clear the block and append the new button
   block.innerHTML = '';
   block.appendChild(buttonElement);
 }
