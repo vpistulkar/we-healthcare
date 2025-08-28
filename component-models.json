@@ -477,6 +477,48 @@
     ]
   },
   {
+    "id": "custom-button",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "link",
+        "label": "Link",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "name": "label",
+        "value": "",
+        "label": "Label",
+        "valueType": "string"
+      },
+      {
+        "component": "select",
+        "name": "style",
+        "label": "Style",
+        "options": [
+          {
+            "name": "Default",
+            "value": "default-button"
+          },
+          {
+            "name": "Link",
+            "value": "default-button-link"
+          },
+          {
+            "name": "Secondary Button",
+            "value": "default-button-secondary"
+          },
+          {
+            "name": "Dark Button",
+            "value": "default-button-dark"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "id": "contentfragment",
     "fields": [
       {
