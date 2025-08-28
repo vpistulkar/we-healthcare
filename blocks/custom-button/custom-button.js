@@ -15,8 +15,8 @@ export default function decorate(block) {
   const styleElement = styleDiv?.querySelector('p');
   const buttonStyle = styleElement?.textContent?.trim() || 'default-button';
   
-  const buttonElement = div({ class: 'button-container' },
-    a({ href: buttonLink, class: `button ${buttonStyle}` },
+  const buttonElement = div({ class: `button-container ${buttonStyle}` },
+    a({ href: buttonLink, class: 'button' },
       span({ class: 'button-text' }, buttonLabel)
     )
   );
