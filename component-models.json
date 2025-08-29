@@ -535,14 +535,14 @@
       {
         "component": "text",
         "name": "label",
-        "value": "",
+        "value": "Button",
         "label": "Label",
         "valueType": "string"
       },
       {
         "component": "text",
         "name": "title",
-        "value": "",
+        "value": "Button",
         "label": "Title",
         "valueType": "string"
       },
