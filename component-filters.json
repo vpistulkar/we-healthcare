@@ -9,7 +9,7 @@
     "id": "section",
     "components": [
       "button",
-      "cta-btn",
+      "custom-button",
       "cards",
       "carousel",
       "columns",
