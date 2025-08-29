@@ -520,7 +520,7 @@
     ]
   },
   {
-    "id": "button",
+    "id": "cta-button",
     "fields": [
       {
         "component": "aem-content",
