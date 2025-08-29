@@ -30,7 +30,6 @@
   margin: 0 auto;
   color: var(--text-light);
   text-align: center;
-  text-shadow: 1px 1px #333;
   font-family: var(--black-font-family);
 }
 
@@ -302,7 +301,6 @@ picture {
   width: 100%;
   max-width: none;
   color: var(--text-light);
-  text-shadow: 1px 1px #333;
 }
 
 .hero.image-background-text-left .button-container {
@@ -322,7 +320,6 @@ picture {
   width: 100%;
   max-width: none;
   color: var(--text-light);
-  text-shadow: 1px 1px #333;
 }
 
 .hero.image-background-text-right .button-container {
