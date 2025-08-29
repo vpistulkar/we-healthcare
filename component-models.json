@@ -540,6 +540,13 @@
         "valueType": "string"
       },
       {
+        "component": "text",
+        "name": "title",
+        "value": "",
+        "label": "Title",
+        "valueType": "string"
+      },
+      {
         "component": "select",
         "name": "style",
         "label": "Style",
