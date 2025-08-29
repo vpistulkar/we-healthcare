@@ -152,35 +152,6 @@ export default function decorate(block) {
           }
         }
       }
-
-      // Render button block from raw p elements (if present)
-      // try {
-      //   const btnP = col.querySelector('p.button-container');
-      //   if (btnP) {
-      //     const pList = Array.from(col.querySelectorAll('p'));
-      //     const idx = pList.indexOf(btnP);
-
-      //     const labelP = pList[idx + 1];
-      //     const titleP = pList[idx + 2];
-      //     const styleP = pList[idx + 3];
-
-      //     const href = btnP.querySelector('a')?.getAttribute('href') || '#';
-      //     const label = labelP?.textContent?.trim() || 'Button';
-      //     const title = titleP?.textContent?.trim() || '';
-      //     const style = styleP?.textContent?.trim() || 'default-button';
-
-      //     const rendered = document.createElement('div');
-      //     rendered.className = `button-container ${style}`;
-      //     rendered.innerHTML = `
-      //       <a href="${href}" class="button" title="${title || label}">
-      //         <span class="button-text">${label}</span>
-      //       </a>
-      //     `;
-
-      //     col.insertBefore(rendered, btnP);
-      //     [btnP, labelP, titleP, styleP].forEach((n) => n && n.remove());
-      //   }
-      // } catch (e) {}
     });
   });
 }
