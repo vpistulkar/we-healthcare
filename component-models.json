@@ -520,7 +520,7 @@
     ]
   },
   {
-    "id": "custom-button",
+    "id": "button",
     "fields": [
       {
         "component": "aem-content",
