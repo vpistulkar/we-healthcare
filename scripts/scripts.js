@@ -238,8 +238,6 @@ async function loadEager(doc) {
   }
 }
 
-
-
 /**
  * Create section background image
  *
@@ -248,26 +246,12 @@ async function loadEager(doc) {
 function decorateSectionImages(doc) {
   const sectionImgContainers = doc.querySelectorAll('main .section[data-image]');
   sectionImgContainers.forEach((sectionImgContainer) => {
-    // Skip if already processed
-    if (sectionImgContainer.dataset.backgroundProcessed) {
-      return;
-    }
-
     const sectionImg = sectionImgContainer.dataset.image;
     const sectionTabImg = sectionImgContainer.dataset.tabImage;
     const sectionMobImg = sectionImgContainer.dataset.mobImage;
-    
-    if (!sectionImg && !sectionTabImg && !sectionMobImg) {
-      return;
-    }
-
-    // Add bg-image class to work with existing CSS
-    sectionImgContainer.classList.add('bg-image');
-
-    // Create picture element with responsive sources
-    const newPic = document.createElement('picture');
     let defaultImgUrl = null;
 
+    const newPic = document.createElement('picture');
     if (sectionImg) {
       newPic.appendChild(createSource(sectionImg, 1920, '(min-width: 1024px)'));
       defaultImgUrl = sectionImg;
@@ -275,15 +259,14 @@ function decorateSectionImages(doc) {
 
     if (sectionTabImg) {
       newPic.appendChild(createSource(sectionTabImg, 1024, '(min-width: 768px)'));
-      if (!defaultImgUrl) defaultImgUrl = sectionTabImg;
+      defaultImgUrl = sectionTabImg;
     }
 
     if (sectionMobImg) {
-      newPic.appendChild(createSource(sectionMobImg, 600, '(max-width: 767px)'));
-      if (!defaultImgUrl) defaultImgUrl = sectionMobImg;
+      newPic.appendChild(createSource(sectionTabImg, 600, '(max-width: 767px)'));
+      defaultImgUrl = sectionMobImg;
     }
 
-    // Create the image element
     const newImg = document.createElement('img');
     newImg.src = defaultImgUrl;
     newImg.alt = '';
@@ -296,12 +279,8 @@ function decorateSectionImages(doc) {
       newPic.appendChild(newImg);
       sectionImgContainer.prepend(newPic);
     }
-
-    // Mark as processed to prevent duplicates
-    sectionImgContainer.dataset.backgroundProcessed = 'true';
   });
 }
-
 
 /**
  * Loads everything that doesn't need to be delayed.
