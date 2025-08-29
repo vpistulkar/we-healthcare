@@ -9,7 +9,7 @@
     "id": "section",
     "components": [
       "button",
-      "custom-button",
+      "action-button",
       "cards",
       "carousel",
       "columns",
