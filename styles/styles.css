@@ -757,12 +757,16 @@ main .section.bg-light {
 /* Section background image */
 main .section.bg-image {
   overflow: hidden;
+  position: relative;  
 }
 main .section.bg-image .sec-img {
   width: 100%;
-  position: absolute;
-  z-index: -1;
   height: 100%;
+  object-fit: cover;     /* ensures image covers the container */
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;       
 }
 
 
