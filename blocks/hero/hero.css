@@ -250,6 +250,11 @@
   padding: 40px;
   box-sizing: border-box;
 }
+
+.hero.image-right > div:nth-child(2) {
+  padding-left: 80px;
+}
+
 picture {
     line-height: 0;
 }
@@ -445,4 +450,48 @@ picture {
   .hero.image-background-text-right .button-container {
     text-align: center;
   }
+}
+
+/* --------------------------
+   Background Style Variations
+--------------------------- */
+
+/* Theme Dark Background Style */
+.hero.theme-dark {
+  background: var(--dark-color);
+}
+
+.hero.theme-dark h1,
+.hero.theme-dark h2,
+.hero.theme-dark h3,
+.hero.theme-dark h4,
+.hero.theme-dark h5,
+.hero.theme-dark h6,
+.hero.theme-dark p {
+  color: var(--light-color);
+}
+
+.hero.theme-dark .button-container a.button {
+  color: var(--light-color);
+  border-color: var(--light-color);
+}
+
+/* Theme Light Background Style */
+.hero.theme-light {
+  background: var(--light-color);
+}
+
+.hero.theme-light h1,
+.hero.theme-light h2,
+.hero.theme-light h3,
+.hero.theme-light h4,
+.hero.theme-light h5,
+.hero.theme-light h6,
+.hero.theme-light p {
+  color: var(--dark-color);
+}
+
+.hero.theme-light .button-container a.button {
+  color: var(--dark-color);
+  border-color: var(--dark-color);
 }
