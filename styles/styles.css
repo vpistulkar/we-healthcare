@@ -759,18 +759,27 @@ main .section.bg-image {
   overflow: hidden;
   position: relative;  
 }
+main .section.bg-image picture {
+  display: block;
+  width: 100%;
+}
 main .section.bg-image .sec-img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;     /* ensures image covers the container */
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: -1;       
+  height: auto;           
+  object-fit: contain;    
+  position: static;       
+  top: auto;
+  left: auto;
+  z-index: auto;
 }
-
-
-
+/* overlay the content on top of the image */
+main .section.bg-image > .default-content-wrapper {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  /* optional padding can be customized per design system */
+}
 
 /* Responsive styles- start */
 @media (max-width: 1024px) {
