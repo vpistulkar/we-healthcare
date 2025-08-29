@@ -288,6 +288,11 @@
     --button-vertical-padding-secondary: 12px;
     --button-horizontal-padding-secondary: 32px;
   }
+
+   main .section.bg-image .sec-img {
+    top: 0;
+    object-fit: cover;
+  }
 }
 
 body {
@@ -749,6 +754,17 @@ main .section.bg-light {
   color: var(--text-color);
 }
 
+/* Section background image */
+main .section.bg-image {
+  overflow: hidden;
+}
+main .section.bg-image .sec-img {
+  width: 100%;
+  position: absolute;
+  z-index: -1;
+  height: 100%;
+}
+
 
 
 
@@ -775,7 +791,6 @@ main .section.bg-light {
     --spacing-large: 2rem;
     --spacing-xlarge: 2.5rem;
   }
-
   main .section {
     padding: 0;
   }
