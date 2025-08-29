@@ -523,11 +523,14 @@
     "id": "custom-button",
     "fields": [
       {
-        "component": "reference",
+        "component": "aem-content",
         "valueType": "string",
         "name": "link",
         "label": "Link",
-        "multi": false
+        "multi": false,
+        "validation": {
+            "rootPath": "/content"
+        }
       },
       {
         "component": "text",
