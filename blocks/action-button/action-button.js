@@ -11,16 +11,25 @@ export default function decorate(block) {
   const labelElement = labelDiv?.querySelector('p');
   const buttonLabel = labelElement?.textContent?.trim() || 'Button';
   
-  const styleDiv = children[2];
+  const titleDiv = children[2];
+  const titleElement = titleDiv?.querySelector('p');
+  const buttonTitle = titleElement?.textContent?.trim() || '';
+  
+  const styleDiv = children[3];
   const styleElement = styleDiv?.querySelector('p');
   const buttonStyle = styleElement?.textContent?.trim() || 'default-button';
   
   const buttonElement = div({ class: `button-container ${buttonStyle}` },
-    a({ href: buttonLink, class: 'button' },
+    a({ 
+      href: buttonLink, 
+      class: 'button',
+      title: buttonTitle || buttonLabel
+    },
       span({ class: 'button-text' }, buttonLabel)
     )
   );
   
+  // Replace the entire block content with the rendered button
   block.innerHTML = '';
   block.appendChild(buttonElement);
 }

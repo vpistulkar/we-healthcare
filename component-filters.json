@@ -9,11 +9,12 @@
     "id": "section",
     "components": [
       "button",
+      "action-button",
       "cards",
       "carousel",
       "columns",
       "contentfragment",
-      "custom-button",
+      "button",
       "dm-asset",
       "dm-template",
       "fragment",
@@ -50,7 +51,6 @@
     "id": "column",
     "components": [
       "button",
-      "custom-button",
       "dm-asset",
       "dm-template",
       "image",

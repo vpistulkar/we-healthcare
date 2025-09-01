@@ -358,8 +358,7 @@
           {
             "name": "Light Color",
             "value": "bg-light"
-          }
-          
+          }         
         ]
       },
       {
@@ -477,20 +476,30 @@
     ]
   },
   {
-    "id": "custom-button",
+    "id": "action-button",
     "fields": [
       {
-        "component": "reference",
+        "component": "aem-content",
         "valueType": "string",
         "name": "link",
         "label": "Link",
-        "multi": false
+        "multi": false,
+        "validation": {
+            "rootPath": "/content"
+        }
       },
       {
         "component": "text",
         "name": "label",
-        "value": "",
+        "value": "Button",
         "label": "Label",
+        "valueType": "string"
+      },
+      {
+        "component": "text",
+        "name": "title",
+        "value": "Button",
+        "label": "Title",
         "valueType": "string"
       },
       {
@@ -565,6 +574,25 @@
             "value": "image-bottom"
           }
         ]
+      },
+      {
+        "component": "select",
+        "name": "alignment",
+        "label": "Alignment",
+        "options": [
+          {
+            "name": "Text Left",
+            "value": "text-left"
+          },
+          {
+            "name": "Text Right",
+            "value": "text-right"
+          },
+          {
+            "name": "Text Center",
+            "value": "text-center"
+          }
+        ]
       }
     ]
   },
@@ -624,6 +652,14 @@
           {
             "name": "Image Bottom",
             "value": "image-bottom"
+          },
+          {
+            "name": "Image-Background Text-Left",
+            "value": "image-background-text-left"
+          },
+          {
+            "name": "Image-Background Text-Right",
+            "value": "image-background-text-right"
           }
         ]
       },
@@ -647,6 +683,25 @@
           {
             "name": "Link",
             "value": "link"
+          }
+        ]
+      },
+      {
+        "component": "select",
+        "name": "backgroundstyle",
+        "label": "Background Style",
+        "options": [
+          {
+            "name": "Default",
+            "value": "default"
+          },
+          {
+            "name": "Theme Dark",
+            "value": "theme-dark"
+          },
+          {
+            "name": "Theme Light",
+            "value": "theme-light"
           }
         ]
       }
