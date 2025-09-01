@@ -949,7 +949,7 @@ table {
 }
 
 .cta-button-secondary a.button:hover::after {
-  color: var(--text-dark) !important;
+  color: var(--dark-color) !important;
   transform: translateX(2px);
 }
 

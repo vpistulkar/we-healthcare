@@ -87,7 +87,7 @@
 }
 
 .default-button-secondary a.button:hover::after {
-  color: var(--text-dark);
+  color: var(--text-color);
   transform: translateX(2px);
 }
 
