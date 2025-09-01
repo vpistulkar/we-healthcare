@@ -446,7 +446,7 @@
 .content-fragment-wrapper .content-fragment .banner-content.image-top .banner-detail.text-left a,
 .content-fragment-wrapper .content-fragment .banner-content.image-bottom .banner-detail.text-left a {
   text-align: left;
-  align-self: left;
+  align-self: flex-start;
 }
 .content-fragment-wrapper .content-fragment .banner-content.image-top .banner-detail.text-right .cfdescription,
 .content-fragment-wrapper .content-fragment .banner-content.image-bottom .banner-detail.text-right .cfdescription {
@@ -456,5 +456,5 @@
 .content-fragment-wrapper .content-fragment .banner-content.image-top .banner-detail.text-right a,
 .content-fragment-wrapper .content-fragment .banner-content.image-bottom .banner-detail.text-right a {
   text-align: right;
-  align-self: right;
+  align-self: flex-end;
 }
