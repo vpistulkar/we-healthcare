@@ -738,9 +738,6 @@ main > .section[data-sec-full-width="true"] > div {
 
 
 /* Section Background Colors */
-main .section.bg-default {
-  background-color: var(--background-color);
-}
 main .section.bg-theme {  
   background-color: var(--main-accent-color);
   color: var(--text-color);
