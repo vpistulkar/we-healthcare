@@ -616,14 +616,25 @@
           {
             "name": "Image Bottom",
             "value": "image-bottom"
+          }
+        ]
+      },
+      {
+        "component": "select",
+        "name": "alignment",
+        "label": "Alignment",
+        "options": [
+          {
+            "name": "Text Left",
+            "value": "text-left"
           },
           {
-            "name": "Overlay Image Left",
-            "value": "overlay-image-left"
+            "name": "Text Right",
+            "value": "text-right"
           },
           {
-            "name": "Overlay Image Right",
-            "value": "overlay-image-right"
+            "name": "Text Center",
+            "value": "text-center"
           }
         ]
       }

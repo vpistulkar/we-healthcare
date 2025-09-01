@@ -420,3 +420,19 @@
     margin-bottom: 200px !important;
   }
 }
+
+/* Alignment Styles */
+.content-fragment-wrapper .content-fragment .banner-content .banner-detail.text-left {
+  text-align: left;
+  align-items: flex-start;
+}
+
+.content-fragment-wrapper .content-fragment .banner-content .banner-detail.text-right {
+  text-align: right;
+  align-items: flex-end;
+}
+
+.content-fragment-wrapper .content-fragment .banner-content .banner-detail.text-center {
+  text-align: center;
+  align-items: center;
+}
