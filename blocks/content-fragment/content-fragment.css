@@ -280,6 +280,12 @@
   color: var(--text-color);
 }
 
+.content-fragment-wrapper .content-fragment .banner-content.image-left .banner-detail .cftitle::after,
+.content-fragment-wrapper .content-fragment .banner-content.image-right .banner-detail .cftitle::after,
+.content-fragment-wrapper .content-fragment .banner-content.image-top .banner-detail .cftitle::after,
+.content-fragment-wrapper .content-fragment .banner-content.image-bottom .banner-detail .cftitle::after {
+  color: var(--text-color);
+}
 /* Override text alignment for top/bottom layouts */
 .content-fragment-wrapper .content-fragment .banner-content.image-top .banner-detail .cfdescription,
 .content-fragment-wrapper .content-fragment .banner-content.image-bottom .banner-detail .cfdescription {
@@ -457,4 +463,10 @@
 .content-fragment-wrapper .content-fragment .banner-content.image-bottom .banner-detail.text-right a {
   text-align: right;
   align-self: flex-end;
+}
+.content-fragment-wrapper .content-fragment .banner-content .banner-detail.text-left .cftitle::after {
+  margin-left: 0;
+}
+.content-fragment-wrapper .content-fragment .banner-content .banner-detail.text-right .cftitle::after {
+  margin-right: 0;
 }
