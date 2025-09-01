@@ -59,7 +59,7 @@
   font-family: var(--black-font-family);
 }
 .content-fragment-wrapper .content-fragment .banner-content .banner-detail .cftitle::after {
-  background-color: var(--light-color);
+  background-color: var(--main-accent-color);
   content: "";
   display: block;
   height: 5px;
@@ -280,12 +280,6 @@
   color: var(--text-color);
 }
 
-.content-fragment-wrapper .content-fragment .banner-content.image-left .banner-detail .cftitle::after,
-.content-fragment-wrapper .content-fragment .banner-content.image-right .banner-detail .cftitle::after,
-.content-fragment-wrapper .content-fragment .banner-content.image-top .banner-detail .cftitle::after,
-.content-fragment-wrapper .content-fragment .banner-content.image-bottom .banner-detail .cftitle::after {
-  color: var(--text-color);
-}
 /* Override text alignment for top/bottom layouts */
 .content-fragment-wrapper .content-fragment .banner-content.image-top .banner-detail .cfdescription,
 .content-fragment-wrapper .content-fragment .banner-content.image-bottom .banner-detail .cfdescription {
