@@ -114,8 +114,7 @@ export default async function decorate(block) {
         const isImageRight = displayStyle === 'image-right';
         const isImageTop = displayStyle === 'image-top';
         const isImageBottom = displayStyle === 'image-bottom';
-        const isOverlayImageLeft = displayStyle === 'overlay-image-left';
-        const isOverlayImageRight = displayStyle === 'overlay-image-right';
+        
         
         // Set background image and styles based on layout
         let bannerContentStyle = '';
@@ -133,13 +132,7 @@ export default async function decorate(block) {
         } else if (isImageBottom) {
           // Image-bottom layout: text on top, image on bottom
           bannerContentStyle = 'background-image: url('+imgUrl+');';
-        } else if (isOverlayImageLeft) {
-          // Overlay image left layout: image on left, text on right
-          bannerContentStyle = 'background-image: url('+imgUrl+');';
-        } else if (isOverlayImageRight) {
-          // Overlay image right layout: image on right, text on left
-          bannerContentStyle = 'background-image: url('+imgUrl+');';
-        } else {
+        }  else {
           // Default layout: image as background with gradient overlay (original behavior)
           bannerDetailStyle = 'background-image: linear-gradient(90deg,rgba(0,0,0,0.6), rgba(0,0,0,0.1) 80%) ,url('+imgUrl+');';
         }
