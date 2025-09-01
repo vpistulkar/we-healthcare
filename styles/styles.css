@@ -289,10 +289,10 @@
     --button-horizontal-padding-secondary: 32px;
   }
 
-   main .section.bg-image .sec-img {
+  /* main .section.bg-image .sec-img {
     top: 0;
     object-fit: cover;
-  }
+  } */
 }
 
 body {
@@ -752,7 +752,7 @@ main .section.bg-light {
 }
 
 /* Section background image */
-main .section.bg-image {
+/* main .section.bg-image {
   overflow: hidden;
   position: relative;  
 }
@@ -769,14 +769,13 @@ main .section.bg-image .sec-img {
   left: auto;
   z-index: auto;
 }
-/* overlay the content on top of the image */
+  
 main .section.bg-image > .default-content-wrapper {
   position: absolute;
   inset: 0;
   z-index: 1;
   display: block;
-  /* optional padding can be customized per design system */
-}
+} */
 
 /* Responsive styles- start */
 @media (max-width: 1024px) {
