@@ -84,7 +84,9 @@ export function getInheritedPageProperties() {
   if (!langCode) langCode = 'en'; // default to en
   // substring before lang
   const prefix = pathname.substring(0, pathname.indexOf(`/${langCode}`)) || '';
-  const suffix = pathname.substring(pathname.indexOf(`/${langCode}`) + langCode.length + 1) || '';
+  let suffix = pathname.substring(pathname.indexOf(`/${langCode}`) + langCode.length + 1) || '';
+  // Normalize to avoid leading slashes (prevents `//` in computed URLs)
+  if (suffix.startsWith('/')) suffix = suffix.replace(/^\/+/, '');
   return {
     prefix,
     suffix,
@@ -116,7 +118,8 @@ export function getPathDetails() {
   if (!langCode) langCode = 'en'; // default to en
   // substring before lang
   const prefix = pathname.substring(0, pathname.indexOf(`/${langCode}`)) || '';
-  const suffix = pathname.substring(pathname.indexOf(`/${langCode}`) + langCode.length + 1) || '';
+  let suffix = pathname.substring(pathname.indexOf(`/${langCode}`) + langCode.length + 1) || '';
+  if (suffix.startsWith('/')) suffix = suffix.replace(/^\/+/, '');
   return {
     prefix,
     suffix,
