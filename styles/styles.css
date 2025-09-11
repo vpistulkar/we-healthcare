@@ -328,6 +328,83 @@ body.green-theme {
   --main-accent-color: #0e630e;
 }
 
+/* Header-Footer theme variants */
+/*body.header-footer-main header .nav-wrapper,
+body.header-footer-main footer {
+  background-color: var(--main-accent-color);
+  color: var(--text-light);
+}
+body.header-footer-black header .nav-wrapper,
+body.header-footer-black footer {
+  background-color: #000000;
+  color: #ffffff;
+}
+body.header-footer-white header .nav-wrapper,
+body.header-footer-white footer {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+body.header-footer-white header .nav-wrapper nav .nav-sections ul > li > a{
+  font-size: 18px;
+  color: #000 !important;
+  text-decoration: none;
+  font-family: var(--body-font-family);
+}
+body.header-footer-white header .search.search-icon .search-box .icon img, body.header-footer-white header .search.search-icon .search-trigger .icon img{
+   filter: invert(0);
+}
+body.header-footer-white .lang-switcher .lang-button {
+  background: transparent;
+  color: #000;
+  border: 1px solid rgb(0 0 0 / 40%);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+}*/
+
+
+
+
+/*theme header footer*/
+/* Header-Footer theme variants */
+/*
+body.header-footer-main header .nav-wrapper,
+body.header-footer-main footer {
+  background-color: var(--main-accent-color);
+  color: var(--text-light);
+}
+body.header-footer-black header .nav-wrapper,
+body.header-footer-black footer {
+  background-color: #000000;
+  color: #ffffff;
+}
+body.header-footer-white header .nav-wrapper,
+body.header-footer-white footer {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+body.header-footer-white header .nav-wrapper nav .nav-sections ul > li > a{
+  font-size: 18px;
+  color: #000 !important;
+  text-decoration: none;
+  font-family: var(--body-font-family);
+}
+body.header-footer-white header .search.search-icon .search-box .icon img, body.header-footer-white header .search.search-icon .search-trigger .icon img{
+   filter: invert(0);
+}
+body.header-footer-white .lang-switcher .lang-button {
+  background: transparent;
+  color: #000;
+  border: 1px solid rgb(0 0 0 / 40%);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+}*/
+
 /*theme header-footer*/
 body.red-theme header .nav-wrapper,
 body.red-theme footer {
