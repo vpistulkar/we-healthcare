@@ -147,6 +147,67 @@ export function setPageLanguage() {
   document.documentElement.lang = currentLang;
 }
 
+/**
+ * Compute the URL of the current page for a target language.
+ * Supports both EDS-style (/en/path) and AEM author (/content/{site}/language-masters/en/path.html)
+ */
+export function computeLocalizedUrl(targetLang) {
+  try {
+    if (!targetLang || typeof targetLang !== 'string') return window.location.href;
+    const { langCode, suffix, isContentPath } = getPathDetails();
+
+    const url = new URL(window.location.href);
+    const query = url.search || '';
+    const hash = url.hash || '';
+
+    if (!isContentPath) {
+      // EDS: /{lang}/{suffix}
+      const cleanSuffix = suffix ? suffix.replace(/^\/+/, '') : '';
+      if (targetLang.toLowerCase() === 'en' && !cleanSuffix) {
+        // Homepage → root
+        return `/${query}${hash}`.replace(/\/\/?(?=\?|#|$)/, '/');
+      }
+      const next = `/${targetLang}${cleanSuffix ? `/${cleanSuffix}` : ''}`;
+      return `${next}${query}${hash}`;
+    }
+
+    // AEM author: /content/{site}/language-masters/{lang}/{suffix}.html
+    // getSiteName can be async; fall back to path parsing if needed synchronously
+    const { pathname } = window.location;
+    const parts = pathname.split('/');
+    const siteNameFromPath = parts[2] || '';
+    const base = `/content/${siteNameFromPath}${PATH_PREFIX}/${targetLang}`;
+    const cleanSuffix = suffix ? suffix.replace(/^\/+/, '') : '';
+    const withSuffix = cleanSuffix ? `/${cleanSuffix}` : '';
+    return `${base}${withSuffix}.html${query}${hash}`;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error('computeLocalizedUrl failed', e);
+    return window.location.href;
+  }
+}
+
+/**
+ * Discover available languages from placeholders.
+ * Authors can set a row in placeholders with Key=languages and Text="en,fr,de".
+ * Falls back to ['en'] if not present.
+ */
+export async function discoverLanguagesFromPlaceholders() {
+  try {
+    const placeholders = await fetchPlaceholders();
+    const raw = placeholders.languages || placeholders.availableLanguages || '';
+    const parsed = String(raw)
+      .split(',')
+      .map((s) => s && s.trim())
+      .filter(Boolean);
+    if (parsed.length) return parsed;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.warn('discoverLanguagesFromPlaceholders failed', e);
+  }
+  return ['en'];
+}
+
 export function formatDate(dObjStr) {
   if (dObjStr) {
     const dObj = new Date(dObjStr);
