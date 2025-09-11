@@ -30,8 +30,9 @@
   --text-light: var(--brand-light-text-color, #ffffff);
   --text-disabled:rgb(113, 113, 113);
   --link-color: var(--brand-link-color, #131313);
- --link-hover-color: var(--brand-link-hover-color, #EA580C);
- --main-accent-color: var(--brand-theme-color, #EA580C);
+--link-hover-color: var(--brand-link-hover-color, #64748B);
+--main-accent-color: var(--brand-theme-color, #475569);
+
   --dark-color-opacity: rgba(0, 0, 0, 0.55);
   --light-color-opacity: rgba(255, 255, 255, 0.5);
 
