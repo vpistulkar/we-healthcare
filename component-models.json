@@ -427,8 +427,8 @@
         "label": "CTA Style",
         "options": [
          {
-            "name": "Default Button",
-            "value": "cta-default"
+            "name": "Link",
+            "value": "cta-link"
           },
           {
             "name": "Primary Button",
@@ -593,6 +593,29 @@
             "value": "text-center"
           }
         ]
+      },
+      {
+        "component": "select",
+        "name": "ctastyle",
+        "label": "CTA Style",
+        "options": [
+         {
+            "name": "Link",
+            "value": "cta-link"
+          },
+          {
+            "name": "Primary Button",
+            "value": "cta-button"
+          },
+          {
+            "name": "Secondary Button",
+            "value": "cta-button-secondary"
+          },
+          {
+            "name": "Dark Button",
+            "value": "cta-button-dark"
+          }
+        ]
       }
     ]
   },
@@ -635,7 +658,7 @@
         "options": [
           {
             "name": "Default",
-            "value": ""
+            "value": "overlay"
           },
           {
             "name": "Image Left",
@@ -669,8 +692,8 @@
         "label": "CTA Style",
         "options": [
           {
-            "name": "default",
-            "value": ""
+            "name": "Link",
+            "value": "link"
           },
           {
             "name": "Button",
@@ -681,8 +704,8 @@
             "value": "button-secondary"
           },
           {
-            "name": "Link",
-            "value": "link"
+            "name": "Dark Button",
+            "value": "button-dark"
           }
         ]
       },
@@ -1168,8 +1191,8 @@
         "label": "CTA Style",
          "options": [
           {
-            "name": "Default Button",
-            "value": "default"
+            "name": "Link",
+            "value": "link"
           },
           {
             "name": "Primary Button",
