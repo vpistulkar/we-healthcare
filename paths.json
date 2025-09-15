@@ -1,19 +1,19 @@
 {
   "mappings": [
-    "/content/wknd-universal/language-masters/en:/",
-    "/content/wknd-universal/language-masters/en/:/en/",
-    "/content/wknd-universal/language-masters/fr/:/fr/",
-    "/content/wknd-universal/language-masters/fr:/fr",
-    "/content/wknd-universal/language-masters/es/:/es/",
-    "/content/wknd-universal/language-masters/es:/es",
-    "/content/wknd-universal/configuration:/.helix/config.json",
-    "/content/wknd-universal/metadata:/metadata.json",
-    "/content/wknd-universal/redirects:/redirects.json",
-    "/content/wknd-universal/placeholders:/placeholders.json",
-    "/content/wknd-universal.resource/language-masters/en/query-index.json:/en/query-index.json"
+    "/content/weHealthcare/language-masters/en:/",
+    "/content/weHealthcare/language-masters/en/:/en/",
+    "/content/weHealthcare/language-masters/fr/:/fr/",
+    "/content/weHealthcare/language-masters/fr:/fr",
+    "/content/weHealthcare/language-masters/es/:/es/",
+    "/content/weHealthcare/language-masters/es:/es",
+    "/content/weHealthcare/configuration:/.helix/config.json",
+    "/content/weHealthcare/metadata:/metadata.json",
+    "/content/weHealthcare/redirects:/redirects.json",
+    "/content/weHealthcare/placeholders:/placeholders.json",
+    "/content/weHealthcare.resource/language-masters/en/query-index.json:/en/query-index.json"
   ],
   "includes": [
-    "/content/wknd-universal/",
-    "/content/dam/wknd-universal/"
+    "/content/weHealthcare/",
+    "/content/dam/weHealthcare/"
   ]
 }
