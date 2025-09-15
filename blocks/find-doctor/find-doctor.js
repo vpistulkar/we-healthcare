@@ -1,4 +1,4 @@
-import { readBlockConfig } from '../../scripts/aem.js';
+// Configuration reading is handled directly from block structure
 
 // Sample doctor data - in production, this would come from your data source
 const SAMPLE_DOCTORS = [
@@ -271,36 +271,52 @@ async function fetchDoctorData(config) {
   try {
     const { dataSourceType, damJsonPath, contentFragmentPath, apiUrl, staticJsonPath } = config;
     
+    console.log('Fetching doctor data with config:', { dataSourceType, damJsonPath, contentFragmentPath, apiUrl, staticJsonPath });
+    
     switch (dataSourceType) {
       case 'dam-json':
         if (damJsonPath) {
+          console.log('Attempting to fetch from DAM JSON:', damJsonPath);
           return await fetchFromDAMJson(damJsonPath);
+        } else {
+          console.warn('DAM JSON path not provided, falling back to sample data');
         }
         break;
         
       case 'content-fragments':
         if (contentFragmentPath) {
+          console.log('Attempting to fetch from Content Fragments:', contentFragmentPath);
           return await fetchFromContentFragments(contentFragmentPath);
+        } else {
+          console.warn('Content Fragment path not provided, falling back to sample data');
         }
         break;
         
       case 'api':
         if (apiUrl) {
+          console.log('Attempting to fetch from API:', apiUrl);
           return await fetchFromAPI(apiUrl);
+        } else {
+          console.warn('API URL not provided, falling back to sample data');
         }
         break;
         
       case 'json':
       default:
         if (staticJsonPath) {
+          console.log('Attempting to fetch from static JSON:', staticJsonPath);
           return await fetchFromStaticJson(staticJsonPath);
+        } else {
+          console.warn('Static JSON path not provided, falling back to sample data');
         }
         break;
     }
     
+    console.log('No valid data source configured, using sample data');
     return SAMPLE_DOCTORS; // Fallback to sample data
   } catch (error) {
     console.error('Error fetching doctor data:', error);
+    console.log('Falling back to sample data due to error');
     return SAMPLE_DOCTORS; // Fallback to sample data
   }
 }
@@ -308,13 +324,23 @@ async function fetchDoctorData(config) {
 async function fetchFromDAMJson(damPath) {
   try {
     // Convert DAM path to accessible URL
-    const jsonUrl = damPath.startsWith('/content/dam/') 
-      ? damPath.replace('/content/dam/', '/content/dam/') + '.json'
-      : damPath;
+    let jsonUrl;
+    if (damPath.startsWith('/content/dam/')) {
+      // Remove .json extension if already present, then add it
+      const cleanPath = damPath.replace(/\.json$/, '');
+      jsonUrl = cleanPath + '.json';
+    } else {
+      jsonUrl = damPath;
+    }
     
+    console.log('Attempting to fetch DAM JSON from:', jsonUrl);
     const response = await fetch(jsonUrl);
-    if (!response.ok) throw new Error('Failed to fetch DAM JSON');
+    if (!response.ok) {
+      console.warn(`Failed to fetch DAM JSON from ${jsonUrl}: ${response.status} ${response.statusText}`);
+      throw new Error(`Failed to fetch DAM JSON: ${response.status} ${response.statusText}`);
+    }
     const data = await response.json();
+    console.log('Successfully fetched DAM JSON data:', data);
     return Array.isArray(data) ? data : data.doctors || [];
   } catch (error) {
     console.error('Error fetching from DAM JSON:', error);
@@ -393,6 +419,22 @@ function transformContentFragmentToDoctor(cfData) {
   };
 }
 
+function getDataSourceInfo(config) {
+  const { dataSourceType, damJsonPath, contentFragmentPath, apiUrl, staticJsonPath } = config;
+  
+  switch (dataSourceType) {
+    case 'dam-json':
+      return damJsonPath ? `DAM JSON (${damJsonPath})` : 'DAM JSON (not configured)';
+    case 'content-fragments':
+      return contentFragmentPath ? `Content Fragments (${contentFragmentPath})` : 'Content Fragments (not configured)';
+    case 'api':
+      return apiUrl ? `External API (${apiUrl})` : 'External API (not configured)';
+    case 'json':
+    default:
+      return staticJsonPath ? `Static JSON (${staticJsonPath})` : 'Sample Data (fallback)';
+  }
+}
+
 function createSearchForm(config) {
   const form = createElement('form', 'find-doctor-form');
   
@@ -436,20 +478,73 @@ function createSearchForm(config) {
 }
 
 export default async function decorate(block) {
-  const config = readBlockConfig(block);
-  const title = config.title || 'Find a Doctor';
-  const subtitle = config.subtitle || 'Search for healthcare providers in your area';
-  const layout = config.layout || 'default';
+  // Read configuration using the same approach as search block
+  const title = block.querySelector(':scope > div:nth-child(1) > div')?.textContent?.trim() || 'Find a Doctor';
+  const subtitle = block.querySelector(':scope > div:nth-child(2) > div')?.textContent?.trim() || 'Search for healthcare providers in your area';
+  const layout = block.querySelector(':scope > div:nth-child(3) > div')?.textContent?.trim() || 'default';
+  const dataSourceType = block.querySelector(':scope > div:nth-child(4) > div')?.textContent?.trim() || 'json';
+  const damJsonPath = block.querySelector(':scope > div:nth-child(5) > div')?.textContent?.trim() || '';
+  const contentFragmentPath = block.querySelector(':scope > div:nth-child(6) > div')?.textContent?.trim() || '';
+  const apiUrl = block.querySelector(':scope > div:nth-child(7) > div')?.textContent?.trim() || '';
+  const staticJsonPath = block.querySelector(':scope > div:nth-child(8) > div')?.textContent?.trim() || '/data/doctors.json';
+  const enableLocationSearch = block.querySelector(':scope > div:nth-child(9) > div')?.textContent?.trim() !== 'false';
+  const enableSpecialtyFilter = block.querySelector(':scope > div:nth-child(10) > div')?.textContent?.trim() !== 'false';
+  const enableProviderNameSearch = block.querySelector(':scope > div:nth-child(11) > div')?.textContent?.trim() !== 'false';
   
-  // Clear the block content
+  console.log('Find Doctor Configuration:', {
+    title,
+    subtitle,
+    layout,
+    dataSourceType,
+    damJsonPath,
+    contentFragmentPath,
+    apiUrl,
+    staticJsonPath,
+    enableLocationSearch,
+    enableSpecialtyFilter,
+    enableProviderNameSearch
+  });
+  
+  // Create config object for compatibility
+  const config = {
+    title,
+    subtitle,
+    layout,
+    dataSourceType,
+    damJsonPath,
+    contentFragmentPath,
+    apiUrl,
+    staticJsonPath,
+    enableLocationSearch,
+    enableSpecialtyFilter,
+    enableProviderNameSearch
+  };
+  
+  // Hide configuration rows after reading them (same approach as search block)
+  try {
+    const configRows = [];
+    for (let i = 1; i <= 11; i++) {
+      const row = block.querySelector(`:scope > div:nth-child(${i})`);
+      if (row) configRows.push(row);
+    }
+    configRows.forEach((row) => { if (row) row.style.display = 'none'; });
+  } catch (e) {
+    console.log('[find-doctor] config/hide rows error', e);
+  }
+  
+  // Clear the block content and set up the component
   block.innerHTML = '';
   block.className = `find-doctor ${layout}`;
   
   // Create header
   const header = createElement('div', 'find-doctor-header');
+  const dataSourceInfo = getDataSourceInfo(config);
   header.innerHTML = `
     <h2 class="find-doctor-title">${title}</h2>
     <p class="find-doctor-subtitle">${subtitle}</p>
+    <div class="data-source-info">
+      <small>Data Source: ${dataSourceInfo}</small>
+    </div>
   `;
   block.appendChild(header);
   
@@ -463,6 +558,30 @@ export default async function decorate(block) {
   
   // Load doctor data
   let doctors = await fetchDoctorData(config);
+  
+  // Show loading state
+  resultsContainer.innerHTML = '<div class="loading-state">Loading doctors...</div>';
+  
+  // Add loading styles
+  const loadingStyle = document.createElement('style');
+  loadingStyle.textContent = `
+    .loading-state {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-color-secondary, #666);
+      font-size: 1.1rem;
+    }
+    .error-state {
+      text-align: center;
+      padding: 2rem;
+      color: var(--error-color, #dc3545);
+      background: var(--error-background, #f8d7da);
+      border: 1px solid var(--error-border, #f5c6cb);
+      border-radius: 8px;
+      margin: 1rem 0;
+    }
+  `;
+  document.head.appendChild(loadingStyle);
   
   // Initialize filters
   const filters = {
