@@ -23,6 +23,20 @@
   margin: 0;
 }
 
+.data-source-info {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--background-color-secondary, #f8f9fa);
+  border-radius: 6px;
+  border-left: 3px solid var(--link-color, #007bff);
+}
+
+.data-source-info small {
+  color: var(--text-color-secondary, #666);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
 .find-doctor-form {
   background: var(--background-color-secondary, #f8f9fa);
   border-radius: 12px;
