@@ -496,25 +496,132 @@ export default async function decorate(block) {
     textContent: child.textContent?.trim().substring(0, 100) + '...'
   })));
   
-  // Read configuration using the same approach as search block
-  let title = block.querySelector(':scope > div:nth-child(1) > div')?.textContent?.trim() || 'Find a Doctor';
-  let subtitle = block.querySelector(':scope > div:nth-child(2) > div')?.textContent?.trim() || 'Search for healthcare providers in your area';
-  const layout = block.querySelector(':scope > div:nth-child(3) > div')?.textContent?.trim() || 'default';
-  const dataSourceType = block.querySelector(':scope > div:nth-child(4) > div')?.textContent?.trim() || 'dam-json';
-  const damJsonPath = block.querySelector(':scope > div:nth-child(5) > div')?.textContent?.trim() || '';
-  const contentFragmentPath = block.querySelector(':scope > div:nth-child(6) > div')?.textContent?.trim() || '';
-  const apiUrl = block.querySelector(':scope > div:nth-child(7) > div')?.textContent?.trim() || '';
-  const staticJsonPath = block.querySelector(':scope > div:nth-child(8) > div')?.textContent?.trim() || '/data/doctors.json';
-  const enableLocationSearch = block.querySelector(':scope > div:nth-child(9) > div')?.textContent?.trim() !== 'false';
-  const enableSpecialtyFilter = block.querySelector(':scope > div:nth-child(10) > div')?.textContent?.trim() !== 'false';
-  const enableProviderNameSearch = block.querySelector(':scope > div:nth-child(11) > div')?.textContent?.trim() !== 'false';
+  // Read configuration - try multiple approaches since AEM structure might vary
+  let title = 'Find a Doctor';
+  let subtitle = 'Search for healthcare providers in your area';
+  let layout = 'default';
+  let dataSourceType = 'dam-json';
+  let damJsonPath = '';
+  let contentFragmentPath = '';
+  let apiUrl = '';
+  let staticJsonPath = '/data/doctors.json';
+  let enableLocationSearch = true;
+  let enableSpecialtyFilter = true;
+  let enableProviderNameSearch = true;
   
-  // Fallback: Try alternative selectors if the standard approach doesn't work
-  if (title === 'Find a Doctor' || subtitle === 'Search for healthcare providers in your area') {
+  // Try to read configuration from the block structure
+  // AEM might render this differently, so we'll try multiple approaches
+  
+  // Approach 1: Try the standard div structure
+  const titleDiv = block.querySelector(':scope > div:nth-child(1) > div');
+  if (titleDiv && titleDiv.textContent?.trim() && titleDiv.textContent.trim() !== 'title') {
+    title = titleDiv.textContent.trim();
+  }
+  
+  const subtitleDiv = block.querySelector(':scope > div:nth-child(2) > div');
+  if (subtitleDiv && subtitleDiv.textContent?.trim() && subtitleDiv.textContent.trim() !== 'subtitle') {
+    subtitle = subtitleDiv.textContent.trim();
+  }
+  
+  const layoutDiv = block.querySelector(':scope > div:nth-child(3) > div');
+  if (layoutDiv && layoutDiv.textContent?.trim() && layoutDiv.textContent.trim() !== 'layout') {
+    layout = layoutDiv.textContent.trim();
+  }
+  
+  const dataSourceDiv = block.querySelector(':scope > div:nth-child(4) > div');
+  if (dataSourceDiv && dataSourceDiv.textContent?.trim() && dataSourceDiv.textContent.trim() !== 'dataSourceType') {
+    dataSourceType = dataSourceDiv.textContent.trim();
+  }
+  
+  const damPathDiv = block.querySelector(':scope > div:nth-child(5) > div');
+  if (damPathDiv && damPathDiv.textContent?.trim() && damPathDiv.textContent.trim() !== 'damJsonPath') {
+    damJsonPath = damPathDiv.textContent.trim();
+  }
+  
+  const cfPathDiv = block.querySelector(':scope > div:nth-child(6) > div');
+  if (cfPathDiv && cfPathDiv.textContent?.trim() && cfPathDiv.textContent.trim() !== 'contentFragmentPath') {
+    contentFragmentPath = cfPathDiv.textContent.trim();
+  }
+  
+  const apiUrlDiv = block.querySelector(':scope > div:nth-child(7) > div');
+  if (apiUrlDiv && apiUrlDiv.textContent?.trim() && apiUrlDiv.textContent.trim() !== 'apiUrl') {
+    apiUrl = apiUrlDiv.textContent.trim();
+  }
+  
+  const staticPathDiv = block.querySelector(':scope > div:nth-child(8) > div');
+  if (staticPathDiv && staticPathDiv.textContent?.trim() && staticPathDiv.textContent.trim() !== 'staticJsonPath') {
+    staticJsonPath = staticPathDiv.textContent.trim();
+  }
+  
+  const locationDiv = block.querySelector(':scope > div:nth-child(9) > div');
+  if (locationDiv && locationDiv.textContent?.trim() && locationDiv.textContent.trim() !== 'enableLocationSearch') {
+    enableLocationSearch = locationDiv.textContent.trim() !== 'false';
+  }
+  
+  const specialtyDiv = block.querySelector(':scope > div:nth-child(10) > div');
+  if (specialtyDiv && specialtyDiv.textContent?.trim() && specialtyDiv.textContent.trim() !== 'enableSpecialtyFilter') {
+    enableSpecialtyFilter = specialtyDiv.textContent.trim() !== 'false';
+  }
+  
+  const providerDiv = block.querySelector(':scope > div:nth-child(11) > div');
+  if (providerDiv && providerDiv.textContent?.trim() && providerDiv.textContent.trim() !== 'enableProviderNameSearch') {
+    enableProviderNameSearch = providerDiv.textContent.trim() !== 'false';
+  }
+  
+  // Fallback: Try readBlockConfig if the standard approach doesn't work
+  if (title === 'Find a Doctor' || subtitle === 'Search for healthcare providers in your area' || !damJsonPath) {
     console.log('=== FALLBACK CONFIGURATION READING ===');
-    console.log('Trying alternative selectors...');
+    console.log('Trying readBlockConfig...');
     
-    // Try reading from all divs to see what's available
+    try {
+      const { readBlockConfig } = await import('../../scripts/aem.js');
+      const config = readBlockConfig(block);
+      console.log('readBlockConfig result:', config);
+      
+      if (config && Object.keys(config).length > 0) {
+        if (config.title && config.title !== 'title') {
+          title = config.title;
+          console.log('Found title via readBlockConfig:', title);
+        }
+        if (config.subtitle && config.subtitle !== 'subtitle') {
+          subtitle = config.subtitle;
+          console.log('Found subtitle via readBlockConfig:', subtitle);
+        }
+        if (config.layout && config.layout !== 'layout') {
+          layout = config.layout;
+        }
+        if (config.dataSourceType && config.dataSourceType !== 'dataSourceType') {
+          dataSourceType = config.dataSourceType;
+        }
+        if (config.damJsonPath && config.damJsonPath !== 'damJsonPath') {
+          damJsonPath = config.damJsonPath;
+          console.log('Found DAM JSON path via readBlockConfig:', damJsonPath);
+        }
+        if (config.contentFragmentPath && config.contentFragmentPath !== 'contentFragmentPath') {
+          contentFragmentPath = config.contentFragmentPath;
+        }
+        if (config.apiUrl && config.apiUrl !== 'apiUrl') {
+          apiUrl = config.apiUrl;
+        }
+        if (config.staticJsonPath && config.staticJsonPath !== 'staticJsonPath') {
+          staticJsonPath = config.staticJsonPath;
+        }
+        if (config.enableLocationSearch !== undefined) {
+          enableLocationSearch = config.enableLocationSearch !== false;
+        }
+        if (config.enableSpecialtyFilter !== undefined) {
+          enableSpecialtyFilter = config.enableSpecialtyFilter !== false;
+        }
+        if (config.enableProviderNameSearch !== undefined) {
+          enableProviderNameSearch = config.enableProviderNameSearch !== false;
+        }
+      }
+    } catch (error) {
+      console.log('readBlockConfig failed:', error);
+    }
+    
+    // Additional fallback: Try reading from all divs to see what's available
+    console.log('Trying alternative selectors...');
     const allDivs = block.querySelectorAll(':scope > div');
     allDivs.forEach((div, index) => {
       const text = div.textContent?.trim();
@@ -556,6 +663,13 @@ export default async function decorate(block) {
   console.log('Subtitle from div 2:', block.querySelector(':scope > div:nth-child(2) > div')?.textContent?.trim());
   console.log('Final title value:', title);
   console.log('Final subtitle value:', subtitle);
+  
+  // Special handling: If we have a DAM JSON path but dataSourceType is not dam-json, fix it
+  if (damJsonPath && damJsonPath !== '' && dataSourceType !== 'dam-json') {
+    console.log('=== FIXING DATA SOURCE TYPE ===');
+    console.log('Found DAM JSON path but dataSourceType is not dam-json, fixing...');
+    dataSourceType = 'dam-json';
+  }
   
   console.log('Find Doctor Configuration:', {
     title,
