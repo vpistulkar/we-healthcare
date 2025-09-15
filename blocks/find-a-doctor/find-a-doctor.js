@@ -184,9 +184,10 @@ function createDoctorCard(doctor) {
         <a href="tel:${doctor.phone}" class="contact-phone">${doctor.phone}</a>
         <a href="mailto:${doctor.email}" class="contact-email">Contact</a>
       </div>
-      <button class="book-appointment-btn" data-doctor-id="${doctor.id}">
-        Book Appointment
-      </button>
+      <p class="button-container cta-button">
+        <a title="Book Appointment" href="#" class="button" data-doctor-id="${doctor.id}">Book Appointment</a>
+      </p>
+  
     </div>
   `;
   
@@ -658,7 +659,7 @@ export default async function decorate(block) {
   
   // Book appointment functionality
   block.addEventListener('click', (e) => {
-    if (e.target.classList.contains('book-appointment-btn')) {
+    if (e.target.classList.contains('button') && e.target.closest('.button-container')) {
       const doctorId = e.target.dataset.doctorId;
       const doctor = doctors.find(d => d.id === doctorId);
       
