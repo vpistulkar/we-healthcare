@@ -479,17 +479,38 @@ function createSearchForm(config) {
 }
 
 export default async function decorate(block) {
-  // Read configuration using the same approach as search block
-  const title = block.querySelector(':scope > div:nth-child(1) > div')?.textContent?.trim() || 'Find a Doctor';
-  const subtitle = block.querySelector(':scope > div:nth-child(2) > div')?.textContent?.trim() || 'Search for healthcare providers in your area';
-  const dataSourceType = block.querySelector(':scope > div:nth-child(3) > div')?.textContent?.trim() || 'json';
-  const damJsonPath = block.querySelector(':scope > div:nth-child(4) > div')?.textContent?.trim() || '';
-  const contentFragmentPath = block.querySelector(':scope > div:nth-child(5) > div')?.textContent?.trim() || '';
-  const apiUrl = block.querySelector(':scope > div:nth-child(6) > div')?.textContent?.trim() || '';
-  const staticJsonPath = block.querySelector(':scope > div:nth-child(7) > div')?.textContent?.trim() || '/data/doctors.json';
-  const enableLocationSearch = block.querySelector(':scope > div:nth-child(8) > div')?.textContent?.trim() !== 'false';
-  const enableSpecialtyFilter = block.querySelector(':scope > div:nth-child(9) > div')?.textContent?.trim() !== 'false';
-  const enableProviderNameSearch = block.querySelector(':scope > div:nth-child(10) > div')?.textContent?.trim() !== 'false';
+  // Debug: Log the block structure to understand the DOM
+  console.log('Block HTML Structure:', block.innerHTML);
+  console.log('Block children count:', block.children.length);
+  
+  // Try to read configuration - let's be more flexible with the selectors
+  let title = 'Find a Doctor';
+  let subtitle = 'Search for healthcare providers in your area';
+  let dataSourceType = 'json';
+  let damJsonPath = '';
+  let contentFragmentPath = '';
+  let apiUrl = '';
+  let staticJsonPath = '/data/doctors.json';
+  let enableLocationSearch = true;
+  let enableSpecialtyFilter = true;
+  let enableProviderNameSearch = true;
+  
+  // Try different approaches to read configuration
+  const children = Array.from(block.children);
+  console.log('Children:', children.map((child, index) => ({ index, text: child.textContent?.trim() })));
+  
+  // Look for title and subtitle in the first few children
+  for (let i = 0; i < Math.min(children.length, 5); i++) {
+    const child = children[i];
+    const text = child.textContent?.trim();
+    console.log(`Child ${i}:`, text);
+    
+    if (text === 'Find a Doctor' || text?.includes('Find a Doctor')) {
+      title = 'Find a Doctor';
+    } else if (text === 'Search for healthcare providers in your area' || text?.includes('Search for healthcare providers')) {
+      subtitle = 'Search for healthcare providers in your area';
+    }
+  }
   
   // Always use default layout
   const layout = 'default';
@@ -522,14 +543,33 @@ export default async function decorate(block) {
     enableProviderNameSearch
   };
   
-  // Hide configuration rows after reading them (same approach as search block)
+  // Hide configuration rows after reading them
   try {
-    const configRows = [];
-    for (let i = 1; i <= 10; i++) {
-      const row = block.querySelector(`:scope > div:nth-child(${i})`);
-      if (row) configRows.push(row);
-    }
-    configRows.forEach((row) => { if (row) row.style.display = 'none'; });
+    // Hide all children that contain configuration data
+    children.forEach((child) => {
+      const text = child.textContent?.trim();
+      // Hide rows that contain configuration field names or values
+      if (text && (
+        text.includes('enableLocationSearch') ||
+        text.includes('enableSpecialtyFilter') ||
+        text.includes('enableProviderNameSearch') ||
+        text.includes('dataSourceType') ||
+        text.includes('damJsonPath') ||
+        text.includes('contentFragmentPath') ||
+        text.includes('apiUrl') ||
+        text.includes('staticJsonPath') ||
+        text.includes('Data Source:') ||
+        text === 'true' ||
+        text === 'false' ||
+        text === 'json' ||
+        text === 'dam-json' ||
+        text === 'content-fragments' ||
+        text === 'api'
+      )) {
+        child.style.display = 'none';
+        console.log('Hiding config row:', text);
+      }
+    });
   } catch (e) {
     console.log('[find-doctor] config/hide rows error', e);
   }
@@ -673,4 +713,91 @@ export default async function decorate(block) {
   
   // Initial render
   renderResults(doctors, resultsContainer);
+  
+  // Add observer to watch for configuration changes in the block
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'childList' || mutation.type === 'characterData') {
+        // Configuration might have changed, re-read it
+        const newDataSourceType = block.querySelector(':scope > div:nth-child(3) > div')?.textContent?.trim() || 'json';
+        const newDamJsonPath = block.querySelector(':scope > div:nth-child(4) > div')?.textContent?.trim() || '';
+        const newContentFragmentPath = block.querySelector(':scope > div:nth-child(5) > div')?.textContent?.trim() || '';
+        const newApiUrl = block.querySelector(':scope > div:nth-child(6) > div')?.textContent?.trim() || '';
+        const newStaticJsonPath = block.querySelector(':scope > div:nth-child(7) > div')?.textContent?.trim() || '/data/doctors.json';
+        
+        // Check if data source configuration has changed
+        if (newDataSourceType !== dataSourceType || 
+            newDamJsonPath !== damJsonPath || 
+            newContentFragmentPath !== contentFragmentPath || 
+            newApiUrl !== apiUrl || 
+            newStaticJsonPath !== staticJsonPath) {
+          
+          console.log('Data source configuration changed, reloading data...');
+          
+          // Update configuration
+          dataSourceType = newDataSourceType;
+          damJsonPath = newDamJsonPath;
+          contentFragmentPath = newContentFragmentPath;
+          apiUrl = newApiUrl;
+          staticJsonPath = newStaticJsonPath;
+          
+          // Update data source info display
+          const dataSourceInfo = getDataSourceInfo({
+            dataSourceType,
+            damJsonPath,
+            contentFragmentPath,
+            apiUrl,
+            staticJsonPath
+          });
+          
+          const dataSourceElement = block.querySelector('.data-source-info small');
+          if (dataSourceElement) {
+            dataSourceElement.textContent = `Data Source: ${dataSourceInfo}`;
+          }
+          
+          // Reload doctor data with new configuration
+          loadDoctorData();
+        }
+      }
+    });
+  });
+  
+  // Start observing the block for changes
+  observer.observe(block, {
+    childList: true,
+    subtree: true,
+    characterData: true
+  });
+  
+  // Function to reload doctor data
+  async function loadDoctorData() {
+    try {
+      // Show loading state
+      resultsContainer.innerHTML = '<div class="loading-state">Loading doctors...</div>';
+      
+      // Fetch new data
+      const newDoctors = await fetchDoctorData({
+        dataSourceType,
+        damJsonPath,
+        contentFragmentPath,
+        apiUrl,
+        staticJsonPath,
+        enableLocationSearch,
+        enableSpecialtyFilter,
+        enableProviderNameSearch
+      });
+      
+      // Update doctors array
+      doctors = newDoctors;
+      
+      // Re-apply current filters and render
+      const filteredDoctors = filterDoctors(doctors, filters);
+      renderResults(filteredDoctors, resultsContainer);
+      
+      console.log('Doctor data reloaded successfully');
+    } catch (error) {
+      console.error('Error reloading doctor data:', error);
+      resultsContainer.innerHTML = '<div class="error-state">Error loading doctor data. Please try again.</div>';
+    }
+  }
 }
