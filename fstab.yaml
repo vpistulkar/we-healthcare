@@ -1,5 +1,5 @@
 mountpoints:
   /:
-    url: "https://author-p159983-e1710854.adobeaemcloud.com/bin/franklin.delivery/vpistulkar/we_healthcare/main"
+    url: "https://author-p159983-e1710854.adobeaemcloud.com/bin/franklin.delivery/vpistulkar/we-healthcare/main"
     type: "markup"
     suffix: ".html"
