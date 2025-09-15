@@ -6277,7 +6277,7 @@
     ]
   },
   {
-    "id": "finddoctor",
+    "id": "find-a-doctor",
     "fields": [
       {
         "component": "text",
