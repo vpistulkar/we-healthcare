@@ -482,15 +482,17 @@ export default async function decorate(block) {
   // Read configuration using the same approach as search block
   const title = block.querySelector(':scope > div:nth-child(1) > div')?.textContent?.trim() || 'Find a Doctor';
   const subtitle = block.querySelector(':scope > div:nth-child(2) > div')?.textContent?.trim() || 'Search for healthcare providers in your area';
-  const layout = block.querySelector(':scope > div:nth-child(3) > div')?.textContent?.trim() || 'default';
-  const dataSourceType = block.querySelector(':scope > div:nth-child(4) > div')?.textContent?.trim() || 'json';
-  const damJsonPath = block.querySelector(':scope > div:nth-child(5) > div')?.textContent?.trim() || '';
-  const contentFragmentPath = block.querySelector(':scope > div:nth-child(6) > div')?.textContent?.trim() || '';
-  const apiUrl = block.querySelector(':scope > div:nth-child(7) > div')?.textContent?.trim() || '';
-  const staticJsonPath = block.querySelector(':scope > div:nth-child(8) > div')?.textContent?.trim() || '/data/doctors.json';
-  const enableLocationSearch = block.querySelector(':scope > div:nth-child(9) > div')?.textContent?.trim() !== 'false';
-  const enableSpecialtyFilter = block.querySelector(':scope > div:nth-child(10) > div')?.textContent?.trim() !== 'false';
-  const enableProviderNameSearch = block.querySelector(':scope > div:nth-child(11) > div')?.textContent?.trim() !== 'false';
+  const dataSourceType = block.querySelector(':scope > div:nth-child(3) > div')?.textContent?.trim() || 'json';
+  const damJsonPath = block.querySelector(':scope > div:nth-child(4) > div')?.textContent?.trim() || '';
+  const contentFragmentPath = block.querySelector(':scope > div:nth-child(5) > div')?.textContent?.trim() || '';
+  const apiUrl = block.querySelector(':scope > div:nth-child(6) > div')?.textContent?.trim() || '';
+  const staticJsonPath = block.querySelector(':scope > div:nth-child(7) > div')?.textContent?.trim() || '/data/doctors.json';
+  const enableLocationSearch = block.querySelector(':scope > div:nth-child(8) > div')?.textContent?.trim() !== 'false';
+  const enableSpecialtyFilter = block.querySelector(':scope > div:nth-child(9) > div')?.textContent?.trim() !== 'false';
+  const enableProviderNameSearch = block.querySelector(':scope > div:nth-child(10) > div')?.textContent?.trim() !== 'false';
+  
+  // Always use default layout
+  const layout = 'default';
   
   console.log('Find Doctor Configuration:', {
     title,
@@ -510,7 +512,6 @@ export default async function decorate(block) {
   const config = {
     title,
     subtitle,
-    layout,
     dataSourceType,
     damJsonPath,
     contentFragmentPath,
@@ -524,7 +525,7 @@ export default async function decorate(block) {
   // Hide configuration rows after reading them (same approach as search block)
   try {
     const configRows = [];
-    for (let i = 1; i <= 11; i++) {
+    for (let i = 1; i <= 10; i++) {
       const row = block.querySelector(`:scope > div:nth-child(${i})`);
       if (row) configRows.push(row);
     }
