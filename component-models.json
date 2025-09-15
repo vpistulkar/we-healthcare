@@ -6319,7 +6319,7 @@
         "name": "dataSourceType",
         "label": "Data Source Type",
         "valueType": "string",
-        "value": "json",
+        "value": "dam-json",
         "options": [
           {
             "name": "JSON File from DAM",

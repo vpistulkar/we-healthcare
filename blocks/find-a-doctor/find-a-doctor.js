@@ -272,7 +272,13 @@ async function fetchDoctorData(config) {
   try {
     const { dataSourceType, damJsonPath, contentFragmentPath, apiUrl, staticJsonPath } = config;
     
-    console.log('Fetching doctor data with config:', { dataSourceType, damJsonPath, contentFragmentPath, apiUrl, staticJsonPath });
+    console.log('=== FETCH DOCTOR DATA DEBUG ===');
+    console.log('Data source type:', dataSourceType);
+    console.log('DAM JSON path:', damJsonPath);
+    console.log('Content Fragment path:', contentFragmentPath);
+    console.log('API URL:', apiUrl);
+    console.log('Static JSON path:', staticJsonPath);
+    console.log('Full config:', config);
     
     switch (dataSourceType) {
       case 'dam-json':
@@ -479,11 +485,22 @@ function createSearchForm(config) {
 }
 
 export default async function decorate(block) {
+  // Debug: Log the entire block structure first
+  console.log('=== BLOCK STRUCTURE DEBUG ===');
+  console.log('Block HTML before processing:', block.innerHTML);
+  console.log('Block children count:', block.children.length);
+  console.log('Block children:', Array.from(block.children).map((child, index) => ({
+    index,
+    tagName: child.tagName,
+    className: child.className,
+    textContent: child.textContent?.trim().substring(0, 100) + '...'
+  })));
+  
   // Read configuration using the same approach as search block
-  const title = block.querySelector(':scope > div:nth-child(1) > div')?.textContent?.trim() || 'Find a Doctor';
-  const subtitle = block.querySelector(':scope > div:nth-child(2) > div')?.textContent?.trim() || 'Search for healthcare providers in your area';
+  let title = block.querySelector(':scope > div:nth-child(1) > div')?.textContent?.trim() || 'Find a Doctor';
+  let subtitle = block.querySelector(':scope > div:nth-child(2) > div')?.textContent?.trim() || 'Search for healthcare providers in your area';
   const layout = block.querySelector(':scope > div:nth-child(3) > div')?.textContent?.trim() || 'default';
-  const dataSourceType = block.querySelector(':scope > div:nth-child(4) > div')?.textContent?.trim() || 'json';
+  const dataSourceType = block.querySelector(':scope > div:nth-child(4) > div')?.textContent?.trim() || 'dam-json';
   const damJsonPath = block.querySelector(':scope > div:nth-child(5) > div')?.textContent?.trim() || '';
   const contentFragmentPath = block.querySelector(':scope > div:nth-child(6) > div')?.textContent?.trim() || '';
   const apiUrl = block.querySelector(':scope > div:nth-child(7) > div')?.textContent?.trim() || '';
@@ -491,6 +508,54 @@ export default async function decorate(block) {
   const enableLocationSearch = block.querySelector(':scope > div:nth-child(9) > div')?.textContent?.trim() !== 'false';
   const enableSpecialtyFilter = block.querySelector(':scope > div:nth-child(10) > div')?.textContent?.trim() !== 'false';
   const enableProviderNameSearch = block.querySelector(':scope > div:nth-child(11) > div')?.textContent?.trim() !== 'false';
+  
+  // Fallback: Try alternative selectors if the standard approach doesn't work
+  if (title === 'Find a Doctor' || subtitle === 'Search for healthcare providers in your area') {
+    console.log('=== FALLBACK CONFIGURATION READING ===');
+    console.log('Trying alternative selectors...');
+    
+    // Try reading from all divs to see what's available
+    const allDivs = block.querySelectorAll(':scope > div');
+    allDivs.forEach((div, index) => {
+      const text = div.textContent?.trim();
+      if (text && text !== '') {
+        console.log(`Div ${index + 1} content:`, text);
+      }
+    });
+    
+    // Try reading title and subtitle from any div that might contain them
+    const allTextDivs = block.querySelectorAll(':scope > div > div');
+    allTextDivs.forEach((div, index) => {
+      const text = div.textContent?.trim();
+      if (text && text !== '') {
+        console.log(`Text div ${index + 1}:`, text);
+        // If we find text that looks like a title or subtitle, use it
+        if (text.length > 5 && text.length < 100 && !text.includes('dataSourceType') && !text.includes('dam-json')) {
+          if (title === 'Find a Doctor' && text.toLowerCase().includes('doctor')) {
+            title = text;
+            console.log('Found title in fallback:', title);
+          } else if (subtitle === 'Search for healthcare providers in your area' && text.toLowerCase().includes('search')) {
+            subtitle = text;
+            console.log('Found subtitle in fallback:', subtitle);
+          }
+        }
+      }
+    });
+  }
+  
+  // Debug: Log what we're reading from each div
+  console.log('=== CONFIGURATION READING DEBUG ===');
+  console.log('Raw div contents:');
+  for (let i = 1; i <= 11; i++) {
+    const div = block.querySelector(`:scope > div:nth-child(${i}) > div`);
+    console.log(`Div ${i}:`, div?.textContent?.trim() || 'empty');
+  }
+  
+  console.log('=== TITLE AND SUBTITLE DEBUG ===');
+  console.log('Title from div 1:', block.querySelector(':scope > div:nth-child(1) > div')?.textContent?.trim());
+  console.log('Subtitle from div 2:', block.querySelector(':scope > div:nth-child(2) > div')?.textContent?.trim());
+  console.log('Final title value:', title);
+  console.log('Final subtitle value:', subtitle);
   
   console.log('Find Doctor Configuration:', {
     title,
@@ -540,6 +605,12 @@ export default async function decorate(block) {
   // Create header
   const header = createElement('div', 'find-doctor-header');
   const dataSourceInfo = getDataSourceInfo(config);
+  
+  console.log('=== HEADER CREATION DEBUG ===');
+  console.log('Creating header with title:', title);
+  console.log('Creating header with subtitle:', subtitle);
+  console.log('Data source info:', dataSourceInfo);
+  
   header.innerHTML = `
     <h2 class="find-doctor-title">${title}</h2>
     <p class="find-doctor-subtitle">${subtitle}</p>
@@ -548,6 +619,8 @@ export default async function decorate(block) {
     </div>
   `;
   block.appendChild(header);
+  
+  console.log('Header HTML created:', header.innerHTML);
   
   // Create search form
   const searchForm = createSearchForm(config);
