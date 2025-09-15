@@ -3,6 +3,7 @@ import {
   decorateIcons
 } from '../../scripts/aem.js';
 import { fetchPlaceholders } from '../../scripts/placeholders.js';
+import { getLanguage } from '../../scripts/utils.js';
 
 const searchParams = new URLSearchParams(window.location.search);
 
@@ -80,11 +81,16 @@ function highlightTextElements(terms, elements) {
   });
 }
 
-function getSnippet(result, searchTerms) {
+function getSnippet(result, searchTerms, searchPhrase) {
   const sourceText = (result.body || result.description || '').trim();
   if (!sourceText) return '';
   const lc = sourceText.toLowerCase();
   let bestIdx = -1;
+  // Prefer exact phrase if present
+  if (searchPhrase && searchPhrase.length >= 2) {
+    const phraseIdx = lc.indexOf(searchPhrase);
+    if (phraseIdx >= 0) bestIdx = phraseIdx;
+  }
   searchTerms.forEach((t) => {
     const idx = lc.indexOf(t.toLowerCase());
     if (idx >= 0 && (bestIdx === -1 || idx < bestIdx)) bestIdx = idx;
@@ -119,7 +125,55 @@ export async function fetchData(source) {
   }
 }
 
-function renderResult(result, searchTerms, titleTag) {
+function applySearchPathFilter(data, searchPath) {
+  const list = Array.isArray(data) ? data : [];
+  const prefix = (searchPath || '').trim().toLowerCase();
+  if (!prefix || prefix === '/' || prefix === '*') return list;
+  return list.filter((r) => typeof r?.path === 'string' && r.path.toLowerCase().startsWith(prefix));
+}
+
+function deriveScopeFromRaw(raw) {
+  const value = (raw || '').trim();
+  if (!value) return '';
+  const marker = '/language-masters/';
+  const idx = value.indexOf(marker);
+  if (idx >= 0) {
+    const after = value.slice(idx + marker.length);
+    const lang = (after.split('/')[0] || '').trim();
+    return lang ? `/${lang}` : '';
+  }
+  if (value.startsWith('/')) {
+    const seg = value.split('/').filter(Boolean)[0] || '';
+    return seg ? `/${seg}` : '';
+  }
+  return '';
+}
+
+function getScopedPrefix(block) {
+  // forwarded scope from overlay → search page takes precedence
+  if (block && typeof block._forwardedScope === 'string' && block._forwardedScope) return block._forwardedScope;
+  try {
+    const a = block.querySelector(':scope > div:nth-child(1) .button-container a[href]');
+    const raw = (a?.textContent || a?.getAttribute('href') || '').trim();
+    return deriveScopeFromRaw(raw);
+  } catch (e) { /* noop */ }
+  return '';
+}
+
+function attachScopeParam(url, scope) {
+  if (!url || !scope) return;
+  if (scope !== '/') url.searchParams.set('sp', scope);
+}
+
+function isExcludedResult(result) {
+  const path = safeText(result.path).toLowerCase();
+  const robots = safeText(result.robots).toLowerCase();
+  if (robots.includes('noindex')) return true;
+  if (/\/(nav|footer)$/i.test(path)) return true;
+  return false;
+}
+
+function renderResult(result, searchTerms, searchPhrase, titleTag) {
   const li = document.createElement('li');
   const a = document.createElement('a');
   a.href = result.path;
@@ -141,7 +195,7 @@ function renderResult(result, searchTerms, titleTag) {
     title.append(link);
     a.append(title);
   }
-  const snippetText = getSnippet(result, searchTerms);
+  const snippetText = getSnippet(result, searchTerms, searchPhrase);
   if (snippetText) {
     const description = document.createElement('p');
     description.textContent = snippetText;
@@ -176,7 +230,7 @@ function clearSearch(block) {
   }
 }
 
-async function renderResults(block, config, filteredData, searchTerms) {
+async function renderResults(block, config, filteredData, searchTerms, searchPhrase) {
   clearSearchResults(block);
   const searchResults = block.querySelector('.search-results');
   const headingTag = searchResults.dataset.h;
@@ -185,7 +239,7 @@ async function renderResults(block, config, filteredData, searchTerms) {
   if (filteredData.length) {
     searchResults.classList.remove('no-results');
     filteredData.forEach((result) => {
-      const li = renderResult(result, searchTerms, headingTag);
+      const li = renderResult(result, searchTerms, searchPhrase, headingTag);
       searchResults.append(li);
     });
     if (dropdown) {
@@ -208,9 +262,10 @@ function compareFound(hit1, hit2) {
   return hit1.minIdx - hit2.minIdx;
 }
 
-function filterData(searchTerms, data) {
+function filterData(searchTerms, data, searchPhrase) {
   const foundInHeader = [];
   const foundInMeta = [];
+  const foundByPhrase = [];
 
   (Array.isArray(data) ? data : []).forEach((result) => {
     let minIdx = -1;
@@ -227,6 +282,15 @@ function filterData(searchTerms, data) {
     }
 
     const metaContents = `${safeText(result.navTitle || result.title)} ${safeText(result.description)} ${safeText(result.body)} ${safeText(result.path)?.split('/').pop() || ''}`.toLowerCase();
+
+    // Prefer exact phrase match across meta contents
+    if (searchPhrase && searchPhrase.length >= 2) {
+      const phraseIdx = metaContents.indexOf(searchPhrase);
+      if (phraseIdx >= 0) {
+        foundByPhrase.push({ minIdx: phraseIdx, result });
+        return;
+      }
+    }
     searchTerms.forEach((term) => {
       const idx = metaContents.indexOf(term);
       if (idx < 0) return;
@@ -239,6 +303,7 @@ function filterData(searchTerms, data) {
   });
 
   return [
+    ...foundByPhrase.sort(compareFound),
     ...foundInHeader.sort(compareFound),
     ...foundInMeta.sort(compareFound),
   ].map((item) => item.result);
@@ -260,11 +325,14 @@ async function handleSearchImpl(e, block, config) {
     clearSearch(block);
     return;
   }
-  const searchTerms = searchValue.toLowerCase().split(/\s+/).filter((term) => !!term);
+  const searchPhrase = searchValue.toLowerCase().trim();
+  const searchTerms = searchPhrase.split(/\s+/).filter((term) => term && term.length >= 3);
 
-  const data = await fetchData(config.source);
-  const filteredData = filterData(searchTerms, data);
-  await renderResults(block, config, filteredData, searchTerms);
+  const authoredPrefix = getScopedPrefix(block);
+  const data = (await fetchData(config.source)).filter((r) => !isExcludedResult(r));
+  const scoped = applySearchPathFilter(data, authoredPrefix);
+  const filteredData = filterData(searchTerms, scoped, searchPhrase);
+  await renderResults(block, config, filteredData, searchTerms, searchPhrase);
 }
 
 const handleSearch = debounce(handleSearchImpl, 150);
@@ -285,9 +353,14 @@ function searchInput(block, config) {
   input.placeholder = searchPlaceholder;
   input.setAttribute('aria-label', searchPlaceholder);
 
-  input.addEventListener('input', (e) => {
-    handleSearch(e, block, config);
-  });
+  // Only attach suggestion handler for icon variant (overlay).
+  // For search-bar variant, we disable suggestions and rely on Enter to expand.
+  const isIconVariant = block.classList.contains('search-icon');
+  if (isIconVariant) {
+    input.addEventListener('input', (e) => {
+      handleSearch(e, block, config);
+    });
+  }
 
   input.addEventListener('keyup', (e) => { if (e.code === 'Escape') { clearSearch(block); } });
 
@@ -305,15 +378,23 @@ function searchBox(block, config) {
   box.classList.add('search-box');
   const input = searchInput(block, config);
   const icon = searchIcon();
-  const dropdown = document.createElement('div');
-  dropdown.className = 'search-dropdown';
-  const results = searchResultsContainer(block);
-  dropdown.append(results);
-  box.append(
-    input,
-    icon,
-    dropdown,
-  );
+  const isIconVariant = block.classList.contains('search-icon');
+  if (isIconVariant) {
+    const dropdown = document.createElement('div');
+    dropdown.className = 'search-dropdown';
+    const results = searchResultsContainer(block);
+    dropdown.append(results);
+    box.append(
+      input,
+      icon,
+      dropdown,
+    );
+  } else {
+    box.append(
+      input,
+      icon,
+    );
+  }
 
   return box;
 }
@@ -324,7 +405,7 @@ function buildExpandedLayout(block) {
   if (expanded) return {
     expanded,
     filters: expanded.querySelector('.search-filters'),
-    results: expanded.querySelector('.search-expanded-results'),
+    results: expanded.querySelector('.search-expanded-results .search-results'),
   };
 
   expanded = document.createElement('div');
@@ -366,7 +447,16 @@ function getResultTimestamp(result) {
   return NaN;
 }
 
-function applyDateFilter(data, dateRange) {
+// Specific timestamp getters for distinct filters
+function getPublishedTimestamp(result) {
+  return normalizeTimestamp(result.publishDate);
+}
+
+function getModifiedTimestamp(result) {
+  return normalizeTimestamp(result.lastModified);
+}
+
+function applyDateFilter(data, dateRange, getResultTimestamp) {
   if (!dateRange || dateRange === 'any') return data;
   const now = Date.now();
   const ranges = { '24h': 24 * 60 * 60 * 1000, '7d': 7 * 24 * 60 * 60 * 1000, '30d': 30 * 24 * 60 * 60 * 1000 };
@@ -408,8 +498,39 @@ function renderDateFilters(container, selected, onChange) {
   container.append(group);
 }
 
-function applyAllFilters(base, selectedDateRange) {
-  return applyDateFilter(base, selectedDateRange);
+function renderModifiedFilters(container, selected, onChange) {
+  const group = document.createElement('div');
+  group.className = 'filter-group date-range modified-range';
+  const title = document.createElement('h4');
+  title.textContent = 'Modified';
+  group.append(title);
+
+  const options = [
+    { key: 'any', label: 'Any time' },
+    { key: '24h', label: 'Last 24 hours' },
+    { key: '7d', label: 'Last week' },
+    { key: '30d', label: 'Last month' },
+  ];
+  const name = `modified-range-${Math.random().toString(36).slice(2)}`;
+  options.forEach((opt, idx) => {
+    const id = `${name}-${idx}`;
+    const label = document.createElement('label');
+    const rb = document.createElement('input');
+    rb.type = 'radio';
+    rb.name = name;
+    rb.id = id;
+    rb.checked = (selected || 'any') === opt.key;
+    rb.addEventListener('change', () => onChange(opt.key));
+    label.append(rb, document.createTextNode(` ${opt.label}`));
+    group.append(label);
+  });
+  container.append(group);
+}
+
+function applyAllFilters(base, selectedPublishedRange, selectedModifiedRange) {
+  const byPublished = applyDateFilter(base, selectedPublishedRange, getPublishedTimestamp);
+  const byModified = applyDateFilter(byPublished, selectedModifiedRange, getModifiedTimestamp);
+  return byModified;
 }
 
 function renderSortControls(container, selected, onChange) {
@@ -479,22 +600,31 @@ async function activateExpandedSearch(block, config, searchValue, cachedData) {
   // fetch/cached data
   let data = cachedData || block._searchData;
   if (!data) {
-    data = await fetchData(config.source);
+    const fetched = (await fetchData(config.source)).filter((r) => !isExcludedResult(r));
+    const scope = getScopedPrefix(block);
+    data = applySearchPathFilter(fetched, scope);
     block._searchData = data;
   }
 
-  const searchTerms = value.toLowerCase().split(/\s+/).filter((t) => !!t);
-  const base = filterData(searchTerms, data);
+  const searchPhrase = value.toLowerCase();
+  const searchTerms = searchPhrase.split(/\s+/).filter((t) => t && t.length >= 3);
+  const base = filterData(searchTerms, data, searchPhrase);
 
   // state
-  let selectedDateRange = block._selectedDateRange || 'any';
+  let selectedPublishedRange = block._selectedPublishedRange || 'any';
+  let selectedModifiedRange = block._selectedModifiedRange || 'any';
   let sortOrder = block._sortOrder || 'relevance';
 
   const renderFilters = () => {
     filters.innerHTML = '';
-    renderDateFilters(filters, selectedDateRange, (next) => {
-      selectedDateRange = next;
-      block._selectedDateRange = selectedDateRange;
+    renderDateFilters(filters, selectedPublishedRange, (next) => {
+      selectedPublishedRange = next;
+      block._selectedPublishedRange = selectedPublishedRange;
+      renderList();
+    });
+    renderModifiedFilters(filters, selectedModifiedRange, (next) => {
+      selectedModifiedRange = next;
+      block._selectedModifiedRange = selectedModifiedRange;
       renderList();
     });
     renderSortControls(filters, sortOrder, (next) => {
@@ -505,7 +635,7 @@ async function activateExpandedSearch(block, config, searchValue, cachedData) {
   };
 
   const renderList = () => {
-    const filtered = applySort(applyAllFilters(base, selectedDateRange), sortOrder);
+    const filtered = applySort(applyAllFilters(base, selectedPublishedRange, selectedModifiedRange), sortOrder);
     results.innerHTML = '';
     if (!filtered.length) {
       const msg = document.createElement('li');
@@ -515,7 +645,7 @@ async function activateExpandedSearch(block, config, searchValue, cachedData) {
       return;
     }
     results.classList.remove('no-results');
-    filtered.forEach((r) => results.append(renderResult(r, searchTerms, results.dataset.h)));
+    filtered.forEach((r) => results.append(renderResult(r, searchTerms, searchPhrase, results.dataset.h)));
   };
 
   renderFilters();
@@ -527,12 +657,16 @@ export default async function decorate(block) {
   // Determine source path from the first config row anchor, or existing anchor in block, or locale default
   const configAnchor = block.querySelector(':scope > div:nth-child(1) a[href]');
   const inlineAnchor = block.querySelector('a[href]');
-  let source = configAnchor?.href || inlineAnchor?.href;
+  const candidate = configAnchor?.href || inlineAnchor?.href || '';
+  const isJsonSource = candidate && /\.json(\?|$)/.test(candidate) && /query-index\.json(\?|$)/.test(candidate);
+  let source = isJsonSource ? candidate : '';
   if (!source) {
     const htmlLang = (document.documentElement.getAttribute('lang') || '').trim();
     const langMatch = htmlLang.match(/^[a-z]{2}(?:-[A-Z]{2})?$/);
     const locale = langMatch ? htmlLang.split('-')[0] : '';
     source = `${locale ? `/${locale}` : ''}/query-index.json`;
+    // eslint-disable-next-line no-console
+    if (candidate && !isJsonSource) console.log('[search] ignoring non-JSON config anchor for source:', candidate);
   }
 
   // Read style from second row and hide first two rows (config rows)
@@ -583,6 +717,37 @@ export default async function decorate(block) {
     trigger.addEventListener('click', openOverlay);
     overlay.addEventListener('click', (e) => { if (e.target === overlay) closeOverlay(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && overlay.classList.contains('open')) closeOverlay(); });
+
+    // Enter in icon variant should redirect to /{lang}/search?q=...
+    const getLocalePrefix = () => {
+      try {
+        const lang = getLanguage();
+        console.log('lang', lang);
+        return lang ? `/${lang}` : '';
+      } catch (e) {
+        const htmlLang = (document.documentElement.getAttribute('lang') || '').trim();
+        const langMatch = htmlLang.match(/^[a-z]{2}(?:-[A-Z]{2})?$/);
+        const locale = langMatch ? htmlLang.split('-')[0] : '';
+        return locale ? `/${locale}` : '';
+      }
+    };
+    const redirectToSearchPage = (query) => {
+      const targetPath = `${getLocalePrefix()}/search`;
+      const url = new URL(targetPath, window.location.origin);
+      if (query && query.trim()) url.searchParams.set('q', query.trim());
+      // Carry scoped search path to the search page if authored
+      attachScopeParam(url, getScopedPrefix(block));
+      window.location.href = url.toString();
+    };
+    const overlayInput = panel.querySelector('input.search-input');
+    if (overlayInput) {
+      overlayInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          redirectToSearchPage(overlayInput.value || '');
+        }
+      });
+    }
   } else {
     // bar variant: inline search box with dropdown beneath input
     block.append(
@@ -597,11 +762,20 @@ export default async function decorate(block) {
         await activateExpandedSearch(block, { source, placeholders }, input.value);
       }
     });
+
+    // Ensure suggestions are hidden for search-bar variant
+    const dropdown = block.querySelector('.search-dropdown');
+    if (dropdown) dropdown.remove();
   }
 
   if (searchParams.get('q')) {
     const input = block.querySelector('input');
     input.value = searchParams.get('q');
+    // Apply scoped path forwarded via 'sp' param (from search-icon overlay)
+    const forwardedScope = (new URL(window.location.href)).searchParams.get('sp') || '';
+    if (forwardedScope) {
+      block._forwardedScope = forwardedScope;
+    }
     if (useBarVariant) {
       await activateExpandedSearch(block, { source, placeholders }, input.value);
     } else {
