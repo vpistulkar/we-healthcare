@@ -640,9 +640,14 @@ export default async function decorate(block) {
     const link = valueEl.querySelector('a');
     const raw = (link?.getAttribute('title') || link?.textContent || valueEl.textContent || '').trim();
     const val = raw;
+    console.log(`Parsing key: "${key}" with value: "${val}"`);
     switch (key) {
       case 'title':
-        if (val && val.toLowerCase() !== 'title') title = val; break;
+        if (val && val.toLowerCase() !== 'title') {
+          console.log(`Setting title to: "${val}"`);
+          title = val;
+        }
+        break;
       case 'subtitle':
         if (val && val.toLowerCase() !== 'subtitle') subtitle = val; break;
       case 'layout':
@@ -763,6 +768,7 @@ export default async function decorate(block) {
   console.log('Subtitle from div 2:', block.querySelector(':scope > div:nth-child(2) > div')?.textContent?.trim());
   console.log('Final title value:', title);
   console.log('Final subtitle value:', subtitle);
+  console.log('Final contentFragmentFolder value:', contentFragmentFolder);
   
   // Special handling: If we have a DAM JSON path but dataSourceType is not dam-json, fix it
   if (damJsonPath && damJsonPath !== '' && dataSourceType !== 'dam-json' && !contentFragmentFolder) {
