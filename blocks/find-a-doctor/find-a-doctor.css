@@ -139,8 +139,8 @@
 .accepting-patients,
 .not-accepting {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  bottom: 1rem;
+  left: 1rem;
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
   font-size: 0.8rem;
