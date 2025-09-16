@@ -285,12 +285,11 @@ function getCurrentLocation() {
 
 async function fetchDoctorData(config) {
   try {
-    const { dataSourceType, damJsonPath, contentFragmentPath, contentFragmentFolder, apiUrl, staticJsonPath } = config;
+    const { dataSourceType, damJsonPath, contentFragmentFolder, apiUrl, staticJsonPath } = config;
     
     console.log('=== FETCH DOCTOR DATA DEBUG ===');
     console.log('Data source type:', dataSourceType);
     console.log('DAM JSON path:', damJsonPath);
-    console.log('Content Fragment path:', contentFragmentPath);
     console.log('Content Fragment folder:', contentFragmentFolder);
     console.log('API URL:', apiUrl);
     console.log('Static JSON path:', staticJsonPath);
@@ -310,11 +309,8 @@ async function fetchDoctorData(config) {
         if (contentFragmentFolder) {
           console.log('Attempting to fetch from Content Fragment folder:', contentFragmentFolder);
           return await fetchFromContentFragmentFolder(contentFragmentFolder);
-        } else if (contentFragmentPath) {
-          console.log('Attempting to fetch from Content Fragment:', contentFragmentPath);
-          return await fetchFromContentFragments(contentFragmentPath);
         } else {
-          console.warn('Content Fragment path or folder not provided, falling back to sample data');
+          console.warn('Content Fragment folder not provided, falling back to sample data');
         }
         break;
         
@@ -544,19 +540,13 @@ function transformContentFragmentToDoctor(cfData) {
 }
 
 function getDataSourceInfo(config) {
-  const { dataSourceType, damJsonPath, contentFragmentPath, contentFragmentFolder, apiUrl, staticJsonPath } = config;
+  const { dataSourceType, damJsonPath, contentFragmentFolder, apiUrl, staticJsonPath } = config;
   
   switch (dataSourceType) {
     case 'dam-json':
       return damJsonPath ? `DAM JSON (${damJsonPath})` : 'DAM JSON (not configured)';
     case 'content-fragments':
-      if (contentFragmentFolder) {
-        return `Content Fragment Folder (${contentFragmentFolder})`;
-      } else if (contentFragmentPath) {
-        return `Content Fragment (${contentFragmentPath})`;
-      } else {
-        return 'Content Fragments (not configured)';
-      }
+      return contentFragmentFolder ? `Content Fragment Folder (${contentFragmentFolder})` : 'Content Fragments (not configured)';
     case 'api':
       return apiUrl ? `External API (${apiUrl})` : 'External API (not configured)';
     case 'json':
@@ -625,7 +615,6 @@ export default async function decorate(block) {
   let layout = 'default';
   let dataSourceType = 'dam-json';
   let damJsonPath = '';
-  let contentFragmentPath = '';
   let contentFragmentFolder = '';
   let apiUrl = '';
   let staticJsonPath = '/data/doctors.json';
@@ -636,66 +625,44 @@ export default async function decorate(block) {
   // Try to read configuration from the block structure
   // AEM might render this differently, so we'll try multiple approaches
   
-  // Approach 1: Try the standard div structure
-  const titleDiv = block.querySelector(':scope > div:nth-child(1) > div');
-  if (titleDiv && titleDiv.textContent?.trim() && titleDiv.textContent.trim() !== 'title') {
-    title = titleDiv.textContent.trim();
-  }
-  
-  const subtitleDiv = block.querySelector(':scope > div:nth-child(2) > div');
-  if (subtitleDiv && subtitleDiv.textContent?.trim() && subtitleDiv.textContent.trim() !== 'subtitle') {
-    subtitle = subtitleDiv.textContent.trim();
-  }
-  
-  const layoutDiv = block.querySelector(':scope > div:nth-child(3) > div');
-  if (layoutDiv && layoutDiv.textContent?.trim() && layoutDiv.textContent.trim() !== 'layout') {
-    layout = layoutDiv.textContent.trim();
-  }
-  
-  const dataSourceDiv = block.querySelector(':scope > div:nth-child(4) > div');
-  if (dataSourceDiv && dataSourceDiv.textContent?.trim() && dataSourceDiv.textContent.trim() !== 'dataSourceType') {
-    dataSourceType = dataSourceDiv.textContent.trim();
-  }
-  
-  const damPathDiv = block.querySelector(':scope > div:nth-child(5) > div');
-  if (damPathDiv && damPathDiv.textContent?.trim() && damPathDiv.textContent.trim() !== 'damJsonPath') {
-    damJsonPath = damPathDiv.textContent.trim();
-  }
-  
-  const cfPathDiv = block.querySelector(':scope > div:nth-child(6) > div');
-  if (cfPathDiv && cfPathDiv.textContent?.trim() && cfPathDiv.textContent.trim() !== 'contentFragmentPath') {
-    contentFragmentPath = cfPathDiv.textContent.trim();
-  }
-  
-  const cfFolderDiv = block.querySelector(':scope > div:nth-child(7) > div');
-  if (cfFolderDiv && cfFolderDiv.textContent?.trim() && cfFolderDiv.textContent.trim() !== 'contentFragmentFolder') {
-    contentFragmentFolder = cfFolderDiv.textContent.trim();
-  }
-  
-  const apiUrlDiv = block.querySelector(':scope > div:nth-child(8) > div');
-  if (apiUrlDiv && apiUrlDiv.textContent?.trim() && apiUrlDiv.textContent.trim() !== 'apiUrl') {
-    apiUrl = apiUrlDiv.textContent.trim();
-  }
-  
-  const staticPathDiv = block.querySelector(':scope > div:nth-child(9) > div');
-  if (staticPathDiv && staticPathDiv.textContent?.trim() && staticPathDiv.textContent.trim() !== 'staticJsonPath') {
-    staticJsonPath = staticPathDiv.textContent.trim();
-  }
-  
-  const locationDiv = block.querySelector(':scope > div:nth-child(10) > div');
-  if (locationDiv && locationDiv.textContent?.trim() && locationDiv.textContent.trim() !== 'enableLocationSearch') {
-    enableLocationSearch = locationDiv.textContent.trim() !== 'false';
-  }
-  
-  const specialtyDiv = block.querySelector(':scope > div:nth-child(11) > div');
-  if (specialtyDiv && specialtyDiv.textContent?.trim() && specialtyDiv.textContent.trim() !== 'enableSpecialtyFilter') {
-    enableSpecialtyFilter = specialtyDiv.textContent.trim() !== 'false';
-  }
-  
-  const providerDiv = block.querySelector(':scope > div:nth-child(12) > div');
-  if (providerDiv && providerDiv.textContent?.trim() && providerDiv.textContent.trim() !== 'enableProviderNameSearch') {
-    enableProviderNameSearch = providerDiv.textContent.trim() !== 'false';
-  }
+  // Approach 1: Keyed parsing by label to avoid positional mix-ups
+  const rows = Array.from(block.querySelectorAll(':scope > div'));
+  rows.forEach((row) => {
+    const cells = row.querySelectorAll(':scope > div');
+    if (cells.length < 2) return;
+    const key = cells[0].textContent?.trim()?.toLowerCase();
+    if (!key) return;
+    let valueEl = cells[1];
+    const link = valueEl.querySelector('a');
+    const raw = (link?.getAttribute('title') || link?.textContent || valueEl.textContent || '').trim();
+    const val = raw;
+    switch (key) {
+      case 'title':
+        if (val && val.toLowerCase() !== 'title') title = val; break;
+      case 'subtitle':
+        if (val && val.toLowerCase() !== 'subtitle') subtitle = val; break;
+      case 'layout':
+        if (val && val.toLowerCase() !== 'layout') layout = val; break;
+      case 'datasourcetype':
+        if (val && val.toLowerCase() !== 'datasourcetype') dataSourceType = val; break;
+      case 'damjsonpath':
+        if (val && val.toLowerCase() !== 'damjsonpath') damJsonPath = val; break;
+      case 'contentfragmentfolder':
+        if (val && val.toLowerCase() !== 'contentfragmentfolder') contentFragmentFolder = val; break;
+      case 'apiurl':
+        if (val && val.toLowerCase() !== 'apiurl') apiUrl = val; break;
+      case 'staticjsonpath':
+        if (val && val.toLowerCase() !== 'staticjsonpath') staticJsonPath = val; break;
+      case 'enablelocationsearch':
+        enableLocationSearch = val !== 'false'; break;
+      case 'enablespecialtyfilter':
+        enableSpecialtyFilter = val !== 'false'; break;
+      case 'enableprovidernamesearch':
+        enableProviderNameSearch = val !== 'false'; break;
+      default:
+        break;
+    }
+  });
   
   // Fallback: Try readBlockConfig if the standard approach doesn't work
   if (title === 'Find a Doctor' || subtitle === 'Search for healthcare providers in your area' || !damJsonPath) {
@@ -725,9 +692,6 @@ export default async function decorate(block) {
         if (config.damJsonPath && config.damJsonPath !== 'damJsonPath') {
           damJsonPath = config.damJsonPath;
           console.log('Found DAM JSON path via readBlockConfig:', damJsonPath);
-        }
-        if (config.contentFragmentPath && config.contentFragmentPath !== 'contentFragmentPath') {
-          contentFragmentPath = config.contentFragmentPath;
         }
         if (config.contentFragmentFolder && config.contentFragmentFolder !== 'contentFragmentFolder') {
           contentFragmentFolder = config.contentFragmentFolder;
@@ -785,7 +749,7 @@ export default async function decorate(block) {
   // Debug: Log what we're reading from each div
   console.log('=== CONFIGURATION READING DEBUG ===');
   console.log('Raw div contents:');
-  for (let i = 1; i <= 12; i++) {
+  for (let i = 1; i <= 11; i++) {
     const div = block.querySelector(`:scope > div:nth-child(${i}) > div`);
     console.log(`Div ${i}:`, div?.textContent?.trim() || 'empty');
   }
@@ -797,7 +761,7 @@ export default async function decorate(block) {
   console.log('Final subtitle value:', subtitle);
   
   // Special handling: If we have a DAM JSON path but dataSourceType is not dam-json, fix it
-  if (damJsonPath && damJsonPath !== '' && dataSourceType !== 'dam-json') {
+  if (damJsonPath && damJsonPath !== '' && dataSourceType !== 'dam-json' && !contentFragmentFolder) {
     console.log('=== FIXING DATA SOURCE TYPE ===');
     console.log('Found DAM JSON path but dataSourceType is not dam-json, fixing...');
     dataSourceType = 'dam-json';
@@ -809,7 +773,6 @@ export default async function decorate(block) {
     layout,
     dataSourceType,
     damJsonPath,
-    contentFragmentPath,
     contentFragmentFolder,
     apiUrl,
     staticJsonPath,
@@ -825,7 +788,6 @@ export default async function decorate(block) {
     layout,
     dataSourceType,
     damJsonPath,
-    contentFragmentPath,
     contentFragmentFolder,
     apiUrl,
     staticJsonPath,
@@ -837,7 +799,7 @@ export default async function decorate(block) {
   // Hide configuration rows after reading them (same approach as search block)
   try {
     const configRows = [];
-    for (let i = 1; i <= 12; i++) {
+    for (let i = 1; i <= 11; i++) {
       const row = block.querySelector(`:scope > div:nth-child(${i})`);
       if (row) configRows.push(row);
     }
