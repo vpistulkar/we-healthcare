@@ -741,12 +741,14 @@ export default async function decorate(block) {
       const text = div.textContent?.trim();
       if (text && text !== '') {
         console.log(`Text div ${index + 1}:`, text);
-        // If we find text that looks like a title or subtitle, use it
-        if (text.length > 5 && text.length < 100 && !text.includes('dataSourceType') && !text.includes('dam-json')) {
-          if (title === 'Find a Doctor' && text.toLowerCase().includes('doctor')) {
+        // Guard against picking DAM paths or URLs as titles
+        const looksLikePath = text.startsWith('/content/') || text.includes('/') || text.includes(':');
+        // If we find text that looks like a proper title/subtitle, use it
+        if (!looksLikePath && text.length > 2 && text.length < 120 && !text.includes('dataSourceType') && !text.includes('dam-json')) {
+          if (title === 'Find a Doctor' && /doctor/i.test(text)) {
             title = text;
             console.log('Found title in fallback:', title);
-          } else if (subtitle === 'Search for healthcare providers in your area' && text.toLowerCase().includes('search')) {
+          } else if (subtitle === 'Search for healthcare providers in your area' && /search|provider|healthcare/i.test(text)) {
             subtitle = text;
             console.log('Found subtitle in fallback:', subtitle);
           }
