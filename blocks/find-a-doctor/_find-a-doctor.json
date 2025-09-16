@@ -104,6 +104,17 @@
           "condition": { "==": [{ "var": "dataSourceType" }, "content-fragments"] }
         },
         {
+          "component": "aem-content",
+          "name": "contentFragmentFolder",
+          "label": "Content Fragment Folder",
+          "description": "Select folder containing multiple doctor Content Fragments",
+          "valueType": "string",
+          "validation": {
+            "rootPath": "/content/dam"
+          },
+          "condition": { "==": [{ "var": "dataSourceType" }, "content-fragments"] }
+        },
+        {
           "component": "text",
           "valueType": "string",
           "name": "apiUrl",

@@ -6350,17 +6350,28 @@
         },
         "condition": { "==": [{ "var": "dataSourceType" }, "dam-json"] }
       },
-      {
-        "component": "aem-content",
-        "name": "contentFragmentPath",
-        "label": "Content Fragment Path",
-        "description": "Select Content Fragment containing doctor data",
-        "valueType": "string",
-        "validation": {
-          "rootPath": "/content/dam"
+        {
+          "component": "aem-content",
+          "name": "contentFragmentPath",
+          "label": "Content Fragment Path",
+          "description": "Select Content Fragment containing doctor data",
+          "valueType": "string",
+          "validation": {
+            "rootPath": "/content/dam"
+          },
+          "condition": { "==": [{ "var": "dataSourceType" }, "content-fragments"] }
         },
-        "condition": { "==": [{ "var": "dataSourceType" }, "content-fragments"] }
-      },
+        {
+          "component": "aem-content",
+          "name": "contentFragmentFolder",
+          "label": "Content Fragment Folder",
+          "description": "Select folder containing multiple doctor Content Fragments",
+          "valueType": "string",
+          "validation": {
+            "rootPath": "/content/dam"
+          },
+          "condition": { "==": [{ "var": "dataSourceType" }, "content-fragments"] }
+        },
       {
         "component": "text",
         "valueType": "string",
