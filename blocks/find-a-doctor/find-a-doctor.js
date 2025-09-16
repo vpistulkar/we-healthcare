@@ -588,12 +588,14 @@ function createSearchForm(config) {
   if (config.enableLocationSearch !== false) {
     const locationGroup = createElement('div', 'search-group');
     const locationLabel = createElement('label', '', 'Location');
+    const subLocation = createElement('div', 'sub-location');
     const locationInput = createSearchInput('City, State, or ZIP code...', 'location-search');
     const locationButton = createElement('button', 'location-button', '📍 Use My Location');
     locationButton.type = 'button';
     locationGroup.appendChild(locationLabel);
-    locationGroup.appendChild(locationInput);
-    locationGroup.appendChild(locationButton);
+    subLocation.appendChild(locationInput);
+    subLocation.appendChild(locationButton);
+    locationGroup.appendChild(subLocation);
     searchRow.appendChild(locationGroup);
   }
   
