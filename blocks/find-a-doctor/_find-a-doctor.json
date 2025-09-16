@@ -94,9 +94,9 @@
         },
         {
           "component": "aem-content",
-          "name": "contentFragmentPath",
-          "label": "Content Fragment Path",
-          "description": "Select Content Fragment containing doctor data",
+          "name": "contentFragmentFolder",
+          "label": "Content Fragment Folder",
+          "description": "Select folder containing multiple doctor Content Fragments",
           "valueType": "string",
           "validation": {
             "rootPath": "/content/dam"
