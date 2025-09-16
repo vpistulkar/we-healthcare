@@ -84,7 +84,6 @@
 
 .location-button {
   margin-left: 5px;
-  margin-top: 0.5rem;
   padding: 0.75rem 1rem;
   color: white;
   border: none;
@@ -97,7 +96,10 @@
 .location-button:hover:not(:disabled) {
   background: var(--button-secondary-hover-color, #cadce9);
 }
-
+.sub-location {
+  display: flex;
+  flex-direction: row;
+}
 .location-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;

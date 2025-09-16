@@ -590,7 +590,7 @@ function createSearchForm(config) {
     const locationLabel = createElement('label', '', 'Location');
     const subLocation = createElement('div', 'sub-location');
     const locationInput = createSearchInput('City, State, or ZIP code...', 'location-search');
-    const locationButton = createElement('button', 'location-button', '📍 Use My Location');
+    const locationButton = createElement('button', 'location-button', '📍');
     locationButton.type = 'button';
     locationGroup.appendChild(locationLabel);
     subLocation.appendChild(locationInput);
@@ -926,7 +926,7 @@ export default async function decorate(block) {
   if (locationButton) {
     locationButton.addEventListener('click', async () => {
       try {
-        locationButton.textContent = '📍 Getting location...';
+        locationButton.textContent = '📍';
         locationButton.disabled = true;
         
         const position = await getCurrentLocation();
