@@ -3,7 +3,7 @@ import { getMetadata } from '../../scripts/aem.js';
 import { isAuthorEnvironment } from '../../scripts/scripts.js';
 
 // Sample doctor data - in production, this would come from your data source
-const GRAPHQL_DOCTORS_BY_FOLDER_QUERY = '/graphql/execute.json/wknd-universal/DoctorsListFromFolder';
+const GRAPHQL_DOCTORS_BY_FOLDER_QUERY = '/graphql/execute.json/weHealthcare/GetDoctorsFromFolder';
 const CONFIG = {
   WRAPPER_SERVICE_URL: 'https://defaultfa7b1b5a7b34438794aed2c178dece.e1.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/2660b7afa9524acbae379074ae38501e/triggers/manual/paths/invoke',
   WRAPPER_SERVICE_PARAMS: 'api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=uDpzD2f3QIHYqS4krx0sTF4M_2pElDpQ0lTHvFl9ntU'
@@ -380,7 +380,7 @@ async function fetchFromContentFragments(cfPath) {
     const data = await response.json();
     
     // Transform Content Fragment data to doctor format
-    if (data[':type'] === 'wknd-universal/doctor') {
+    if (data[':type'] === 'weHealthcare/doctor') {
       return [transformContentFragmentToDoctor(data)];
     } else if (Array.isArray(data)) {
       return data.map(item => transformContentFragmentToDoctor(item));
@@ -591,6 +591,8 @@ function createSearchForm(config) {
     const subLocation = createElement('div', 'sub-location');
     const locationInput = createSearchInput('City, State, or ZIP code...', 'location-search');
     const locationButton = createElement('button', 'location-button', '📍');
+    locationButton.title = 'my location';
+    locationButton.setAttribute('aria-label', 'my location');
     locationButton.type = 'button';
     locationGroup.appendChild(locationLabel);
     subLocation.appendChild(locationInput);
