@@ -937,17 +937,17 @@ export default async function decorate(block) {
         filters.location = 'Current location detected';
         performSearch();
         
-        locationButton.textContent = '📍 Location Found';
+        locationButton.textContent = '📍';
         setTimeout(() => {
-          locationButton.textContent = '📍 Use My Location';
+          locationButton.textContent = '📍';
           locationButton.disabled = false;
         }, 2000);
         
       } catch (error) {
         console.error('Error getting location:', error);
-        locationButton.textContent = '📍 Location Error';
+        locationButton.textContent = '📍';
         setTimeout(() => {
-          locationButton.textContent = '📍 Use My Location';
+          locationButton.textContent = '📍';
           locationButton.disabled = false;
         }, 2000);
       }
