@@ -24,6 +24,7 @@
 }
 
 .data-source-info {
+  display: none;
   margin-top: 0.5rem;
   padding: 0.5rem 1rem;
   background: var(--background-color-secondary, #f8f9fa);
