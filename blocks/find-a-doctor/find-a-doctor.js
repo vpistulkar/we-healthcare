@@ -411,7 +411,7 @@ async function fetchFromContentFragmentFolder(folderPath) {
 
     const requestConfig = isAuthor
       ? {
-          url: `${aemauthorurl}${GRAPHQL_DOCTORS_BY_FOLDER_QUERY};folderPath=${encodeURIComponent(decodedFolderPath)};ts=${Date.now()}`,
+          url: `${aemauthorurl}${GRAPHQL_DOCTORS_BY_FOLDER_QUERY};folderPath=${decodedFolderPath};ts=${Date.now()}`,
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
         }
