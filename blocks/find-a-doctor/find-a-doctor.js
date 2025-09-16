@@ -1,6 +1,21 @@
 // Configuration reading is handled directly from block structure
+import { getMetadata } from '../../scripts/aem.js';
+import { isAuthorEnvironment } from '../../scripts/scripts.js';
 
 // Sample doctor data - in production, this would come from your data source
+const GRAPHQL_DOCTORS_BY_FOLDER_QUERY = '/graphql/execute.json/wknd-universal/DoctorsListFromFolder';
+const CONFIG = {
+  WRAPPER_SERVICE_URL: 'https://defaultfa7b1b5a7b34438794aed2c178dece.e1.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/2660b7afa9524acbae379074ae38501e/triggers/manual/paths/invoke',
+  WRAPPER_SERVICE_PARAMS: 'api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=uDpzD2f3QIHYqS4krx0sTF4M_2pElDpQ0lTHvFl9ntU'
+};
+
+function isAuthorEnvironmentSimple() {
+  try {
+    return typeof window !== 'undefined' && /(^|\.)author[-.]/.test(window.location.hostname);
+  } catch (_) {
+    return false;
+  }
+}
 const SAMPLE_DOCTORS = [
   {
     id: '1',
@@ -270,12 +285,13 @@ function getCurrentLocation() {
 
 async function fetchDoctorData(config) {
   try {
-    const { dataSourceType, damJsonPath, contentFragmentPath, apiUrl, staticJsonPath } = config;
+    const { dataSourceType, damJsonPath, contentFragmentPath, contentFragmentFolder, apiUrl, staticJsonPath } = config;
     
     console.log('=== FETCH DOCTOR DATA DEBUG ===');
     console.log('Data source type:', dataSourceType);
     console.log('DAM JSON path:', damJsonPath);
     console.log('Content Fragment path:', contentFragmentPath);
+    console.log('Content Fragment folder:', contentFragmentFolder);
     console.log('API URL:', apiUrl);
     console.log('Static JSON path:', staticJsonPath);
     console.log('Full config:', config);
@@ -291,11 +307,14 @@ async function fetchDoctorData(config) {
         break;
         
       case 'content-fragments':
-        if (contentFragmentPath) {
-          console.log('Attempting to fetch from Content Fragments:', contentFragmentPath);
+        if (contentFragmentFolder) {
+          console.log('Attempting to fetch from Content Fragment folder:', contentFragmentFolder);
+          return await fetchFromContentFragmentFolder(contentFragmentFolder);
+        } else if (contentFragmentPath) {
+          console.log('Attempting to fetch from Content Fragment:', contentFragmentPath);
           return await fetchFromContentFragments(contentFragmentPath);
         } else {
-          console.warn('Content Fragment path not provided, falling back to sample data');
+          console.warn('Content Fragment path or folder not provided, falling back to sample data');
         }
         break;
         
@@ -380,6 +399,104 @@ async function fetchFromContentFragments(cfPath) {
   }
 }
 
+async function fetchFromContentFragmentFolder(folderPath) {
+  try {
+    console.log('Fetching doctors via GraphQL from folder:', folderPath);
+
+    const hostname = getMetadata('hostname');
+    const aemauthorurl = getMetadata('authorurl') || '';
+    const aempublishurl = hostname?.replace('author', 'publish')?.replace(/\/$/, '') || '';
+
+    const isAuthor = isAuthorEnvironment();
+
+    const requestConfig = isAuthor
+      ? {
+          url: `${aemauthorurl}${GRAPHQL_DOCTORS_BY_FOLDER_QUERY};folderPath=${encodeURIComponent(folderPath)};ts=${Date.now()}`,
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        }
+      : {
+          url: `${CONFIG.WRAPPER_SERVICE_URL}?${CONFIG.WRAPPER_SERVICE_PARAMS}`,
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            graphQLPath: `${aempublishurl}${GRAPHQL_DOCTORS_BY_FOLDER_QUERY}`,
+            folderPath
+          })
+        };
+
+    const response = await fetch(requestConfig.url, {
+      method: requestConfig.method,
+      headers: requestConfig.headers,
+      ...(requestConfig.body && { body: requestConfig.body })
+    });
+
+    if (!response.ok) {
+      console.error(`error making doctors graphql request:${response.status}`, { folderPath, isAuthor });
+      throw new Error(`Failed GraphQL folder query: ${response.status}`);
+    }
+
+    let payload;
+    try {
+      payload = await response.json();
+    } catch (parseError) {
+      console.error('Error parsing GraphQL JSON:', { folderPath, isAuthor });
+      throw parseError;
+    }
+
+    const items = payload?.data?.doctorProfile_healthcare_List?.items || [];
+    console.log('GraphQL items received:', items?.length || 0);
+
+    const doctors = items.map((item) => transformGraphQLDoctorItem(item, isAuthor));
+    console.log('Total doctors loaded from GraphQL folder:', doctors.length);
+    return doctors;
+    
+  } catch (error) {
+    console.error('Error fetching from Content Fragment folder:', error);
+    throw error;
+  }
+}
+
+function toTitleCase(text) {
+  if (!text) return '';
+  return text.replace(/[-_]/g, ' ').replace(/\b\w/g, (m) => m.toUpperCase());
+}
+
+function extractTagLabel(tagId) {
+  // Example: "healthcare:department/cardiology" -> "Cardiology"
+  if (!tagId || typeof tagId !== 'string') return '';
+  const last = tagId.split('/').pop();
+  return toTitleCase(last);
+}
+
+function transformGraphQLDoctorItem(item, isAuthorEnv) {
+  const imageUrl = item?.image?.[isAuthorEnv ? '_authorUrl' : '_publishUrl'] || item?.image?._dynamicUrl || '';
+  const specialty = Array.isArray(item?.speciality) && item.speciality.length > 0
+    ? extractTagLabel(item.speciality[0])
+    : '';
+  const languages = Array.isArray(item?.languages)
+    ? item.languages.map(extractTagLabel)
+    : [];
+
+  return {
+    id: item?._path || Math.random().toString(36).slice(2),
+    name: item?.name || 'Dr. Unknown',
+    specialty: specialty || 'General Medicine',
+    location: item?.location || 'Location not specified',
+    zipCode: item?.zipcode || '',
+    phone: item?.phone || '',
+    email: item?.email || '',
+    image: imageUrl || '/images/doctors/default-doctor.jpg',
+    rating: typeof item?.rating === 'number' ? item.rating : 4.5,
+    experience: typeof item?.experience === 'number' ? `${item.experience} years` : (item?.experience || '5 years'),
+    languages: languages.length ? languages : ['English'],
+    acceptingNewPatients: !!item?.acceptingNewPatients,
+    hospital: item?.hospital || 'Medical Center',
+    latitude: 0,
+    longitude: 0
+  };
+}
+
 async function fetchFromAPI(apiUrl) {
   try {
     const response = await fetch(apiUrl);
@@ -427,13 +544,19 @@ function transformContentFragmentToDoctor(cfData) {
 }
 
 function getDataSourceInfo(config) {
-  const { dataSourceType, damJsonPath, contentFragmentPath, apiUrl, staticJsonPath } = config;
+  const { dataSourceType, damJsonPath, contentFragmentPath, contentFragmentFolder, apiUrl, staticJsonPath } = config;
   
   switch (dataSourceType) {
     case 'dam-json':
       return damJsonPath ? `DAM JSON (${damJsonPath})` : 'DAM JSON (not configured)';
     case 'content-fragments':
-      return contentFragmentPath ? `Content Fragments (${contentFragmentPath})` : 'Content Fragments (not configured)';
+      if (contentFragmentFolder) {
+        return `Content Fragment Folder (${contentFragmentFolder})`;
+      } else if (contentFragmentPath) {
+        return `Content Fragment (${contentFragmentPath})`;
+      } else {
+        return 'Content Fragments (not configured)';
+      }
     case 'api':
       return apiUrl ? `External API (${apiUrl})` : 'External API (not configured)';
     case 'json':
@@ -503,6 +626,7 @@ export default async function decorate(block) {
   let dataSourceType = 'dam-json';
   let damJsonPath = '';
   let contentFragmentPath = '';
+  let contentFragmentFolder = '';
   let apiUrl = '';
   let staticJsonPath = '/data/doctors.json';
   let enableLocationSearch = true;
@@ -543,27 +667,32 @@ export default async function decorate(block) {
     contentFragmentPath = cfPathDiv.textContent.trim();
   }
   
-  const apiUrlDiv = block.querySelector(':scope > div:nth-child(7) > div');
+  const cfFolderDiv = block.querySelector(':scope > div:nth-child(7) > div');
+  if (cfFolderDiv && cfFolderDiv.textContent?.trim() && cfFolderDiv.textContent.trim() !== 'contentFragmentFolder') {
+    contentFragmentFolder = cfFolderDiv.textContent.trim();
+  }
+  
+  const apiUrlDiv = block.querySelector(':scope > div:nth-child(8) > div');
   if (apiUrlDiv && apiUrlDiv.textContent?.trim() && apiUrlDiv.textContent.trim() !== 'apiUrl') {
     apiUrl = apiUrlDiv.textContent.trim();
   }
   
-  const staticPathDiv = block.querySelector(':scope > div:nth-child(8) > div');
+  const staticPathDiv = block.querySelector(':scope > div:nth-child(9) > div');
   if (staticPathDiv && staticPathDiv.textContent?.trim() && staticPathDiv.textContent.trim() !== 'staticJsonPath') {
     staticJsonPath = staticPathDiv.textContent.trim();
   }
   
-  const locationDiv = block.querySelector(':scope > div:nth-child(9) > div');
+  const locationDiv = block.querySelector(':scope > div:nth-child(10) > div');
   if (locationDiv && locationDiv.textContent?.trim() && locationDiv.textContent.trim() !== 'enableLocationSearch') {
     enableLocationSearch = locationDiv.textContent.trim() !== 'false';
   }
   
-  const specialtyDiv = block.querySelector(':scope > div:nth-child(10) > div');
+  const specialtyDiv = block.querySelector(':scope > div:nth-child(11) > div');
   if (specialtyDiv && specialtyDiv.textContent?.trim() && specialtyDiv.textContent.trim() !== 'enableSpecialtyFilter') {
     enableSpecialtyFilter = specialtyDiv.textContent.trim() !== 'false';
   }
   
-  const providerDiv = block.querySelector(':scope > div:nth-child(11) > div');
+  const providerDiv = block.querySelector(':scope > div:nth-child(12) > div');
   if (providerDiv && providerDiv.textContent?.trim() && providerDiv.textContent.trim() !== 'enableProviderNameSearch') {
     enableProviderNameSearch = providerDiv.textContent.trim() !== 'false';
   }
@@ -599,6 +728,9 @@ export default async function decorate(block) {
         }
         if (config.contentFragmentPath && config.contentFragmentPath !== 'contentFragmentPath') {
           contentFragmentPath = config.contentFragmentPath;
+        }
+        if (config.contentFragmentFolder && config.contentFragmentFolder !== 'contentFragmentFolder') {
+          contentFragmentFolder = config.contentFragmentFolder;
         }
         if (config.apiUrl && config.apiUrl !== 'apiUrl') {
           apiUrl = config.apiUrl;
@@ -653,7 +785,7 @@ export default async function decorate(block) {
   // Debug: Log what we're reading from each div
   console.log('=== CONFIGURATION READING DEBUG ===');
   console.log('Raw div contents:');
-  for (let i = 1; i <= 11; i++) {
+  for (let i = 1; i <= 12; i++) {
     const div = block.querySelector(`:scope > div:nth-child(${i}) > div`);
     console.log(`Div ${i}:`, div?.textContent?.trim() || 'empty');
   }
@@ -678,6 +810,7 @@ export default async function decorate(block) {
     dataSourceType,
     damJsonPath,
     contentFragmentPath,
+    contentFragmentFolder,
     apiUrl,
     staticJsonPath,
     enableLocationSearch,
@@ -693,6 +826,7 @@ export default async function decorate(block) {
     dataSourceType,
     damJsonPath,
     contentFragmentPath,
+    contentFragmentFolder,
     apiUrl,
     staticJsonPath,
     enableLocationSearch,
@@ -703,7 +837,7 @@ export default async function decorate(block) {
   // Hide configuration rows after reading them (same approach as search block)
   try {
     const configRows = [];
-    for (let i = 1; i <= 11; i++) {
+    for (let i = 1; i <= 12; i++) {
       const row = block.querySelector(`:scope > div:nth-child(${i})`);
       if (row) configRows.push(row);
     }
