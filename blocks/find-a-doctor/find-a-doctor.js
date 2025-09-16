@@ -51,8 +51,8 @@ const SAMPLE_DOCTORS = [
     id: '3',
     name: 'Dr. Emily Rodriguez',
     specialty: 'Dermatology',
-    location: 'Chicago, IL',
-    zipCode: '60601',
+    location: 'Noida',
+    zipCode: '201020',
     phone: '(555) 345-6789',
     email: 'emily.rodriguez@healthcare.com',
     image: '/content/dam/weHealthcare/en/images/doctors/dr-emily-rodriguez.jpg',
@@ -60,7 +60,7 @@ const SAMPLE_DOCTORS = [
     experience: '8 years',
     languages: ['English', 'Spanish'],
     acceptingNewPatients: false,
-    hospital: 'Chicago Skin Institute'
+    hospital: 'Noida Skin Institute'
   },
   {
     id: '4',
