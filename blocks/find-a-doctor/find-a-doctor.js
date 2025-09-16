@@ -399,6 +399,10 @@ async function fetchFromContentFragmentFolder(folderPath) {
   try {
     console.log('Fetching doctors via GraphQL from folder:', folderPath);
 
+    // Decode URL-encoded path to convert %2F back to /
+    const decodedFolderPath = decodeURIComponent(folderPath);
+    console.log('Decoded folder path:', decodedFolderPath);
+
     const hostname = getMetadata('hostname');
     const aemauthorurl = getMetadata('authorurl') || '';
     const aempublishurl = hostname?.replace('author', 'publish')?.replace(/\/$/, '') || '';
@@ -407,7 +411,7 @@ async function fetchFromContentFragmentFolder(folderPath) {
 
     const requestConfig = isAuthor
       ? {
-          url: `${aemauthorurl}${GRAPHQL_DOCTORS_BY_FOLDER_QUERY};folderPath=${encodeURIComponent(folderPath)};ts=${Date.now()}`,
+          url: `${aemauthorurl}${GRAPHQL_DOCTORS_BY_FOLDER_QUERY};folderPath=${encodeURIComponent(decodedFolderPath)};ts=${Date.now()}`,
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
         }
@@ -417,7 +421,7 @@ async function fetchFromContentFragmentFolder(folderPath) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             graphQLPath: `${aempublishurl}${GRAPHQL_DOCTORS_BY_FOLDER_QUERY}`,
-            folderPath
+            folderPath: decodedFolderPath
           })
         };
 
