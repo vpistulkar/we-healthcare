@@ -609,6 +609,9 @@ export default function decorate(block) {
   // Use readBlockConfig like other blocks for immediate configuration reading
   const config = readBlockConfig(block);
   
+  // Debug: log the configuration to help troubleshoot UE issues
+  console.log('Find-a-doctor readBlockConfig result:', config);
+  
   // Set defaults and read from config
   const title = config.title || 'Find a Doctor';
   const subtitle = config.subtitle || 'Search for healthcare providers in your area';
@@ -622,6 +625,8 @@ export default function decorate(block) {
   const enableSpecialtyFilter = config.enableSpecialtyFilter !== 'false' && config.enablespecialtyfilter !== 'false';
   const enableProviderNameSearch = config.enableProviderNameSearch !== 'false' && config.enableprovidernamesearch !== 'false';
   
+  console.log('Final configuration values:', { title, subtitle, layout, dataSourceType });
+  
   // Hide configuration rows immediately like other blocks do
   const rows = Array.from(block.querySelectorAll(':scope > div'));
   rows.forEach((row) => {
@@ -631,6 +636,12 @@ export default function decorate(block) {
   // Clear the block content and set up the component
   block.innerHTML = '';
   block.className = `find-doctor ${layout}`;
+  
+  // Add Universal Editor resource attribute if not present
+  if (!block.hasAttribute('data-aue-resource')) {
+    // This will be set by the UE framework, but ensure it's ready for UE
+    block.setAttribute('data-aue-type', 'container');
+  }
   
   // Create header
   const header = createElement('div', 'find-doctor-header');
@@ -642,8 +653,8 @@ export default function decorate(block) {
   console.log('Data source info:', dataSourceInfo);
   
   header.innerHTML = `
-    <h2 class="find-doctor-title">${title}</h2>
-    <p class="find-doctor-subtitle">${subtitle}</p>
+    <h2 class="find-doctor-title" data-aue-prop="title" data-aue-type="text">${title}</h2>
+    <p class="find-doctor-subtitle" data-aue-prop="subtitle" data-aue-type="text">${subtitle}</p>
     <div class="data-source-info">
       <small>Data Source: ${dataSourceInfo}</small>
     </div>
@@ -787,4 +798,5 @@ export default function decorate(block) {
   });
   
   // Initial render will happen when data is loaded via the promise
+  // Franklin's editor-support.js automatically handles UE updates by re-decorating blocks
 }
