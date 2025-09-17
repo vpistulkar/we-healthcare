@@ -606,6 +606,43 @@ function createSearchForm(config) {
 }
 
 export default async function decorate(block) {
+  // Clean up any previous initialization to support UE editor updates
+  if (block.dataset.initialized === 'true') {
+    // Clean up previous event listeners and state
+    if (block._eventHandlers) {
+      const nameInput = block.querySelector('.provider-name-search');
+      const specialtySelect = block.querySelector('.specialty-filter');
+      const locationInput = block.querySelector('.location-search');
+      const locationButton = block.querySelector('.location-button');
+      
+      // Remove event listeners
+      if (nameInput && block._eventHandlers.nameInputHandler) {
+        nameInput.removeEventListener('input', block._eventHandlers.nameInputHandler);
+      }
+      if (specialtySelect && block._eventHandlers.specialtySelectHandler) {
+        specialtySelect.removeEventListener('change', block._eventHandlers.specialtySelectHandler);
+      }
+      if (locationInput && block._eventHandlers.locationInputHandler) {
+        locationInput.removeEventListener('input', block._eventHandlers.locationInputHandler);
+      }
+      if (locationButton && block._eventHandlers.locationButtonHandler) {
+        locationButton.removeEventListener('click', block._eventHandlers.locationButtonHandler);
+      }
+      if (block._eventHandlers.bookAppointmentHandler) {
+        block.removeEventListener('click', block._eventHandlers.bookAppointmentHandler);
+      }
+      
+      // Clear handlers
+      delete block._eventHandlers;
+    }
+    
+    // Clear any timeouts or intervals that might be running
+    if (block._searchTimeout) {
+      clearTimeout(block._searchTimeout);
+      delete block._searchTimeout;
+    }
+  }
+  
   // Debug: Log the entire block structure first
   console.log('=== BLOCK STRUCTURE DEBUG ===');
   console.log('Block HTML before processing:', block.innerHTML);
@@ -856,32 +893,64 @@ export default async function decorate(block) {
   const resultsContainer = createElement('div', 'doctor-results');
   block.appendChild(resultsContainer);
   
-  // Load doctor data
-  let doctors = await fetchDoctorData(config);
-  
-  // Show loading state
+  // Show loading state first
   resultsContainer.innerHTML = '<div class="loading-state">Loading doctors...</div>';
   
-  // Add loading styles
-  const loadingStyle = document.createElement('style');
-  loadingStyle.textContent = `
-    .loading-state {
-      text-align: center;
-      padding: 2rem;
-      color: var(--text-color-secondary, #666);
-      font-size: 1.1rem;
+  // Load doctor data with error handling for UE updates
+  let doctors;
+  try {
+    doctors = await fetchDoctorData(config);
+    
+    // Check if block is still in DOM (might be removed during UE update)
+    if (!document.contains(block)) {
+      console.log('Block removed from DOM during data fetch, aborting initialization');
+      return;
     }
-    .error-state {
-      text-align: center;
-      padding: 2rem;
-      color: var(--error-color, #dc3545);
-      background: var(--error-background, #f8d7da);
-      border: 1px solid var(--error-border, #f5c6cb);
-      border-radius: 8px;
-      margin: 1rem 0;
+    
+    if (!doctors || !Array.isArray(doctors)) {
+      console.warn('Invalid doctor data received, falling back to sample data');
+      doctors = SAMPLE_DOCTORS;
     }
-  `;
-  document.head.appendChild(loadingStyle);
+  } catch (error) {
+    console.error('Error loading doctor data:', error);
+    
+    // Check if block is still in DOM before updating UI
+    if (!document.contains(block)) {
+      console.log('Block removed from DOM during error handling, aborting');
+      return;
+    }
+    
+    resultsContainer.innerHTML = '<div class="error-state">Error loading doctors. Using sample data.</div>';
+    doctors = SAMPLE_DOCTORS;
+  }
+  
+  // Add loading styles scoped to this block to avoid conflicts during UE updates
+  const blockId = `find-doctor-${Math.random().toString(36).substr(2, 9)}`;
+  block.id = blockId;
+  
+  let loadingStyle = document.getElementById('find-doctor-styles');
+  if (!loadingStyle) {
+    loadingStyle = document.createElement('style');
+    loadingStyle.id = 'find-doctor-styles';
+    loadingStyle.textContent = `
+      .find-doctor .loading-state {
+        text-align: center;
+        padding: 2rem;
+        color: var(--text-color-secondary, #666);
+        font-size: 1.1rem;
+      }
+      .find-doctor .error-state {
+        text-align: center;
+        padding: 2rem;
+        color: var(--error-color, #dc3545);
+        background: var(--error-background, #f8d7da);
+        border: 1px solid var(--error-border, #f5c6cb);
+        border-radius: 8px;
+        margin: 1rem 0;
+      }
+    `;
+    document.head.appendChild(loadingStyle);
+  }
   
   // Initialize filters
   const filters = {
@@ -896,68 +965,89 @@ export default async function decorate(block) {
   const locationInput = block.querySelector('.location-search');
   const locationButton = block.querySelector('.location-button');
   
-  // Search functionality
-  const performSearch = debounce(() => {
-    const filteredDoctors = filterDoctors(doctors, filters);
-    renderResults(filteredDoctors, resultsContainer);
-  }, 300);
+  // Search functionality with proper cleanup support
+  const performSearch = () => {
+    // Clear any existing timeout to avoid multiple searches
+    if (block._searchTimeout) {
+      clearTimeout(block._searchTimeout);
+    }
+    
+    block._searchTimeout = setTimeout(() => {
+      const filteredDoctors = filterDoctors(doctors, filters);
+      renderResults(filteredDoctors, resultsContainer);
+    }, 300);
+  };
+  
+  // Store event handlers for potential cleanup
+  const eventHandlers = {
+    nameInputHandler: (e) => {
+      filters.nameSearch = e.target.value;
+      performSearch();
+    },
+    specialtySelectHandler: (e) => {
+      filters.specialty = e.target.value;
+      performSearch();
+    },
+    locationInputHandler: (e) => {
+      filters.location = e.target.value;
+      performSearch();
+    }
+  };
   
   // Event listeners
   if (nameInput) {
-    nameInput.addEventListener('input', (e) => {
-      filters.nameSearch = e.target.value;
-      performSearch();
-    });
+    nameInput.addEventListener('input', eventHandlers.nameInputHandler);
   }
   
   if (specialtySelect) {
-    specialtySelect.addEventListener('change', (e) => {
-      filters.specialty = e.target.value;
-      performSearch();
-    });
+    specialtySelect.addEventListener('change', eventHandlers.specialtySelectHandler);
   }
   
   if (locationInput) {
-    locationInput.addEventListener('input', (e) => {
-      filters.location = e.target.value;
-      performSearch();
-    });
+    locationInput.addEventListener('input', eventHandlers.locationInputHandler);
   }
   
+  // Store event handlers on the block for potential cleanup
+  block._eventHandlers = eventHandlers;
+  
   // Location button functionality
+  const locationButtonHandler = async () => {
+    try {
+      locationButton.textContent = '📍';
+      locationButton.disabled = true;
+      
+      const position = await getCurrentLocation();
+      
+      // In a real implementation, you would reverse geocode the coordinates
+      // For now, we'll just show a success message
+      locationInput.value = 'Current location detected';
+      filters.location = 'Current location detected';
+      performSearch();
+      
+      locationButton.textContent = '📍';
+      setTimeout(() => {
+        locationButton.textContent = '📍';
+        locationButton.disabled = false;
+      }, 2000);
+      
+    } catch (error) {
+      console.error('Error getting location:', error);
+      locationButton.textContent = '📍';
+      setTimeout(() => {
+        locationButton.textContent = '📍';
+        locationButton.disabled = false;
+      }, 2000);
+    }
+  };
+  
   if (locationButton) {
-    locationButton.addEventListener('click', async () => {
-      try {
-        locationButton.textContent = '📍';
-        locationButton.disabled = true;
-        
-        const position = await getCurrentLocation();
-        
-        // In a real implementation, you would reverse geocode the coordinates
-        // For now, we'll just show a success message
-        locationInput.value = 'Current location detected';
-        filters.location = 'Current location detected';
-        performSearch();
-        
-        locationButton.textContent = '📍';
-        setTimeout(() => {
-          locationButton.textContent = '📍';
-          locationButton.disabled = false;
-        }, 2000);
-        
-      } catch (error) {
-        console.error('Error getting location:', error);
-        locationButton.textContent = '📍';
-        setTimeout(() => {
-          locationButton.textContent = '📍';
-          locationButton.disabled = false;
-        }, 2000);
-      }
-    });
+    locationButton.addEventListener('click', locationButtonHandler);
+    // Store for cleanup
+    eventHandlers.locationButtonHandler = locationButtonHandler;
   }
   
   // Book appointment functionality
-  block.addEventListener('click', (e) => {
+  const bookAppointmentHandler = (e) => {
     if (e.target.classList.contains('book-appointment-btn')) {
       const doctorId = e.target.dataset.doctorId;
       const doctor = doctors.find(d => d.id === doctorId);
@@ -967,8 +1057,15 @@ export default async function decorate(block) {
         alert(`Booking appointment with ${doctor.name}\n\nPhone: ${doctor.phone}\nEmail: ${doctor.email}`);
       }
     }
-  });
+  };
+  
+  block.addEventListener('click', bookAppointmentHandler);
+  // Store for cleanup
+  eventHandlers.bookAppointmentHandler = bookAppointmentHandler;
   
   // Initial render
   renderResults(doctors, resultsContainer);
+  
+  // Mark block as initialized to support UE editor updates
+  block.dataset.initialized = 'true';
 }
