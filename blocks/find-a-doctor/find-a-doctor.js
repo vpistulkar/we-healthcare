@@ -1,5 +1,5 @@
 // Configuration reading is handled directly from block structure
-import { getMetadata, readBlockConfig } from '../../scripts/aem.js';
+import { getMetadata } from '../../scripts/aem.js';
 import { isAuthorEnvironment } from '../../scripts/scripts.js';
 
 // Sample doctor data - in production, this would come from your data source
@@ -109,20 +109,25 @@ const SAMPLE_DOCTORS = [
   }
 ];
 
-const SPECIALTIES = [
-  'Cardiology',
-  'Pediatrics',
-  'Dermatology',
-  'Orthopedics',
-  'Neurology',
-  'Oncology',
-  'Gynecology',
-  'Urology',
-  'Psychiatry',
-  'Family Medicine',
-  'Internal Medicine',
-  'Emergency Medicine'
-];
+// Function to extract unique specialties from doctor data
+function getUniqueSpecialties(doctors) {
+  const specialties = new Set();
+  doctors.forEach(doctor => {
+    // Handle different possible specialty field names and formats
+    const specialty = doctor.specialty || doctor.medicalSpecialty || doctor.speciality;
+    if (specialty && typeof specialty === 'string' && specialty.trim()) {
+      specialties.add(specialty.trim());
+    } else if (Array.isArray(specialty)) {
+      // Handle array of specialties (from Content Fragments)
+      specialty.forEach(spec => {
+        if (spec && typeof spec === 'string' && spec.trim()) {
+          specialties.add(spec.trim());
+        }
+      });
+    }
+  });
+  return Array.from(specialties).sort();
+}
 
 // Utility functions
 function debounce(func, wait) {
@@ -559,7 +564,7 @@ function getDataSourceInfo(config) {
   }
 }
 
-function createSearchForm(config) {
+function createSearchForm(config, doctors = []) {
   const form = createElement('form', 'find-doctor-form');
   
   const searchRow = createElement('div', 'search-row');
@@ -578,7 +583,9 @@ function createSearchForm(config) {
   if (config.enableSpecialtyFilter !== false) {
     const specialtyGroup = createElement('div', 'search-group');
     const specialtyLabel = createElement('label', '', 'Specialty');
-    const specialtySelect = createSelect(SPECIALTIES, 'All Specialties', 'specialty-filter');
+    // Get dynamic specialties from doctor data
+    const dynamicSpecialties = getUniqueSpecialties(doctors);
+    const specialtySelect = createSelect(dynamicSpecialties, 'All Specialties', 'specialty-filter');
     specialtyGroup.appendChild(specialtyLabel);
     specialtyGroup.appendChild(specialtySelect);
     searchRow.appendChild(specialtyGroup);
@@ -605,45 +612,228 @@ function createSearchForm(config) {
   return form;
 }
 
-export default function decorate(block) {
-  // Use readBlockConfig like other blocks for immediate configuration reading
-  const config = readBlockConfig(block);
+export default async function decorate(block) {
+  // Debug: Log the entire block structure first
+  console.log('=== BLOCK STRUCTURE DEBUG ===');
+  console.log('Block HTML before processing:', block.innerHTML);
+  console.log('Block children count:', block.children.length);
+  console.log('Block children:', Array.from(block.children).map((child, index) => ({
+    index,
+    tagName: child.tagName,
+    className: child.className,
+    textContent: child.textContent?.trim().substring(0, 100) + '...'
+  })));
   
-  // Debug: log the configuration to help troubleshoot UE issues
-  console.log('🔍 Find-a-doctor block decorating with config:', config);
-  console.log('🔍 Config keys:', Object.keys(config));
-  console.log('🔍 Block innerHTML before clear:', block.innerHTML.substring(0, 200));
+  // Read configuration - try multiple approaches since AEM structure might vary
+  let title = 'Find a Doctor';
+  let subtitle = 'Search for healthcare providers in your area';
+  let layout = 'default';
+  let dataSourceType = 'dam-json';
+  let damJsonPath = '';
+  let contentFragmentFolder = '';
+  let apiUrl = '';
+  let staticJsonPath = '/data/doctors.json';
+  let enableLocationSearch = true;
+  let enableSpecialtyFilter = true;
+  let enableProviderNameSearch = true;
   
-  // Set defaults and read from config
-  const title = config.title || 'Find a Doctor';
-  const subtitle = config.subtitle || 'Search for healthcare providers in your area';
-  const layout = config.layout || 'default';
-  const dataSourceType = config.dataSourceType || config.datasourcetype || 'dam-json';
-  const damJsonPath = config.damJsonPath || config.damjsonpath || '';
-  const contentFragmentFolder = config.contentFragmentFolder || config.contentfragmentfolder || '';
-  const apiUrl = config.apiUrl || config.apiurl || '';
-  const staticJsonPath = config.staticJsonPath || config.staticjsonpath || '/data/doctors.json';
-  const enableLocationSearch = config.enableLocationSearch !== 'false' && config.enablelocationsearch !== 'false';
-  const enableSpecialtyFilter = config.enableSpecialtyFilter !== 'false' && config.enablespecialtyfilter !== 'false';
-  const enableProviderNameSearch = config.enableProviderNameSearch !== 'false' && config.enableprovidernamesearch !== 'false';
+  // Try to read configuration from the block structure
+  // AEM might render this differently, so we'll try multiple approaches
   
-  console.log('✅ Rendered with values:', { title, subtitle, layout, dataSourceType });
-  
-  // Hide configuration rows immediately like other blocks do
+  // Approach 1: Keyed parsing by label to avoid positional mix-ups
   const rows = Array.from(block.querySelectorAll(':scope > div'));
   rows.forEach((row) => {
-    row.style.display = 'none';
+    const cells = row.querySelectorAll(':scope > div');
+    if (cells.length < 2) return;
+    const key = cells[0].textContent?.trim()?.toLowerCase();
+    if (!key) return;
+    let valueEl = cells[1];
+    const link = valueEl.querySelector('a');
+    const raw = (link?.getAttribute('title') || link?.textContent || valueEl.textContent || '').trim();
+    const val = raw;
+    console.log(`Parsing key: "${key}" with value: "${val}"`);
+    switch (key) {
+      case 'title':
+        if (val && val.toLowerCase() !== 'title') {
+          console.log(`Setting title to: "${val}"`);
+          title = val;
+        }
+        break;
+      case 'subtitle':
+        if (val && val.toLowerCase() !== 'subtitle') subtitle = val; break;
+      case 'layout':
+        if (val && val.toLowerCase() !== 'layout') layout = val; break;
+      case 'datasourcetype':
+        if (val && val.toLowerCase() !== 'datasourcetype') dataSourceType = val; break;
+      case 'damjsonpath':
+        if (val && val.toLowerCase() !== 'damjsonpath') damJsonPath = val; break;
+      case 'contentfragmentfolder':
+        if (val && val.toLowerCase() !== 'contentfragmentfolder') contentFragmentFolder = val; break;
+      case 'apiurl':
+        if (val && val.toLowerCase() !== 'apiurl') apiUrl = val; break;
+      case 'staticjsonpath':
+        if (val && val.toLowerCase() !== 'staticjsonpath') staticJsonPath = val; break;
+      case 'enablelocationsearch':
+        enableLocationSearch = val !== 'false'; break;
+      case 'enablespecialtyfilter':
+        enableSpecialtyFilter = val !== 'false'; break;
+      case 'enableprovidernamesearch':
+        enableProviderNameSearch = val !== 'false'; break;
+      default:
+        break;
+    }
   });
+  
+  // Fallback: Try readBlockConfig if the standard approach doesn't work
+  if (title === 'Find a Doctor' || subtitle === 'Search for healthcare providers in your area' || !damJsonPath) {
+    console.log('=== FALLBACK CONFIGURATION READING ===');
+    console.log('Trying readBlockConfig...');
+    
+    try {
+      const { readBlockConfig } = await import('../../scripts/aem.js');
+      const config = readBlockConfig(block);
+      console.log('readBlockConfig result:', config);
+      
+      if (config && Object.keys(config).length > 0) {
+        if (config.title && config.title !== 'title') {
+          title = config.title;
+          console.log('Found title via readBlockConfig:', title);
+        }
+        if (config.subtitle && config.subtitle !== 'subtitle') {
+          subtitle = config.subtitle;
+          console.log('Found subtitle via readBlockConfig:', subtitle);
+        }
+        if (config.layout && config.layout !== 'layout') {
+          layout = config.layout;
+        }
+        if (config.dataSourceType && config.dataSourceType !== 'dataSourceType') {
+          dataSourceType = config.dataSourceType;
+        }
+        if (config.damJsonPath && config.damJsonPath !== 'damJsonPath') {
+          damJsonPath = config.damJsonPath;
+          console.log('Found DAM JSON path via readBlockConfig:', damJsonPath);
+        }
+        if (config.contentFragmentFolder && config.contentFragmentFolder !== 'contentFragmentFolder') {
+          contentFragmentFolder = config.contentFragmentFolder;
+        }
+        if (config.apiUrl && config.apiUrl !== 'apiUrl') {
+          apiUrl = config.apiUrl;
+        }
+        if (config.staticJsonPath && config.staticJsonPath !== 'staticJsonPath') {
+          staticJsonPath = config.staticJsonPath;
+        }
+        if (config.enableLocationSearch !== undefined) {
+          enableLocationSearch = config.enableLocationSearch !== false;
+        }
+        if (config.enableSpecialtyFilter !== undefined) {
+          enableSpecialtyFilter = config.enableSpecialtyFilter !== false;
+        }
+        if (config.enableProviderNameSearch !== undefined) {
+          enableProviderNameSearch = config.enableProviderNameSearch !== false;
+        }
+      }
+    } catch (error) {
+      console.log('readBlockConfig failed:', error);
+    }
+    
+    // Additional fallback: Try reading from all divs to see what's available
+    console.log('Trying alternative selectors...');
+    const allDivs = block.querySelectorAll(':scope > div');
+    allDivs.forEach((div, index) => {
+      const text = div.textContent?.trim();
+      if (text && text !== '') {
+        console.log(`Div ${index + 1} content:`, text);
+      }
+    });
+    
+    // Try reading title and subtitle from any div that might contain them
+    const allTextDivs = block.querySelectorAll(':scope > div > div');
+    allTextDivs.forEach((div, index) => {
+      const text = div.textContent?.trim();
+      if (text && text !== '') {
+        console.log(`Text div ${index + 1}:`, text);
+        // Guard against picking DAM paths or URLs as titles
+        const looksLikePath = text.startsWith('/content/') || text.includes('/') || text.includes(':');
+        // If we find text that looks like a proper title/subtitle, use it
+        if (!looksLikePath && text.length > 2 && text.length < 120 && !text.includes('dataSourceType') && !text.includes('dam-json')) {
+          if (title === 'Find a Doctor' && /doctor/i.test(text)) {
+            title = text;
+            console.log('Found title in fallback:', title);
+          } else if (subtitle === 'Search for healthcare providers in your area' && /search|provider|healthcare/i.test(text)) {
+            subtitle = text;
+            console.log('Found subtitle in fallback:', subtitle);
+          }
+        }
+      }
+    });
+  }
+  
+  // Debug: Log what we're reading from each div
+  console.log('=== CONFIGURATION READING DEBUG ===');
+  console.log('Raw div contents:');
+  for (let i = 1; i <= 11; i++) {
+    const div = block.querySelector(`:scope > div:nth-child(${i}) > div`);
+    console.log(`Div ${i}:`, div?.textContent?.trim() || 'empty');
+  }
+  
+  console.log('=== TITLE AND SUBTITLE DEBUG ===');
+  console.log('Title from div 1:', block.querySelector(':scope > div:nth-child(1) > div')?.textContent?.trim());
+  console.log('Subtitle from div 2:', block.querySelector(':scope > div:nth-child(2) > div')?.textContent?.trim());
+  console.log('Final title value:', title);
+  console.log('Final subtitle value:', subtitle);
+  console.log('Final contentFragmentFolder value:', contentFragmentFolder);
+  
+  // Special handling: If we have a DAM JSON path but dataSourceType is not dam-json, fix it
+  if (damJsonPath && damJsonPath !== '' && dataSourceType !== 'dam-json' && !contentFragmentFolder) {
+    console.log('=== FIXING DATA SOURCE TYPE ===');
+    console.log('Found DAM JSON path but dataSourceType is not dam-json, fixing...');
+    dataSourceType = 'dam-json';
+  }
+  
+  console.log('Find Doctor Configuration:', {
+    title,
+    subtitle,
+    layout,
+    dataSourceType,
+    damJsonPath,
+    contentFragmentFolder,
+    apiUrl,
+    staticJsonPath,
+    enableLocationSearch,
+    enableSpecialtyFilter,
+    enableProviderNameSearch
+  });
+  
+  // Create config object for compatibility
+  const config = {
+    title,
+    subtitle,
+    layout,
+    dataSourceType,
+    damJsonPath,
+    contentFragmentFolder,
+    apiUrl,
+    staticJsonPath,
+    enableLocationSearch,
+    enableSpecialtyFilter,
+    enableProviderNameSearch
+  };
+  
+  // Hide configuration rows after reading them (same approach as search block)
+  try {
+    const configRows = [];
+    for (let i = 1; i <= 11; i++) {
+      const row = block.querySelector(`:scope > div:nth-child(${i})`);
+      if (row) configRows.push(row);
+    }
+    configRows.forEach((row) => { if (row) row.style.display = 'none'; });
+  } catch (e) {
+    console.log('[find-doctor] config/hide rows error', e);
+  }
   
   // Clear the block content and set up the component
   block.innerHTML = '';
   block.className = `find-doctor ${layout}`;
-  
-  // Add Universal Editor resource attribute if not present
-  if (!block.hasAttribute('data-aue-resource')) {
-    // This will be set by the UE framework, but ensure it's ready for UE
-    block.setAttribute('data-aue-type', 'container');
-  }
   
   // Create header
   const header = createElement('div', 'find-doctor-header');
@@ -655,8 +845,8 @@ export default function decorate(block) {
   console.log('Data source info:', dataSourceInfo);
   
   header.innerHTML = `
-    <h2 class="find-doctor-title" data-aue-prop="title" data-aue-type="text">${title}</h2>
-    <p class="find-doctor-subtitle" data-aue-prop="subtitle" data-aue-type="text">${subtitle}</p>
+    <h2 class="find-doctor-title">${title}</h2>
+    <p class="find-doctor-subtitle">${subtitle}</p>
     <div class="data-source-info">
       <small>Data Source: ${dataSourceInfo}</small>
     </div>
@@ -665,27 +855,20 @@ export default function decorate(block) {
   
   console.log('Header HTML created:', header.innerHTML);
   
-  // Create search form
-  const searchForm = createSearchForm(config);
-  block.appendChild(searchForm);
-  
-  // Create results container
+  // Create results container and add to DOM
   const resultsContainer = createElement('div', 'doctor-results');
   block.appendChild(resultsContainer);
   
-  // Show loading state immediately
+  // Show loading state while fetching data
   resultsContainer.innerHTML = '<div class="loading-state">Loading doctors...</div>';
   
-  // Load doctor data asynchronously (don't await here)
-  let doctors = [];
-  fetchDoctorData(config).then(loadedDoctors => {
-    doctors = loadedDoctors;
-    // Update the results when data is loaded
-    renderResults(doctors, resultsContainer);
-  }).catch(error => {
-    console.error('Error loading doctor data:', error);
-    resultsContainer.innerHTML = '<div class="error-state">Error loading doctor data. Please try again later.</div>';
-  });
+  // Load doctor data first
+  let doctors = await fetchDoctorData(config);
+  
+  // Create search form with dynamic specialties from loaded doctor data
+  const searchForm = createSearchForm(config, doctors);
+  // Insert search form before results container
+  block.insertBefore(searchForm, resultsContainer);
   
   // Add loading styles
   const loadingStyle = document.createElement('style');
@@ -723,11 +906,6 @@ export default function decorate(block) {
   
   // Search functionality
   const performSearch = debounce(() => {
-    if (doctors.length === 0) {
-      // Data not loaded yet, show loading message
-      resultsContainer.innerHTML = '<div class="loading-state">Loading doctors...</div>';
-      return;
-    }
     const filteredDoctors = filterDoctors(doctors, filters);
     renderResults(filteredDoctors, resultsContainer);
   }, 300);
@@ -799,6 +977,6 @@ export default function decorate(block) {
     }
   });
   
-  // Initial render will happen when data is loaded via the promise
-  // Franklin's editor-support.js automatically handles UE updates by re-decorating blocks
+  // Initial render
+  renderResults(doctors, resultsContainer);
 }
