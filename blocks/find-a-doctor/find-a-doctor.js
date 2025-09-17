@@ -611,6 +611,8 @@ export default function decorate(block) {
   
   // Debug: log the configuration to help troubleshoot UE issues
   console.log('🔍 Find-a-doctor block decorating with config:', config);
+  console.log('🔍 Config keys:', Object.keys(config));
+  console.log('🔍 Block innerHTML before clear:', block.innerHTML.substring(0, 200));
   
   // Set defaults and read from config
   const title = config.title || 'Find a Doctor';

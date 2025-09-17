@@ -292,7 +292,7 @@
 .find-doctor.compact .doctor-card {
   display: flex;
   flex-direction: row;
-  height: 200px;
+  height: 225px;
 }
 
 .find-doctor.compact .doctor-image {
@@ -327,6 +327,15 @@
   padding: 0.5rem;
   font-size: 0.9rem;
 }
+
+  .find-doctor.compact .doctor-hospital,
+  .find-doctor.compact .doctor-languages,
+  .find-doctor.compact .doctor-contact{
+    display: none;
+  }
+  .find-doctor.compact .doctor-rating{
+    margin-bottom: 0;
+  }
 
 /* Expanded layout */
 .find-doctor.expanded .doctor-results {
@@ -382,6 +391,7 @@
     width: 100%;
     height: 150px;
   }
+
 }
 
 @media (max-width: 480px) {
