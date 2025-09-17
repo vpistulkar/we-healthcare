@@ -610,7 +610,7 @@ export default function decorate(block) {
   const config = readBlockConfig(block);
   
   // Debug: log the configuration to help troubleshoot UE issues
-  console.log('Find-a-doctor readBlockConfig result:', config);
+  console.log('🔍 Find-a-doctor block decorating with config:', config);
   
   // Set defaults and read from config
   const title = config.title || 'Find a Doctor';
@@ -625,7 +625,7 @@ export default function decorate(block) {
   const enableSpecialtyFilter = config.enableSpecialtyFilter !== 'false' && config.enablespecialtyfilter !== 'false';
   const enableProviderNameSearch = config.enableProviderNameSearch !== 'false' && config.enableprovidernamesearch !== 'false';
   
-  console.log('Final configuration values:', { title, subtitle, layout, dataSourceType });
+  console.log('✅ Rendered with values:', { title, subtitle, layout, dataSourceType });
   
   // Hide configuration rows immediately like other blocks do
   const rows = Array.from(block.querySelectorAll(':scope > div'));
