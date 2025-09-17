@@ -1,5 +1,5 @@
 // Configuration reading is handled directly from block structure
-import { getMetadata } from '../../scripts/aem.js';
+import { getMetadata, readBlockConfig } from '../../scripts/aem.js';
 import { isAuthorEnvironment } from '../../scripts/scripts.js';
 
 // Sample doctor data - in production, this would come from your data source
@@ -605,261 +605,28 @@ function createSearchForm(config) {
   return form;
 }
 
-export default async function decorate(block) {
-  // Clean up any previous initialization to support UE editor updates
-  if (block.dataset.initialized === 'true') {
-    // Clean up previous event listeners and state
-    if (block._eventHandlers) {
-      const nameInput = block.querySelector('.provider-name-search');
-      const specialtySelect = block.querySelector('.specialty-filter');
-      const locationInput = block.querySelector('.location-search');
-      const locationButton = block.querySelector('.location-button');
-      
-      // Remove event listeners
-      if (nameInput && block._eventHandlers.nameInputHandler) {
-        nameInput.removeEventListener('input', block._eventHandlers.nameInputHandler);
-      }
-      if (specialtySelect && block._eventHandlers.specialtySelectHandler) {
-        specialtySelect.removeEventListener('change', block._eventHandlers.specialtySelectHandler);
-      }
-      if (locationInput && block._eventHandlers.locationInputHandler) {
-        locationInput.removeEventListener('input', block._eventHandlers.locationInputHandler);
-      }
-      if (locationButton && block._eventHandlers.locationButtonHandler) {
-        locationButton.removeEventListener('click', block._eventHandlers.locationButtonHandler);
-      }
-      if (block._eventHandlers.bookAppointmentHandler) {
-        block.removeEventListener('click', block._eventHandlers.bookAppointmentHandler);
-      }
-      
-      // Clear handlers
-      delete block._eventHandlers;
-    }
-    
-    // Clear any timeouts or intervals that might be running
-    if (block._searchTimeout) {
-      clearTimeout(block._searchTimeout);
-      delete block._searchTimeout;
-    }
-  }
+export default function decorate(block) {
+  // Use readBlockConfig like other blocks for immediate configuration reading
+  const config = readBlockConfig(block);
   
-  // Debug: Log the entire block structure first
-  console.log('=== BLOCK STRUCTURE DEBUG ===');
-  console.log('Block HTML before processing:', block.innerHTML);
-  console.log('Block children count:', block.children.length);
-  console.log('Block children:', Array.from(block.children).map((child, index) => ({
-    index,
-    tagName: child.tagName,
-    className: child.className,
-    textContent: child.textContent?.trim().substring(0, 100) + '...'
-  })));
+  // Set defaults and read from config
+  const title = config.title || 'Find a Doctor';
+  const subtitle = config.subtitle || 'Search for healthcare providers in your area';
+  const layout = config.layout || 'default';
+  const dataSourceType = config.dataSourceType || config.datasourcetype || 'dam-json';
+  const damJsonPath = config.damJsonPath || config.damjsonpath || '';
+  const contentFragmentFolder = config.contentFragmentFolder || config.contentfragmentfolder || '';
+  const apiUrl = config.apiUrl || config.apiurl || '';
+  const staticJsonPath = config.staticJsonPath || config.staticjsonpath || '/data/doctors.json';
+  const enableLocationSearch = config.enableLocationSearch !== 'false' && config.enablelocationsearch !== 'false';
+  const enableSpecialtyFilter = config.enableSpecialtyFilter !== 'false' && config.enablespecialtyfilter !== 'false';
+  const enableProviderNameSearch = config.enableProviderNameSearch !== 'false' && config.enableprovidernamesearch !== 'false';
   
-  // Read configuration - try multiple approaches since AEM structure might vary
-  let title = 'Find a Doctor';
-  let subtitle = 'Search for healthcare providers in your area';
-  let layout = 'default';
-  let dataSourceType = 'dam-json';
-  let damJsonPath = '';
-  let contentFragmentFolder = '';
-  let apiUrl = '';
-  let staticJsonPath = '/data/doctors.json';
-  let enableLocationSearch = true;
-  let enableSpecialtyFilter = true;
-  let enableProviderNameSearch = true;
-  
-  // Try to read configuration from the block structure
-  // AEM might render this differently, so we'll try multiple approaches
-  
-  // Approach 1: Keyed parsing by label to avoid positional mix-ups
+  // Hide configuration rows immediately like other blocks do
   const rows = Array.from(block.querySelectorAll(':scope > div'));
   rows.forEach((row) => {
-    const cells = row.querySelectorAll(':scope > div');
-    if (cells.length < 2) return;
-    const key = cells[0].textContent?.trim()?.toLowerCase();
-    if (!key) return;
-    let valueEl = cells[1];
-    const link = valueEl.querySelector('a');
-    const raw = (link?.getAttribute('title') || link?.textContent || valueEl.textContent || '').trim();
-    const val = raw;
-    console.log(`Parsing key: "${key}" with value: "${val}"`);
-    switch (key) {
-      case 'title':
-        if (val && val.toLowerCase() !== 'title') {
-          console.log(`Setting title to: "${val}"`);
-          title = val;
-        }
-        break;
-      case 'subtitle':
-        if (val && val.toLowerCase() !== 'subtitle') subtitle = val; break;
-      case 'layout':
-        if (val && val.toLowerCase() !== 'layout') layout = val; break;
-      case 'datasourcetype':
-        if (val && val.toLowerCase() !== 'datasourcetype') dataSourceType = val; break;
-      case 'damjsonpath':
-        if (val && val.toLowerCase() !== 'damjsonpath') damJsonPath = val; break;
-      case 'contentfragmentfolder':
-        if (val && val.toLowerCase() !== 'contentfragmentfolder') contentFragmentFolder = val; break;
-      case 'apiurl':
-        if (val && val.toLowerCase() !== 'apiurl') apiUrl = val; break;
-      case 'staticjsonpath':
-        if (val && val.toLowerCase() !== 'staticjsonpath') staticJsonPath = val; break;
-      case 'enablelocationsearch':
-        enableLocationSearch = val !== 'false'; break;
-      case 'enablespecialtyfilter':
-        enableSpecialtyFilter = val !== 'false'; break;
-      case 'enableprovidernamesearch':
-        enableProviderNameSearch = val !== 'false'; break;
-      default:
-        break;
-    }
+    row.style.display = 'none';
   });
-  
-  // Fallback: Try readBlockConfig if the standard approach doesn't work
-  if (title === 'Find a Doctor' || subtitle === 'Search for healthcare providers in your area' || !damJsonPath) {
-    console.log('=== FALLBACK CONFIGURATION READING ===');
-    console.log('Trying readBlockConfig...');
-    
-    try {
-      const { readBlockConfig } = await import('../../scripts/aem.js');
-      const config = readBlockConfig(block);
-      console.log('readBlockConfig result:', config);
-      
-      if (config && Object.keys(config).length > 0) {
-        if (config.title && config.title !== 'title') {
-          title = config.title;
-          console.log('Found title via readBlockConfig:', title);
-        }
-        if (config.subtitle && config.subtitle !== 'subtitle') {
-          subtitle = config.subtitle;
-          console.log('Found subtitle via readBlockConfig:', subtitle);
-        }
-        if (config.layout && config.layout !== 'layout') {
-          layout = config.layout;
-        }
-        if (config.dataSourceType && config.dataSourceType !== 'dataSourceType') {
-          dataSourceType = config.dataSourceType;
-        }
-        if (config.damJsonPath && config.damJsonPath !== 'damJsonPath') {
-          damJsonPath = config.damJsonPath;
-          console.log('Found DAM JSON path via readBlockConfig:', damJsonPath);
-        }
-        if (config.contentFragmentFolder && config.contentFragmentFolder !== 'contentFragmentFolder') {
-          contentFragmentFolder = config.contentFragmentFolder;
-        }
-        if (config.apiUrl && config.apiUrl !== 'apiUrl') {
-          apiUrl = config.apiUrl;
-        }
-        if (config.staticJsonPath && config.staticJsonPath !== 'staticJsonPath') {
-          staticJsonPath = config.staticJsonPath;
-        }
-        if (config.enableLocationSearch !== undefined) {
-          enableLocationSearch = config.enableLocationSearch !== false;
-        }
-        if (config.enableSpecialtyFilter !== undefined) {
-          enableSpecialtyFilter = config.enableSpecialtyFilter !== false;
-        }
-        if (config.enableProviderNameSearch !== undefined) {
-          enableProviderNameSearch = config.enableProviderNameSearch !== false;
-        }
-      }
-    } catch (error) {
-      console.log('readBlockConfig failed:', error);
-    }
-    
-    // Additional fallback: Try reading from all divs to see what's available
-    console.log('Trying alternative selectors...');
-    const allDivs = block.querySelectorAll(':scope > div');
-    allDivs.forEach((div, index) => {
-      const text = div.textContent?.trim();
-      if (text && text !== '') {
-        console.log(`Div ${index + 1} content:`, text);
-      }
-    });
-    
-    // Try reading title and subtitle from any div that might contain them
-    const allTextDivs = block.querySelectorAll(':scope > div > div');
-    allTextDivs.forEach((div, index) => {
-      const text = div.textContent?.trim();
-      if (text && text !== '') {
-        console.log(`Text div ${index + 1}:`, text);
-        // Guard against picking DAM paths or URLs as titles
-        const looksLikePath = text.startsWith('/content/') || text.includes('/') || text.includes(':');
-        // If we find text that looks like a proper title/subtitle, use it
-        if (!looksLikePath && text.length > 2 && text.length < 120 && !text.includes('dataSourceType') && !text.includes('dam-json')) {
-          if (title === 'Find a Doctor' && /doctor/i.test(text)) {
-            title = text;
-            console.log('Found title in fallback:', title);
-          } else if (subtitle === 'Search for healthcare providers in your area' && /search|provider|healthcare/i.test(text)) {
-            subtitle = text;
-            console.log('Found subtitle in fallback:', subtitle);
-          }
-        }
-      }
-    });
-  }
-  
-  // Debug: Log what we're reading from each div
-  console.log('=== CONFIGURATION READING DEBUG ===');
-  console.log('Raw div contents:');
-  for (let i = 1; i <= 11; i++) {
-    const div = block.querySelector(`:scope > div:nth-child(${i}) > div`);
-    console.log(`Div ${i}:`, div?.textContent?.trim() || 'empty');
-  }
-  
-  console.log('=== TITLE AND SUBTITLE DEBUG ===');
-  console.log('Title from div 1:', block.querySelector(':scope > div:nth-child(1) > div')?.textContent?.trim());
-  console.log('Subtitle from div 2:', block.querySelector(':scope > div:nth-child(2) > div')?.textContent?.trim());
-  console.log('Final title value:', title);
-  console.log('Final subtitle value:', subtitle);
-  console.log('Final contentFragmentFolder value:', contentFragmentFolder);
-  
-  // Special handling: If we have a DAM JSON path but dataSourceType is not dam-json, fix it
-  if (damJsonPath && damJsonPath !== '' && dataSourceType !== 'dam-json' && !contentFragmentFolder) {
-    console.log('=== FIXING DATA SOURCE TYPE ===');
-    console.log('Found DAM JSON path but dataSourceType is not dam-json, fixing...');
-    dataSourceType = 'dam-json';
-  }
-  
-  console.log('Find Doctor Configuration:', {
-    title,
-    subtitle,
-    layout,
-    dataSourceType,
-    damJsonPath,
-    contentFragmentFolder,
-    apiUrl,
-    staticJsonPath,
-    enableLocationSearch,
-    enableSpecialtyFilter,
-    enableProviderNameSearch
-  });
-  
-  // Create config object for compatibility
-  const config = {
-    title,
-    subtitle,
-    layout,
-    dataSourceType,
-    damJsonPath,
-    contentFragmentFolder,
-    apiUrl,
-    staticJsonPath,
-    enableLocationSearch,
-    enableSpecialtyFilter,
-    enableProviderNameSearch
-  };
-  
-  // Hide configuration rows after reading them (same approach as search block)
-  try {
-    const configRows = [];
-    for (let i = 1; i <= 11; i++) {
-      const row = block.querySelector(`:scope > div:nth-child(${i})`);
-      if (row) configRows.push(row);
-    }
-    configRows.forEach((row) => { if (row) row.style.display = 'none'; });
-  } catch (e) {
-    console.log('[find-doctor] config/hide rows error', e);
-  }
   
   // Clear the block content and set up the component
   block.innerHTML = '';
@@ -893,64 +660,40 @@ export default async function decorate(block) {
   const resultsContainer = createElement('div', 'doctor-results');
   block.appendChild(resultsContainer);
   
-  // Show loading state first
+  // Show loading state immediately
   resultsContainer.innerHTML = '<div class="loading-state">Loading doctors...</div>';
   
-  // Load doctor data with error handling for UE updates
-  let doctors;
-  try {
-    doctors = await fetchDoctorData(config);
-    
-    // Check if block is still in DOM (might be removed during UE update)
-    if (!document.contains(block)) {
-      console.log('Block removed from DOM during data fetch, aborting initialization');
-      return;
-    }
-    
-    if (!doctors || !Array.isArray(doctors)) {
-      console.warn('Invalid doctor data received, falling back to sample data');
-      doctors = SAMPLE_DOCTORS;
-    }
-  } catch (error) {
+  // Load doctor data asynchronously (don't await here)
+  let doctors = [];
+  fetchDoctorData(config).then(loadedDoctors => {
+    doctors = loadedDoctors;
+    // Update the results when data is loaded
+    renderResults(doctors, resultsContainer);
+  }).catch(error => {
     console.error('Error loading doctor data:', error);
-    
-    // Check if block is still in DOM before updating UI
-    if (!document.contains(block)) {
-      console.log('Block removed from DOM during error handling, aborting');
-      return;
+    resultsContainer.innerHTML = '<div class="error-state">Error loading doctor data. Please try again later.</div>';
+  });
+  
+  // Add loading styles
+  const loadingStyle = document.createElement('style');
+  loadingStyle.textContent = `
+    .loading-state {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-color-secondary, #666);
+      font-size: 1.1rem;
     }
-    
-    resultsContainer.innerHTML = '<div class="error-state">Error loading doctors. Using sample data.</div>';
-    doctors = SAMPLE_DOCTORS;
-  }
-  
-  // Add loading styles scoped to this block to avoid conflicts during UE updates
-  const blockId = `find-doctor-${Math.random().toString(36).substr(2, 9)}`;
-  block.id = blockId;
-  
-  let loadingStyle = document.getElementById('find-doctor-styles');
-  if (!loadingStyle) {
-    loadingStyle = document.createElement('style');
-    loadingStyle.id = 'find-doctor-styles';
-    loadingStyle.textContent = `
-      .find-doctor .loading-state {
-        text-align: center;
-        padding: 2rem;
-        color: var(--text-color-secondary, #666);
-        font-size: 1.1rem;
-      }
-      .find-doctor .error-state {
-        text-align: center;
-        padding: 2rem;
-        color: var(--error-color, #dc3545);
-        background: var(--error-background, #f8d7da);
-        border: 1px solid var(--error-border, #f5c6cb);
-        border-radius: 8px;
-        margin: 1rem 0;
-      }
-    `;
-    document.head.appendChild(loadingStyle);
-  }
+    .error-state {
+      text-align: center;
+      padding: 2rem;
+      color: var(--error-color, #dc3545);
+      background: var(--error-background, #f8d7da);
+      border: 1px solid var(--error-border, #f5c6cb);
+      border-radius: 8px;
+      margin: 1rem 0;
+    }
+  `;
+  document.head.appendChild(loadingStyle);
   
   // Initialize filters
   const filters = {
@@ -965,89 +708,73 @@ export default async function decorate(block) {
   const locationInput = block.querySelector('.location-search');
   const locationButton = block.querySelector('.location-button');
   
-  // Search functionality with proper cleanup support
-  const performSearch = () => {
-    // Clear any existing timeout to avoid multiple searches
-    if (block._searchTimeout) {
-      clearTimeout(block._searchTimeout);
+  // Search functionality
+  const performSearch = debounce(() => {
+    if (doctors.length === 0) {
+      // Data not loaded yet, show loading message
+      resultsContainer.innerHTML = '<div class="loading-state">Loading doctors...</div>';
+      return;
     }
-    
-    block._searchTimeout = setTimeout(() => {
-      const filteredDoctors = filterDoctors(doctors, filters);
-      renderResults(filteredDoctors, resultsContainer);
-    }, 300);
-  };
-  
-  // Store event handlers for potential cleanup
-  const eventHandlers = {
-    nameInputHandler: (e) => {
-      filters.nameSearch = e.target.value;
-      performSearch();
-    },
-    specialtySelectHandler: (e) => {
-      filters.specialty = e.target.value;
-      performSearch();
-    },
-    locationInputHandler: (e) => {
-      filters.location = e.target.value;
-      performSearch();
-    }
-  };
+    const filteredDoctors = filterDoctors(doctors, filters);
+    renderResults(filteredDoctors, resultsContainer);
+  }, 300);
   
   // Event listeners
   if (nameInput) {
-    nameInput.addEventListener('input', eventHandlers.nameInputHandler);
+    nameInput.addEventListener('input', (e) => {
+      filters.nameSearch = e.target.value;
+      performSearch();
+    });
   }
   
   if (specialtySelect) {
-    specialtySelect.addEventListener('change', eventHandlers.specialtySelectHandler);
+    specialtySelect.addEventListener('change', (e) => {
+      filters.specialty = e.target.value;
+      performSearch();
+    });
   }
   
   if (locationInput) {
-    locationInput.addEventListener('input', eventHandlers.locationInputHandler);
+    locationInput.addEventListener('input', (e) => {
+      filters.location = e.target.value;
+      performSearch();
+    });
   }
   
-  // Store event handlers on the block for potential cleanup
-  block._eventHandlers = eventHandlers;
-  
   // Location button functionality
-  const locationButtonHandler = async () => {
-    try {
-      locationButton.textContent = '📍';
-      locationButton.disabled = true;
-      
-      const position = await getCurrentLocation();
-      
-      // In a real implementation, you would reverse geocode the coordinates
-      // For now, we'll just show a success message
-      locationInput.value = 'Current location detected';
-      filters.location = 'Current location detected';
-      performSearch();
-      
-      locationButton.textContent = '📍';
-      setTimeout(() => {
-        locationButton.textContent = '📍';
-        locationButton.disabled = false;
-      }, 2000);
-      
-    } catch (error) {
-      console.error('Error getting location:', error);
-      locationButton.textContent = '📍';
-      setTimeout(() => {
-        locationButton.textContent = '📍';
-        locationButton.disabled = false;
-      }, 2000);
-    }
-  };
-  
   if (locationButton) {
-    locationButton.addEventListener('click', locationButtonHandler);
-    // Store for cleanup
-    eventHandlers.locationButtonHandler = locationButtonHandler;
+    locationButton.addEventListener('click', async () => {
+      try {
+        locationButton.textContent = '📍';
+        locationButton.disabled = true;
+        
+        const position = await getCurrentLocation();
+        
+        // In a real implementation, you would reverse geocode the coordinates
+        // For now, we'll just show a success message
+        locationInput.value = 'Current location detected';
+        filters.location = 'Current location detected';
+        performSearch();
+        
+        locationButton.textContent = '📍';
+        setTimeout(() => {
+          locationButton.textContent = '📍';
+          locationButton.disabled = false;
+        }, 2000);
+        
+      } catch (error) {
+        console.error('Error getting location:', error);
+        locationButton.textContent = '📍';
+        setTimeout(() => {
+          locationButton.textContent = '📍';
+          locationButton.disabled = false;
+        }, 2000);
+      }
+    });
   }
   
   // Book appointment functionality
-  const bookAppointmentHandler = (e) => {
+  block.addEventListener('click', (e) => {
     if (e.target.classList.contains('book-appointment-btn')) {
       const doctorId = e.target.dataset.doctorId;
       const doctor = doctors.find(d => d.id === doctorId);
@@ -1057,15 +784,7 @@ export default async function decorate(block) {
         alert(`Booking appointment with ${doctor.name}\n\nPhone: ${doctor.phone}\nEmail: ${doctor.email}`);
       }
     }
-  };
+  });
   
-  block.addEventListener('click', bookAppointmentHandler);
-  // Store for cleanup
-  eventHandlers.bookAppointmentHandler = bookAppointmentHandler;
-  
-  // Initial render
-  renderResults(doctors, resultsContainer);
-  
-  // Mark block as initialized to support UE editor updates
-  block.dataset.initialized = 'true';
+  // Initial render will happen when data is loaded via the promise
 }
