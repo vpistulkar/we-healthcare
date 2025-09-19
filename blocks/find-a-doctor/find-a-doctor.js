@@ -1,7 +1,6 @@
 // Configuration reading is handled directly from block structure
 import { getMetadata } from '../../scripts/aem.js';
 import { isAuthorEnvironment } from '../../scripts/scripts.js';
-import { readBlockConfig } from '../../scripts/aem.js';
 
 // Sample doctor data - in production, this would come from your data source
 const GRAPHQL_DOCTORS_BY_FOLDER_QUERY = '/graphql/execute.json/weHealthcare/GetDoctorsFromFolder';
@@ -614,22 +613,23 @@ function createSearchForm(config, doctors = []) {
 }
 
 export default async function decorate(block) {
-  // Debug: Log the entire block structure first
-  console.log('=== BLOCK STRUCTURE DEBUG ===');
-  console.log('Block HTML before processing:', block.innerHTML);
-  console.log('Block children count:', block.children.length);
-  console.log('Block children:', Array.from(block.children).map((child, index) => ({
-    index,
-    tagName: child.tagName,
-    className: child.className,
-    textContent: child.textContent?.trim().substring(0, 100) + '...'
-  })));
+  // Debug log with timestamp to track re-decoration
+  const timestamp = new Date().toLocaleTimeString();
+  console.log(`🏥 Find-a-doctor block decorating at ${timestamp}`);
+  console.log('Block data-aue-resource:', block.getAttribute('data-aue-resource'));
   
-  // Read configuration - try multiple approaches since AEM structure might vary
+  // Debug: Log all div contents to see what we're reading
+  console.log('=== CONFIG DEBUG ===');
+  for (let i = 1; i <= 11; i++) {
+    const div = block.querySelector(`:scope div:nth-child(${i}) > div`);
+    console.log(`Position ${i}:`, div?.textContent?.trim() || 'empty');
+  }
+  
+  // Read configuration using key-based approach (works with Universal Editor)
   let title = 'Find a Doctor';
   let subtitle = 'Search for healthcare providers in your area';
   let layout = 'default';
-  let dataSourceType = 'dam-json';
+  let dataSourceType = 'json';
   let damJsonPath = '';
   let contentFragmentFolder = '';
   let apiUrl = '';
@@ -638,172 +638,53 @@ export default async function decorate(block) {
   let enableSpecialtyFilter = true;
   let enableProviderNameSearch = true;
   
-  // Try to read configuration from the block structure
-  // AEM might render this differently, so we'll try multiple approaches
-  
-  // Approach 1: Keyed parsing by label to avoid positional mix-ups
+  // Parse config from block structure (key-value pairs)
   const rows = Array.from(block.querySelectorAll(':scope > div'));
   rows.forEach((row) => {
     const cells = row.querySelectorAll(':scope > div');
     if (cells.length < 2) return;
+    
     const key = cells[0].textContent?.trim()?.toLowerCase();
-    if (!key) return;
-    let valueEl = cells[1];
-    const link = valueEl.querySelector('a');
-    const raw = (link?.getAttribute('title') || link?.textContent || valueEl.textContent || '').trim();
-    const val = raw;
-    console.log(`Parsing key: "${key}" with value: "${val}"`);
+    const valueCell = cells[1];
+    const link = valueCell.querySelector('a');
+    const value = (link?.getAttribute('title') || link?.textContent || valueCell.textContent || '').trim();
+    
+    if (!key || !value) return;
+    
+    console.log(`Reading config: "${key}" = "${value}"`);
+    
     switch (key) {
-      case 'title':
-        if (val && val.toLowerCase() !== 'title') {
-          console.log(`Setting title to: "${val}"`);
-          title = val;
-        }
-        break;
-      case 'subtitle':
-        if (val && val.toLowerCase() !== 'subtitle') subtitle = val; break;
-      case 'layout':
-        if (val && val.toLowerCase() !== 'layout') layout = val; break;
-      case 'datasourcetype':
-        if (val && val.toLowerCase() !== 'datasourcetype') dataSourceType = val; break;
-      case 'damjsonpath':
-        if (val && val.toLowerCase() !== 'damjsonpath') damJsonPath = val; break;
-      case 'contentfragmentfolder':
-        if (val && val.toLowerCase() !== 'contentfragmentfolder') contentFragmentFolder = val; break;
-      case 'apiurl':
-        if (val && val.toLowerCase() !== 'apiurl') apiUrl = val; break;
-      case 'staticjsonpath':
-        if (val && val.toLowerCase() !== 'staticjsonpath') staticJsonPath = val; break;
-      case 'enablelocationsearch':
-        enableLocationSearch = val !== 'false'; break;
-      case 'enablespecialtyfilter':
-        enableSpecialtyFilter = val !== 'false'; break;
-      case 'enableprovidernamesearch':
-        enableProviderNameSearch = val !== 'false'; break;
-      default:
-        break;
+      case 'title': title = value; break;
+      case 'subtitle': subtitle = value; break;
+      case 'layout': layout = value; break;
+      case 'layout style': layout = value; break;
+      case 'data source type': 
+      case 'datasourcetype': dataSourceType = value; break;
+      case 'content fragment folder':
+      case 'contentfragmentfolder': contentFragmentFolder = value; break;
+      case 'dam json path':
+      case 'damjsonpath': damJsonPath = value; break;
+      case 'api url':
+      case 'apiurl': apiUrl = value; break;
+      case 'static json path':
+      case 'staticjsonpath': staticJsonPath = value; break;
+      case 'enable location search':
+      case 'enablelocationsearch': enableLocationSearch = value !== 'false'; break;
+      case 'enable specialty filter':
+      case 'enablespecialtyfilter': enableSpecialtyFilter = value !== 'false'; break;
+      case 'enable provider name search':
+      case 'enableprovidernamesearch': enableProviderNameSearch = value !== 'false'; break;
     }
   });
-  
-  // Fallback: Try readBlockConfig if the standard approach doesn't work
-  if (title === 'Find a Doctor' || subtitle === 'Search for healthcare providers in your area' || !damJsonPath) {
-    console.log('=== FALLBACK CONFIGURATION READING ===');
-    console.log('Trying readBlockConfig...');
-    
-    try {
-      const { readBlockConfig } = await import('../../scripts/aem.js');
-      const config = readBlockConfig(block);
-      console.log('readBlockConfig result:', config);
-      
-      if (config && Object.keys(config).length > 0) {
-        if (config.title && config.title !== 'title') {
-          title = config.title;
-          console.log('Found title via readBlockConfig:', title);
-        }
-        if (config.subtitle && config.subtitle !== 'subtitle') {
-          subtitle = config.subtitle;
-          console.log('Found subtitle via readBlockConfig:', subtitle);
-        }
-        if (config.layout && config.layout !== 'layout') {
-          layout = config.layout;
-        }
-        if (config.dataSourceType && config.dataSourceType !== 'dataSourceType') {
-          dataSourceType = config.dataSourceType;
-        }
-        if (config.damJsonPath && config.damJsonPath !== 'damJsonPath') {
-          damJsonPath = config.damJsonPath;
-          console.log('Found DAM JSON path via readBlockConfig:', damJsonPath);
-        }
-        if (config.contentFragmentFolder && config.contentFragmentFolder !== 'contentFragmentFolder') {
-          contentFragmentFolder = config.contentFragmentFolder;
-        }
-        if (config.apiUrl && config.apiUrl !== 'apiUrl') {
-          apiUrl = config.apiUrl;
-        }
-        if (config.staticJsonPath && config.staticJsonPath !== 'staticJsonPath') {
-          staticJsonPath = config.staticJsonPath;
-        }
-        if (config.enableLocationSearch !== undefined) {
-          enableLocationSearch = config.enableLocationSearch !== false;
-        }
-        if (config.enableSpecialtyFilter !== undefined) {
-          enableSpecialtyFilter = config.enableSpecialtyFilter !== false;
-        }
-        if (config.enableProviderNameSearch !== undefined) {
-          enableProviderNameSearch = config.enableProviderNameSearch !== false;
-        }
-      }
-    } catch (error) {
-      console.log('readBlockConfig failed:', error);
-    }
-    
-    // Additional fallback: Try reading from all divs to see what's available
-    console.log('Trying alternative selectors...');
-    const allDivs = block.querySelectorAll(':scope > div');
-    allDivs.forEach((div, index) => {
-      const text = div.textContent?.trim();
-      if (text && text !== '') {
-        console.log(`Div ${index + 1} content:`, text);
-      }
-    });
-    
-    // Try reading title and subtitle from any div that might contain them
-    const allTextDivs = block.querySelectorAll(':scope > div > div');
-    allTextDivs.forEach((div, index) => {
-      const text = div.textContent?.trim();
-      if (text && text !== '') {
-        console.log(`Text div ${index + 1}:`, text);
-        // Guard against picking DAM paths or URLs as titles
-        const looksLikePath = text.startsWith('/content/') || text.includes('/') || text.includes(':');
-        // If we find text that looks like a proper title/subtitle, use it
-        if (!looksLikePath && text.length > 2 && text.length < 120 && !text.includes('dataSourceType') && !text.includes('dam-json')) {
-          if (title === 'Find a Doctor' && /doctor/i.test(text)) {
-            title = text;
-            console.log('Found title in fallback:', title);
-          } else if (subtitle === 'Search for healthcare providers in your area' && /search|provider|healthcare/i.test(text)) {
-            subtitle = text;
-            console.log('Found subtitle in fallback:', subtitle);
-          }
-        }
-      }
-    });
-  }
-  
-  // Debug: Log what we're reading from each div
-  console.log('=== CONFIGURATION READING DEBUG ===');
-  console.log('Raw div contents:');
-  for (let i = 1; i <= 11; i++) {
-    const div = block.querySelector(`:scope > div:nth-child(${i}) > div`);
-    console.log(`Div ${i}:`, div?.textContent?.trim() || 'empty');
-  }
-  
-  console.log('=== TITLE AND SUBTITLE DEBUG ===');
-  console.log('Title from div 1:', block.querySelector(':scope > div:nth-child(1) > div')?.textContent?.trim());
-  console.log('Subtitle from div 2:', block.querySelector(':scope > div:nth-child(2) > div')?.textContent?.trim());
-  console.log('Final title value:', title);
-  console.log('Final subtitle value:', subtitle);
-  console.log('Final contentFragmentFolder value:', contentFragmentFolder);
-  
-  // Special handling: If we have a DAM JSON path but dataSourceType is not dam-json, fix it
-  if (damJsonPath && damJsonPath !== '' && dataSourceType !== 'dam-json' && !contentFragmentFolder) {
-    console.log('=== FIXING DATA SOURCE TYPE ===');
-    console.log('Found DAM JSON path but dataSourceType is not dam-json, fixing...');
-    dataSourceType = 'dam-json';
-  }
-  
-  console.log('Find Doctor Configuration:', {
-    title,
-    subtitle,
-    layout,
-    dataSourceType,
-    damJsonPath,
-    contentFragmentFolder,
-    apiUrl,
-    staticJsonPath,
-    enableLocationSearch,
-    enableSpecialtyFilter,
-    enableProviderNameSearch
+
+  // Hide config rows but keep them in DOM (like cards block)
+  const configRows = Array.from(block.children);
+  configRows.forEach((row) => {
+    row.style.display = 'none';
   });
+
+  // Set layout class
+  block.className = `find-doctor ${layout}`;
   
   // Create config object for compatibility
   const config = {
@@ -820,23 +701,16 @@ export default async function decorate(block) {
     enableProviderNameSearch
   };
   
-  // Hide configuration rows after reading them (same approach as search block)
-  try {
-    const configRows = [];
-    for (let i = 1; i <= 11; i++) {
-      const row = block.querySelector(`:scope > div:nth-child(${i})`);
-      if (row) configRows.push(row);
-    }
-    configRows.forEach((row) => { if (row) row.style.display = 'none'; });
-  } catch (e) {
-    console.log('[find-doctor] config/hide rows error', e);
-  }
-  
-  // Clear the block content and set up the component
-  block.innerHTML = '';
-  block.className = `find-doctor ${layout}`;
-  
-  // Create header
+  console.log('=== FINAL CONFIG VALUES ===');
+  console.log('Title:', title);
+  console.log('Subtitle:', subtitle);
+  console.log('Layout:', layout);
+  console.log('Data Source Type:', dataSourceType);
+  console.log('Content Fragment Folder:', contentFragmentFolder);
+  console.log('DAM JSON Path:', damJsonPath);
+  console.log('Static JSON Path:', staticJsonPath);
+    
+  // --- Build UI ---
   const header = createElement('div', 'find-doctor-header');
   const dataSourceInfo = getDataSourceInfo(config);
   
@@ -856,23 +730,21 @@ export default async function decorate(block) {
   
   console.log('Header HTML created:', header.innerHTML);
   
-  // Create results container and add to DOM
   const resultsContainer = createElement('div', 'doctor-results');
+    resultsContainer.innerHTML = '<div class="loading-state">Loading doctors...</div>';
   block.appendChild(resultsContainer);
   
-  // Show loading state while fetching data
-  resultsContainer.innerHTML = '<div class="loading-state">Loading doctors...</div>';
-  
-  // Load doctor data first
+    // Load data
   let doctors = await fetchDoctorData(config);
   
-  // Create search form with dynamic specialties from loaded doctor data
+    // Build search form
   const searchForm = createSearchForm(config, doctors);
-  // Insert search form before results container
   block.insertBefore(searchForm, resultsContainer);
   
-  // Add loading styles
+    // Add loading styles (only if not already added)
+    if (!document.querySelector('#find-doctor-loading-styles')) {
   const loadingStyle = document.createElement('style');
+      loadingStyle.id = 'find-doctor-loading-styles';
   loadingStyle.textContent = `
     .loading-state {
       text-align: center;
@@ -891,27 +763,16 @@ export default async function decorate(block) {
     }
   `;
   document.head.appendChild(loadingStyle);
-  
-  // Initialize filters
-  const filters = {
-    nameSearch: '',
-    specialty: '',
-    location: ''
-  };
-  
-  // Get form elements
-  const nameInput = block.querySelector('.provider-name-search');
-  const specialtySelect = block.querySelector('.specialty-filter');
-  const locationInput = block.querySelector('.location-search');
-  const locationButton = block.querySelector('.location-button');
-  
-  // Search functionality
+    }
+
+    // Hook up filters + listeners
+    const filters = { nameSearch: '', specialty: '', location: '' };
   const performSearch = debounce(() => {
     const filteredDoctors = filterDoctors(doctors, filters);
     renderResults(filteredDoctors, resultsContainer);
   }, 300);
   
-  // Event listeners
+    const nameInput = block.querySelector('.provider-name-search');
   if (nameInput) {
     nameInput.addEventListener('input', (e) => {
       filters.nameSearch = e.target.value;
@@ -919,6 +780,7 @@ export default async function decorate(block) {
     });
   }
   
+    const specialtySelect = block.querySelector('.specialty-filter');
   if (specialtySelect) {
     specialtySelect.addEventListener('change', (e) => {
       filters.specialty = e.target.value;
@@ -926,6 +788,7 @@ export default async function decorate(block) {
     });
   }
   
+    const locationInput = block.querySelector('.location-search');
   if (locationInput) {
     locationInput.addEventListener('input', (e) => {
       filters.location = e.target.value;
@@ -934,6 +797,7 @@ export default async function decorate(block) {
   }
   
   // Location button functionality
+    const locationButton = block.querySelector('.location-button');
   if (locationButton) {
     locationButton.addEventListener('click', async () => {
       try {
@@ -980,4 +844,27 @@ export default async function decorate(block) {
   
   // Initial render
   renderResults(doctors, resultsContainer);
+  
+  console.log(`✅ Find-a-doctor block decoration completed at ${timestamp}`);
+  
+  // Add Universal Editor auto-reload support
+  const blockResource = block.getAttribute('data-aue-resource');
+  if (blockResource) {
+    const handleUEEvent = (event) => {
+      const eventResource = event.detail?.request?.target?.resource;
+      if (eventResource === blockResource) {
+        console.log('🔄 Find-a-doctor config change detected, will reload in 1 second...');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      }
+    };
+    
+    // Listen for Universal Editor events (only add listener once)
+    if (!block._ueListenerAdded) {
+      document.querySelector('main')?.addEventListener('aue:content-patch', handleUEEvent);
+      document.querySelector('main')?.addEventListener('aue:content-update', handleUEEvent);
+      block._ueListenerAdded = true;
+    }
+  }
 }
