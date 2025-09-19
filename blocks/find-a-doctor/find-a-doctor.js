@@ -1,6 +1,7 @@
 // Configuration reading is handled directly from block structure
 import { getMetadata } from '../../scripts/aem.js';
 import { isAuthorEnvironment } from '../../scripts/scripts.js';
+import { readBlockConfig } from '../../scripts/aem.js';
 
 // Sample doctor data - in production, this would come from your data source
 const GRAPHQL_DOCTORS_BY_FOLDER_QUERY = '/graphql/execute.json/weHealthcare/GetDoctorsFromFolder';
