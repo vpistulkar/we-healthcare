@@ -6398,6 +6398,21 @@
         "label": "Enable Provider Name Search",
         "value": "true",
         "valueType": "boolean"
+      },
+      {
+        "component": "boolean",
+        "name": "enableSubmitAction",
+        "label": "Enable Submit Action",
+        "value": "true",
+        "valueType": "boolean"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "submitUrl",
+        "label": "Submit URL",
+        "description": "URL to redirect to when Book Appointment is clicked (if Submit Action is enabled)",
+        "condition": { "==": [{ "var": "enableSubmitAction" }, true] }
       }
     ]
   }

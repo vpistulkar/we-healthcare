@@ -5,8 +5,10 @@ import { isAuthorEnvironment } from '../../scripts/scripts.js';
 // Sample doctor data - in production, this would come from your data source
 const GRAPHQL_DOCTORS_BY_FOLDER_QUERY = '/graphql/execute.json/weHealthcare/GetDoctorsFromFolder';
 const CONFIG = {
-  WRAPPER_SERVICE_URL: 'https://defaultfa7b1b5a7b34438794aed2c178dece.e1.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/2660b7afa9524acbae379074ae38501e/triggers/manual/paths/invoke',
-  WRAPPER_SERVICE_PARAMS: 'api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=uDpzD2f3QIHYqS4krx0sTF4M_2pElDpQ0lTHvFl9ntU'
+  /*WRAPPER_SERVICE_URL: 'https://defaultfa7b1b5a7b34438794aed2c178dece.e1.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/2660b7afa9524acbae379074ae38501e/triggers/manual/paths/invoke',*/
+   /*WRAPPER_SERVICE_PARAMS: 'api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=540k5P2jXO3u7i_9VxBp_X3aTqTn8a0o9zYjQiJt5pQ'*/
+  WRAPPER_SERVICE_URL: 'https://prod-60.eastus2.logic.azure.com:443/workflows/94ef4cd1fc1243e08aeab8ae74bc7980/triggers/manual/paths/invoke',
+  WRAPPER_SERVICE_PARAMS: 'api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=e81iCCcESEf9NzzxLvbfMGPmredbADtTZSs8mspUTa4'
 };
 
 function isAuthorEnvironmentSimple() {
@@ -16,6 +18,9 @@ function isAuthorEnvironmentSimple() {
     return false;
   }
 }
+// COMMENTED OUT - Static JSON sample data removed per user request
+// Keeping for reference only - this was the fallback data before removing static JSON support
+/*
 const SAMPLE_DOCTORS = [
   {
     id: '1',
@@ -108,6 +113,7 @@ const SAMPLE_DOCTORS = [
     hospital: 'Boston Orthopedic Center'
   }
 ];
+*/
 
 // Function to extract unique specialties from doctor data
 function getUniqueSpecialties(doctors) {
@@ -147,6 +153,128 @@ function createElement(tag, className, content) {
   if (className) element.className = className;
   if (content) element.innerHTML = content;
   return element;
+}
+
+// Appointment popup helpers
+function ensureAppointmentStyles() {
+  if (document.getElementById('find-doctor-appointment-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'find-doctor-appointment-styles';
+  style.textContent = `
+    body.fd-modal-open { overflow: hidden; }
+    .fd-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 1rem;
+    }
+    .fd-modal {
+      background: #fff;
+      color: inherit;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      max-width: 520px;
+      width: 100%;
+      overflow: hidden;
+      animation: fd-modal-in 160ms ease-out;
+    }
+    @keyframes fd-modal-in { from { transform: translateY(8px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+    .fd-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid #eee;
+    }
+    .fd-modal-title {
+      margin: 0;
+      font-size: 1.125rem;
+      font-weight: 600;
+    }
+    .fd-modal-close {
+      background: transparent;
+      border: none;
+      font-size: 1.25rem;
+      cursor: pointer;
+      line-height: 1;
+      padding: 6px;
+      border-radius: 6px;
+    }
+    .fd-modal-close:focus { outline: 2px solid #2680eb; outline-offset: 2px; }
+    .fd-modal-body { padding: 16px 20px; }
+    .fd-modal-actions { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+    .fd-success {
+      display: inline-block;
+      background: #e6f4ea;
+      color: #137333;
+      border: 1px solid #c6e7d0;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .fd-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      text-decoration: none;
+      color: inherit;
+      background: #f8f9fa;
+      cursor: pointer;
+    }
+    .fd-btn-primary { background: #1a73e8; color: #fff; border-color: #1a73e8; }
+    .fd-contact-row { display: flex; flex-direction: column; gap: 6px; }
+    .fd-contact-row a { color: #1a73e8; text-decoration: none; }
+    .fd-contact-row a:hover { text-decoration: underline; }
+  `;
+  document.head.appendChild(style);
+}
+
+function showAppointmentPopup(doctor) {
+  ensureAppointmentStyles();
+  const overlay = document.createElement('div');
+  overlay.className = 'fd-modal-overlay';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+
+  const modal = document.createElement('div');
+  modal.className = 'fd-modal';
+  modal.innerHTML = `
+    <div class="fd-modal-header">
+      <h3 class="fd-modal-title">Contact ${doctor.name}</h3>
+      <button class="fd-modal-close" aria-label="Close">×</button>
+    </div>
+    <div class="fd-modal-body">
+      <div class="fd-success">Booking confirmed!</div>
+      <div class="fd-contact-row">
+        ${doctor.phone ? `<div><strong>Phone:</strong> <a href="tel:${doctor.phone}">${doctor.phone}</a></div>` : ''}
+        ${doctor.email ? `<div><strong>Email:</strong> <a href="mailto:${doctor.email}">${doctor.email}</a></div>` : ''}
+      </div>
+    </div>
+  `;
+
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+  document.body.classList.add('fd-modal-open');
+
+  const cleanup = () => {
+    document.removeEventListener('keydown', onKey);
+    overlay.removeEventListener('click', onOverlayClick);
+    overlay.remove();
+    document.body.classList.remove('fd-modal-open');
+  };
+  const onKey = (e) => { if (e.key === 'Escape') cleanup(); };
+  const onOverlayClick = (e) => { if (e.target === overlay) cleanup(); };
+  document.addEventListener('keydown', onKey);
+  overlay.addEventListener('click', onOverlayClick);
+  modal.querySelector('.fd-modal-close')?.addEventListener('click', cleanup);
 }
 
 function createSearchInput(placeholder, className) {
@@ -204,7 +332,7 @@ function createDoctorCard(doctor) {
         <a href="tel:${doctor.phone}" class="contact-phone">${doctor.phone}</a>
         <a href="mailto:${doctor.email}" class="contact-email">Contact</a>
       </div>
-      <button class="book-appointment-btn" data-doctor-id="${doctor.id}">
+      <button class="book-appointment-btn" data-doctor-id="${doctor.id}" data-appointment-url="${doctor.bookAppointmentUrl || ''}">
         Book Appointment
       </button>
   
@@ -290,26 +418,15 @@ function getCurrentLocation() {
 
 async function fetchDoctorData(config) {
   try {
-    const { dataSourceType, damJsonPath, contentFragmentFolder, apiUrl, staticJsonPath } = config;
+    const { dataSourceType, contentFragmentFolder, apiUrl } = config;
     
     console.log('=== FETCH DOCTOR DATA DEBUG ===');
     console.log('Data source type:', dataSourceType);
-    console.log('DAM JSON path:', damJsonPath);
     console.log('Content Fragment folder:', contentFragmentFolder);
     console.log('API URL:', apiUrl);
-    console.log('Static JSON path:', staticJsonPath);
     console.log('Full config:', config);
     
     switch (dataSourceType) {
-      case 'dam-json':
-        if (damJsonPath) {
-          console.log('Attempting to fetch from DAM JSON:', damJsonPath);
-          return await fetchFromDAMJson(damJsonPath);
-        } else {
-          console.warn('DAM JSON path not provided, falling back to sample data');
-        }
-        break;
-        
       case 'content-fragments':
         if (contentFragmentFolder) {
           console.log('Attempting to fetch from Content Fragment folder:', contentFragmentFolder);
@@ -324,27 +441,21 @@ async function fetchDoctorData(config) {
           console.log('Attempting to fetch from API:', apiUrl);
           return await fetchFromAPI(apiUrl);
         } else {
-          console.warn('API URL not provided, falling back to sample data');
+          console.warn('API URL not provided, falling back to empty array');
         }
         break;
         
-      case 'json':
       default:
-        if (staticJsonPath) {
-          console.log('Attempting to fetch from static JSON:', staticJsonPath);
-          return await fetchFromStaticJson(staticJsonPath);
-        } else {
-          console.warn('Static JSON path not provided, falling back to sample data');
-        }
+        console.warn('Unknown data source type:', dataSourceType, 'falling back to empty array');
         break;
     }
     
-    console.log('No valid data source configured, using sample data');
-    return SAMPLE_DOCTORS; // Fallback to sample data
+    console.log('No valid data source configured, returning empty array');
+    return []; // Return empty array since static JSON support was removed
   } catch (error) {
     console.error('Error fetching doctor data:', error);
-    console.log('Falling back to sample data due to error');
-    return SAMPLE_DOCTORS; // Fallback to sample data
+    console.log('Falling back to empty array due to error');
+    return []; // Return empty array since static JSON support was removed
   }
 }
 
@@ -498,7 +609,31 @@ function transformGraphQLDoctorItem(item, isAuthorEnv) {
     acceptingNewPatients: !!item?.acceptingNewPatients,
     hospital: item?.hospital || 'Medical Center',
     latitude: 0,
-    longitude: 0
+    longitude: 0,
+    bookAppointmentUrl: item?.bookAppointmentUrl || item?.appointmentUrl || item?.bookingUrl || item?.bookUrl || ''
+  };
+}
+
+function transformAPIDataToDoctor(apiData) {
+  // Transform API data to match our doctor structure
+  return {
+    id: apiData.id || apiData.doctorId || Math.random().toString(36).substr(2, 9),
+    name: apiData.name || apiData.doctorName || apiData.fullName || 'Dr. Unknown',
+    specialty: apiData.specialty || apiData.medicalSpecialty || apiData.speciality || 'General Medicine',
+    location: apiData.location || apiData.practiceLocation || apiData.address || 'Location not specified',
+    zipCode: apiData.zipCode || apiData.postalCode || apiData.zip || '',
+    phone: apiData.phone || apiData.phoneNumber || apiData.contactNumber || '',
+    email: apiData.email || apiData.emailAddress || apiData.contactEmail || '',
+    image: apiData.image || apiData.profileImage || apiData.photo || apiData.avatar || '/images/doctors/default-doctor.jpg',
+    rating: parseFloat(apiData.rating || apiData.starRating || apiData.score || 4.5),
+    experience: apiData.experience || apiData.yearsExperience || apiData.experienceYears || '5 years',
+    languages: Array.isArray(apiData.languages) ? apiData.languages : 
+               (apiData.languages ? apiData.languages.split(',').map(lang => lang.trim()) : ['English']),
+    acceptingNewPatients: apiData.acceptingNewPatients === true || apiData.acceptingNewPatients === 'true' || apiData.acceptingPatients === true,
+    hospital: apiData.hospital || apiData.affiliatedHospital || apiData.practiceName || apiData.clinic || 'Medical Center',
+    latitude: parseFloat(apiData.latitude || apiData.lat || 0),
+    longitude: parseFloat(apiData.longitude || apiData.lng || apiData.lon || 0),
+    bookAppointmentUrl: apiData.bookAppointmentUrl || apiData.appointmentUrl || apiData.bookingUrl || apiData.bookUrl || apiData.scheduleUrl || ''
   };
 }
 
@@ -507,7 +642,10 @@ async function fetchFromAPI(apiUrl) {
     const response = await fetch(apiUrl);
     if (!response.ok) throw new Error('Failed to fetch from API');
     const data = await response.json();
-    return Array.isArray(data) ? data : data.doctors || [];
+    const rawData = Array.isArray(data) ? data : data.doctors || [];
+    
+    // Transform API data to match our doctor structure
+    return rawData.map(item => transformAPIDataToDoctor(item));
   } catch (error) {
     console.error('Error fetching from API:', error);
     throw error;
@@ -544,23 +682,21 @@ function transformContentFragmentToDoctor(cfData) {
     acceptingNewPatients: cfData.acceptingNewPatients === 'true' || cfData.acceptingNewPatients === true,
     hospital: cfData.hospital || cfData.affiliatedHospital || cfData.practiceName || 'Medical Center',
     latitude: parseFloat(cfData.latitude || 0),
-    longitude: parseFloat(cfData.longitude || 0)
+    longitude: parseFloat(cfData.longitude || 0),
+    bookAppointmentUrl: cfData.bookAppointmentUrl || cfData.appointmentUrl || cfData.bookingUrl || cfData.bookUrl || ''
   };
 }
 
 function getDataSourceInfo(config) {
-  const { dataSourceType, damJsonPath, contentFragmentFolder, apiUrl, staticJsonPath } = config;
+  const { dataSourceType, contentFragmentFolder, apiUrl } = config;
   
   switch (dataSourceType) {
-    case 'dam-json':
-      return damJsonPath ? `DAM JSON (${damJsonPath})` : 'DAM JSON (not configured)';
     case 'content-fragments':
       return contentFragmentFolder ? `Content Fragment Folder (${contentFragmentFolder})` : 'Content Fragments (not configured)';
     case 'api':
       return apiUrl ? `External API (${apiUrl})` : 'External API (not configured)';
-    case 'json':
     default:
-      return staticJsonPath ? `Static JSON (${staticJsonPath})` : 'Sample Data (fallback)';
+      return 'Unknown data source';
   }
 }
 
@@ -629,14 +765,14 @@ export default async function decorate(block) {
   let title = 'Find a Doctor';
   let subtitle = 'Search for healthcare providers in your area';
   let layout = 'default';
-  let dataSourceType = 'json';
-  let damJsonPath = '';
+  let dataSourceType = 'content-fragments';
   let contentFragmentFolder = '';
   let apiUrl = '';
-  let staticJsonPath = '/data/doctors.json';
   let enableLocationSearch = true;
   let enableSpecialtyFilter = true;
   let enableProviderNameSearch = true;
+  let enableSubmitAction = true;
+  let submitUrl = '';
   
   // Parse config from block structure (key-value pairs)
   const rows = Array.from(block.querySelectorAll(':scope > div'));
@@ -653,28 +789,28 @@ export default async function decorate(block) {
     
     console.log(`Reading config: "${key}" = "${value}"`);
     
-    switch (key) {
-      case 'title': title = value; break;
-      case 'subtitle': subtitle = value; break;
-      case 'layout': layout = value; break;
-      case 'layout style': layout = value; break;
-      case 'data source type': 
-      case 'datasourcetype': dataSourceType = value; break;
-      case 'content fragment folder':
-      case 'contentfragmentfolder': contentFragmentFolder = value; break;
-      case 'dam json path':
-      case 'damjsonpath': damJsonPath = value; break;
-      case 'api url':
-      case 'apiurl': apiUrl = value; break;
-      case 'static json path':
-      case 'staticjsonpath': staticJsonPath = value; break;
-      case 'enable location search':
-      case 'enablelocationsearch': enableLocationSearch = value !== 'false'; break;
-      case 'enable specialty filter':
-      case 'enablespecialtyfilter': enableSpecialtyFilter = value !== 'false'; break;
-      case 'enable provider name search':
-      case 'enableprovidernamesearch': enableProviderNameSearch = value !== 'false'; break;
-    }
+            switch (key) {
+              case 'title': title = value; break;
+              case 'subtitle': subtitle = value; break;
+              case 'layout': layout = value; break;
+              case 'layout style': layout = value; break;
+              case 'data source type': 
+              case 'datasourcetype': dataSourceType = value; break;
+              case 'content fragment folder':
+              case 'contentfragmentfolder': contentFragmentFolder = value; break;
+              case 'api url':
+              case 'apiurl': apiUrl = value; break;
+              case 'enable location search':
+              case 'enablelocationsearch': enableLocationSearch = value !== 'false'; break;
+              case 'enable specialty filter':
+              case 'enablespecialtyfilter': enableSpecialtyFilter = value !== 'false'; break;
+              case 'enable provider name search':
+              case 'enableprovidernamesearch': enableProviderNameSearch = value !== 'false'; break;
+              case 'enable submit action':
+              case 'enablesubmitaction': enableSubmitAction = value !== 'false'; break;
+              case 'submit url':
+              case 'submiturl': submitUrl = value; break;
+            }
   });
 
   // Hide config rows but keep them in DOM (like cards block)
@@ -692,13 +828,13 @@ export default async function decorate(block) {
     subtitle,
     layout,
     dataSourceType,
-    damJsonPath,
     contentFragmentFolder,
     apiUrl,
-    staticJsonPath,
     enableLocationSearch,
     enableSpecialtyFilter,
-    enableProviderNameSearch
+    enableProviderNameSearch,
+    enableSubmitAction,
+    submitUrl
   };
   
   console.log('=== FINAL CONFIG VALUES ===');
@@ -707,8 +843,7 @@ export default async function decorate(block) {
   console.log('Layout:', layout);
   console.log('Data Source Type:', dataSourceType);
   console.log('Content Fragment Folder:', contentFragmentFolder);
-  console.log('DAM JSON Path:', damJsonPath);
-  console.log('Static JSON Path:', staticJsonPath);
+  console.log('API URL:', apiUrl);
     
   // --- Build UI ---
   const header = createElement('div', 'find-doctor-header');
@@ -833,11 +968,20 @@ export default async function decorate(block) {
   block.addEventListener('click', (e) => {
     if (e.target.classList.contains('book-appointment-btn')) {
       const doctorId = e.target.dataset.doctorId;
+      const appointmentUrl = e.target.dataset.appointmentUrl;
       const doctor = doctors.find(d => d.id === doctorId);
       
       if (doctor) {
-        // In a real implementation, this would open a booking modal or redirect to booking page
-        alert(`Booking appointment with ${doctor.name}\n\nPhone: ${doctor.phone}\nEmail: ${doctor.email}`);
+        if (config.enableSubmitAction && config.submitUrl && config.submitUrl.trim()) {
+          // Redirect to the configured submit URL
+          window.location.href = config.submitUrl;
+        } else if (appointmentUrl && appointmentUrl.trim()) {
+          // Open the appointment URL in a new tab
+          window.open(appointmentUrl, '_blank');
+        } else {
+          // Fallback: show contact information in a modal if no URL is provided
+          showAppointmentPopup(doctor);
+        }
       }
     }
   });
