@@ -51,7 +51,13 @@ header nav[aria-expanded='true'] {
     height: auto;
   }
 }
-.section.nav-sections {
+.default-theme header nav[aria-expanded='true'] {
+  min-height: 0;
+  overflow: visible;
+  padding: 0;
+  height: auto;
+}
+.default-theme .section.nav-sections {
   padding: 22px 32px;
 }
 header nav p {
@@ -153,13 +159,19 @@ header nav[aria-expanded='true'] .nav-hamburger-icon::after {
 /* brand */
 header .nav-brand {
   grid-area: brand;
- /* flex-basis: 128px;*/
+  flex-basis: 128px;
   font-size: var(--heading-font-size-s);
   font-weight: 700;
   line-height: 1;
 }
-
+.default-theme header .nav-brand {
+  flex-basis: none;
+}
 header nav .nav-brand img {
+  width: 100px;
+  height: auto;
+}
+.default-theme header nav .nav-brand img {
   width: auto;
   height: 36.5px;
 }

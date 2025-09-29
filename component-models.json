@@ -70,7 +70,7 @@
           "options": [
             {
               "name": "default",
-              "value": "default-theme"
+              "value": ""
             },
             {
               "name": "Gray Theme",
@@ -87,6 +87,10 @@
              {
               "name": "Green Theme",
               "value": "green-theme"
+            },
+            {
+              "name": "WeHealthcare Theme",
+              "value": "default-theme"
             }
           ]
       },

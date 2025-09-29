@@ -31,7 +31,7 @@
   --text-disabled:rgb(113, 113, 113);
   --link-color: var(--brand-link-color, #131313);
 --link-hover-color: var(--brand-link-hover-color, #64748B);
---main-accent-color: var(--brand-theme-color, #00C4FF);
+--main-accent-color: var(--brand-theme-color, #475569);
 
   --dark-color-opacity: rgba(0, 0, 0, 0.55);
   --light-color-opacity: rgba(255, 255, 255, 0.5);
@@ -370,8 +370,6 @@ body.blue-theme header .nav-wrapper nav .nav-sections ul > li > a::before{
 body.blue-theme header .nav-wrapper nav .nav-sections ul > li > a:hover{
   color: var(--text-light);
 }
-
-
 /*theme header-footer*/
 header {
   height: var(--nav-height);
