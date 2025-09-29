@@ -6319,12 +6319,8 @@
         "name": "dataSourceType",
         "label": "Data Source Type",
         "valueType": "string",
-        "value": "dam-json",
+        "value": "content-fragments",
         "options": [
-          {
-            "name": "JSON File from DAM",
-            "value": "dam-json"
-          },
           {
             "name": "Content Fragments",
             "value": "content-fragments"
@@ -6332,23 +6328,8 @@
           {
             "name": "External API",
             "value": "api"
-          },
-          {
-            "name": "Static JSON",
-            "value": "json"
           }
         ]
-      },
-      {
-        "component": "aem-content",
-        "name": "damJsonPath",
-        "label": "JSON File Path",
-        "description": "Select JSON file from DAM",
-        "valueType": "string",
-        "validation": {
-          "rootPath": "/content/dam"
-        },
-        "condition": { "==": [{ "var": "dataSourceType" }, "dam-json"] }
       },
         {
           "component": "aem-content",
@@ -6370,13 +6351,15 @@
         "condition": { "==": [{ "var": "dataSourceType" }, "api"] }
       },
       {
-        "component": "text",
+        "component": "aem-content",
+        "name": "damJsonAsset",
+        "label": "DAM JSON Asset",
+        "description": "Select JSON file from DAM as alternative to external API",
         "valueType": "string",
-        "name": "staticJsonPath",
-        "label": "Static JSON Path",
-        "description": "Path to static JSON file",
-        "value": "/data/doctors.json",
-        "condition": { "==": [{ "var": "dataSourceType" }, "json"] }
+        "validation": {
+          "rootPath": "/content/dam"
+        },
+        "condition": { "==": [{ "var": "dataSourceType" }, "api"] }
       },
       {
         "component": "boolean",
