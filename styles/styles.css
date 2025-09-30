@@ -333,6 +333,11 @@ body.green-theme {
   --link-hover-color: #10B981;    /* Lighter Mint Green */
 }
 
+/* wehealthcare theme */
+.wehealthcare-theme {
+  --main-accent-color: #00c4ff;
+}
+
 
 /*theme header-footer*/
 body.red-theme header .nav-wrapper,
