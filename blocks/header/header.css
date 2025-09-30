@@ -51,15 +51,18 @@ header nav[aria-expanded='true'] {
     height: auto;
   }
 }
-.default-theme header nav[aria-expanded='true'] {
+
+.weHealthcare-theme header nav[aria-expanded='true'] {
   min-height: 0;
   overflow: visible;
   padding: 0;
   height: auto;
 }
-.default-theme .section.nav-sections {
+
+.weHealthcare-theme .section.nav-sections {
   padding: 22px 32px;
 }
+
 header nav p {
   margin: 0;
   line-height: 1;
@@ -164,14 +167,17 @@ header .nav-brand {
   font-weight: 700;
   line-height: 1;
 }
-.default-theme header .nav-brand {
-  flex-basis: none;
+
+.weHealthcare-theme header .nav-brand {
+  flex-basis: unset;
 }
+
 header nav .nav-brand img {
   width: 100px;
   height: auto;
 }
-.default-theme header nav .nav-brand img {
+
+.weHealthcare-theme header nav .nav-brand img {
   width: auto;
   height: 36.5px;
 }
@@ -210,7 +216,7 @@ header nav .nav-sections ul > li > a {
   font-family: var(--body-font-family);
 }
 header nav .nav-sections ul > li > a:hover {
-  color: var(--main-accent-color);
+  color: #ffffff;
 }
 
 header nav .nav-sections ul > li > a::before {
@@ -425,21 +431,24 @@ header nav .nav-tools .icon-search-light  {
   margin-bottom: 5px;
 }
 
+
+body.weHealthcare-theme header nav .nav-sections ul > li > a{
+  color:#000;
+}
+
+ body.weHealthcare-theme header .nav-wrapper {
+  background-color: #fff;
+}
+
+body.weHealthcare-theme .lang-switcher .lang-button{
+  color: #000;
+  border: 1px solid rgb(0 0 0 / 40%);
+}
+
 /* ensure search and language switcher sit side-by-side inside tools */
 header nav .nav-tools .search-wrapper { display: flex; align-items: center; }
 header nav .nav-tools .lang-switcher { display: inline-flex; }
 
-
-body.default-theme header nav .nav-sections ul > li > a{
-  color:#000;
- }
- body.default-theme header .nav-wrapper {
-  background-color: #fff;
-}
-body.default-theme .lang-switcher .lang-button{
-  color: #000;
-  border: 1px solid rgb(0 0 0 / 40%);
-}
 /* Responsive Styles */
 @media (width < 900px) {
 
@@ -468,8 +477,8 @@ body.default-theme .lang-switcher .lang-button{
     align-items: flex-start;
   }
   
+  body.weHealthcare-theme header nav .nav-sections ul > li > a{
+    color:#000;
+  }
 
-}
-body.default-theme header nav .nav-sections ul > li > a{
- color:#000;
 }
