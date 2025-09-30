@@ -52,14 +52,14 @@ header nav[aria-expanded='true'] {
   }
 }
 
-.weHealthcare-theme header nav[aria-expanded='true'] {
+.wehealthcare-theme header nav[aria-expanded='true'] {
   min-height: 0;
   overflow: visible;
   padding: 0;
   height: auto;
 }
 
-.weHealthcare-theme .section.nav-sections {
+.wehealthcare-theme .section.nav-sections {
   padding: 22px 32px;
 }
 
@@ -168,7 +168,7 @@ header .nav-brand {
   line-height: 1;
 }
 
-.weHealthcare-theme header .nav-brand {
+.wehealthcare-theme header .nav-brand {
   flex-basis: unset;
 }
 
@@ -177,7 +177,7 @@ header nav .nav-brand img {
   height: auto;
 }
 
-.weHealthcare-theme header nav .nav-brand img {
+.wehealthcare-theme header nav .nav-brand img {
   width: auto;
   height: 36.5px;
 }
@@ -432,15 +432,15 @@ header nav .nav-tools .icon-search-light  {
 }
 
 
-body.weHealthcare-theme header nav .nav-sections ul > li > a{
+body.wehealthcare-theme header nav .nav-sections ul > li > a{
   color:#000;
 }
 
- body.weHealthcare-theme header .nav-wrapper {
+ body.wehealthcare-theme header .nav-wrapper {
   background-color: #fff;
 }
 
-body.weHealthcare-theme .lang-switcher .lang-button{
+body.wehealthcare-theme .lang-switcher .lang-button{
   color: #000;
   border: 1px solid rgb(0 0 0 / 40%);
 }
@@ -477,7 +477,7 @@ header nav .nav-tools .lang-switcher { display: inline-flex; }
     align-items: flex-start;
   }
   
-  body.weHealthcare-theme header nav .nav-sections ul > li > a{
+  body.wehealthcare-theme header nav .nav-sections ul > li > a{
     color:#000;
   }
 
