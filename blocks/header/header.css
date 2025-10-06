@@ -211,12 +211,12 @@ header nav .nav-sections ul > li {
 
 header nav .nav-sections ul > li > a {  
   font-size: 18px;
-  color: #ffffff;
+  color: var(--nav-text-color);
   text-decoration: none;
   font-family: var(--body-font-family);
 }
 header nav .nav-sections ul > li > a:hover {
-  color: #ffffff;
+  color: var(--nav-text-color);
 }
 
 header nav .nav-sections ul > li > a::before {
@@ -355,7 +355,7 @@ header nav .nav-tools {
 }
 .lang-switcher .lang-button {
   background: transparent;
-  color: #fff;
+  color: var(--nav-text-color);
   border: 1px solid rgba(255,255,255,0.4);
   border-radius: 4px;
   padding: 4px 8px;
@@ -388,7 +388,12 @@ header nav .nav-tools {
 .lang-switcher .lang-menu a:hover {
   background: #f2f2f2;
 }
-
+header .search.search-icon .icon {
+  width: 24px; height: 24px; background-color: var(--nav-text-color);
+  -webkit-mask: url(/content/wknd-universal.resource/icons/search.svg) no-repeat center / contain;
+          mask: url(/content/wknd-universal.resource/icons/search.svg) no-repeat center / contain;
+}
+header .search.search-icon .icon img { display: none; }
 /* Language item layout: pretitle (code) then country name */
 .lang-switcher .lang-menu .lang-item a {
   display: flex;
