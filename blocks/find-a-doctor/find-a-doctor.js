@@ -4,7 +4,6 @@ import { isAuthorEnvironment } from '../../scripts/scripts.js';
 
 // Sample doctor data - in production, this would come from your data source
 const GRAPHQL_DOCTORS_BY_FOLDER_QUERY = '/graphql/execute.json/ref-demo-eds/GetDoctorsFromFolder';
- 
 const CONFIG = {
   /*WRAPPER_SERVICE_URL: 'https://defaultfa7b1b5a7b34438794aed2c178dece.e1.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/2660b7afa9524acbae379074ae38501e/triggers/manual/paths/invoke',*/
    /*WRAPPER_SERVICE_PARAMS: 'api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=540k5P2jXO3u7i_9VxBp_X3aTqTn8a0o9zYjQiJt5pQ'*/
@@ -419,12 +418,13 @@ function getCurrentLocation() {
 
 async function fetchDoctorData(config) {
   try {
-    const { dataSourceType, contentFragmentFolder, apiUrl } = config;
+    const { dataSourceType, contentFragmentFolder, apiUrl, damJsonAsset } = config;
     
     console.log('=== FETCH DOCTOR DATA DEBUG ===');
     console.log('Data source type:', dataSourceType);
     console.log('Content Fragment folder:', contentFragmentFolder);
     console.log('API URL:', apiUrl);
+    console.log('DAM JSON Asset:', damJsonAsset);
     console.log('Full config:', config);
     
     switch (dataSourceType) {
@@ -438,11 +438,14 @@ async function fetchDoctorData(config) {
         break;
         
       case 'api':
-        if (apiUrl) {
+        if (damJsonAsset) {
+          console.log('Attempting to fetch from DAM JSON asset:', damJsonAsset);
+          return await fetchFromAPI(damJsonAsset);
+        } else if (apiUrl) {
           console.log('Attempting to fetch from API:', apiUrl);
           return await fetchFromAPI(apiUrl);
         } else {
-          console.warn('API URL not provided, falling back to empty array');
+          console.warn('Neither DAM JSON asset nor API URL provided, falling back to empty array');
         }
         break;
         
@@ -528,7 +531,7 @@ async function fetchFromContentFragmentFolder(folderPath) {
 
     const requestConfig = isAuthor
       ? {
-          url: `${aemauthorurl}${GRAPHQL_DOCTORS_BY_FOLDER_QUERY};path=${decodedFolderPath};ts=${Date.now()}`,
+          url: `${aemauthorurl}${GRAPHQL_DOCTORS_BY_FOLDER_QUERY};folderPath=${decodedFolderPath};ts=${Date.now()}`,
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
         }
@@ -538,8 +541,7 @@ async function fetchFromContentFragmentFolder(folderPath) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             graphQLPath: `${aempublishurl}${GRAPHQL_DOCTORS_BY_FOLDER_QUERY}`,
-            cfpath: decodedFolderPath,
-            variation: "main"
+            folderPath: decodedFolderPath
           })
         };
 
@@ -770,6 +772,7 @@ export default async function decorate(block) {
   let dataSourceType = 'content-fragments';
   let contentFragmentFolder = '';
   let apiUrl = '';
+  let damJsonAsset = '';
   let enableLocationSearch = true;
   let enableSpecialtyFilter = true;
   let enableProviderNameSearch = true;
@@ -802,6 +805,8 @@ export default async function decorate(block) {
               case 'contentfragmentfolder': contentFragmentFolder = value; break;
               case 'api url':
               case 'apiurl': apiUrl = value; break;
+              case 'dam json asset':
+              case 'damjsonasset': damJsonAsset = value; break;
               case 'enable location search':
               case 'enablelocationsearch': enableLocationSearch = value !== 'false'; break;
               case 'enable specialty filter':
@@ -832,6 +837,7 @@ export default async function decorate(block) {
     dataSourceType,
     contentFragmentFolder,
     apiUrl,
+    damJsonAsset,
     enableLocationSearch,
     enableSpecialtyFilter,
     enableProviderNameSearch,
