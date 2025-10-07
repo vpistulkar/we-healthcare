@@ -650,4 +650,17 @@ export default async function decorate(block) {
   settingAltTextForSearchIcon();
   //fetchingPlaceholdersData();
   addLogoLink(langCode);
+
+  // Ensure search icon mask uses correct base path in UE/author/local
+  try {
+    const iconEl = document.querySelector('header .search.search-icon .icon');
+    if (iconEl && window.hlx && window.hlx.codeBasePath) {
+      const iconUrl = `${window.hlx.codeBasePath}/icons/search.svg`;
+      iconEl.style.webkitMask = `url(${iconUrl}) no-repeat center / contain`;
+      iconEl.style.mask = `url(${iconUrl}) no-repeat center / contain`;
+    }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.debug('search icon mask init skipped', e);
+  }
 }
