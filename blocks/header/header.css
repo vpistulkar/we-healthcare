@@ -356,7 +356,7 @@ header nav .nav-tools {
 .lang-switcher .lang-button {
   background: transparent;
   color: var(--nav-text-color);
-  border: 1px solid rgba(255,255,255,0.4);
+  border: 1px solid var(--nav-text-color);
   border-radius: 4px;
   padding: 4px 8px;
   font-size: 12px;
@@ -390,8 +390,8 @@ header nav .nav-tools {
 }
 header .search.search-icon .icon {
   width: 24px; height: 24px; background-color: var(--nav-text-color);
-  -webkit-mask: url(/content/wknd-universal.resource/icons/search.svg) no-repeat center / contain;
-          mask: url(/content/wknd-universal.resource/icons/search.svg) no-repeat center / contain;
+  -webkit-mask: url(/icons/search.svg) no-repeat center / contain;
+          mask: url(/icons/search.svg) no-repeat center / contain;
 }
 header .search.search-icon .icon img { display: none; }
 /* Language item layout: pretitle (code) then country name */
