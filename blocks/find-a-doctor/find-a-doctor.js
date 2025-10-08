@@ -1,11 +1,12 @@
 // Configuration reading is handled directly from block structure
 import { getMetadata } from '../../scripts/aem.js';
 import { isAuthorEnvironment } from '../../scripts/scripts.js';
-import { getHostname } from '../../scripts/utils.js';
 
 // Sample doctor data - in production, this would come from your data source
 const GRAPHQL_DOCTORS_BY_FOLDER_QUERY = '/graphql/execute.json/ref-demo-eds/GetDoctorsFromFolder';
 const CONFIG = {
+  /*WRAPPER_SERVICE_URL: 'https://defaultfa7b1b5a7b34438794aed2c178dece.e1.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/2660b7afa9524acbae379074ae38501e/triggers/manual/paths/invoke',*/
+   /*WRAPPER_SERVICE_PARAMS: 'api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=540k5P2jXO3u7i_9VxBp_X3aTqTn8a0o9zYjQiJt5pQ'*/
   WRAPPER_SERVICE_URL: 'https://prod-60.eastus2.logic.azure.com:443/workflows/94ef4cd1fc1243e08aeab8ae74bc7980/triggers/manual/paths/invoke',
   WRAPPER_SERVICE_PARAMS: 'api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=e81iCCcESEf9NzzxLvbfMGPmredbADtTZSs8mspUTa4'
 };
@@ -17,6 +18,102 @@ function isAuthorEnvironmentSimple() {
     return false;
   }
 }
+// COMMENTED OUT - Static JSON sample data removed per user request
+// Keeping for reference only - this was the fallback data before removing static JSON support
+/*
+const SAMPLE_DOCTORS = [
+  {
+    id: '1',
+    name: 'Dr. Sarah Johnson',
+    specialty: 'Cardiology',
+    location: 'New York, NY',
+    zipCode: '10001',
+    phone: '(555) 123-4567',
+    email: 'sarah.johnson@healthcare.com',
+    image: '/content/dam/weHealthcare/en/images/doctors/dr-sarah-johnson.jpg',
+    rating: 4.8,
+    experience: '15 years',
+    languages: ['English', 'Spanish'],
+    acceptingNewPatients: true,
+    hospital: 'New York Medical Center'
+  },
+  {
+    id: '2',
+    name: 'Dr. Michael Chen',
+    specialty: 'Pediatrics',
+    location: 'Los Angeles, CA',
+    zipCode: '90210',
+    phone: '(555) 234-5678',
+    email: 'michael.chen@healthcare.com',
+    image: '/content/dam/weHealthcare/en/images/doctors/dr-michael-chen.jpg',
+    rating: 4.9,
+    experience: '12 years',
+    languages: ['English', 'Mandarin'],
+    acceptingNewPatients: true,
+    hospital: 'Children\'s Hospital LA'
+  },
+  {
+    id: '3',
+    name: 'Dr. Emily Rodriguez',
+    specialty: 'Dermatology',
+    location: 'Noida',
+    zipCode: '201020',
+    phone: '(555) 345-6789',
+    email: 'emily.rodriguez@healthcare.com',
+    image: '/content/dam/weHealthcare/en/images/doctors/dr-emily-rodriguez.jpg',
+    rating: 4.7,
+    experience: '8 years',
+    languages: ['English', 'Spanish'],
+    acceptingNewPatients: false,
+    hospital: 'Noida Skin Institute'
+  },
+  {
+    id: '4',
+    name: 'Dr. James Wilson',
+    specialty: 'Cardiology',
+    location: 'Houston, TX',
+    zipCode: '77001',
+    phone: '(555) 456-7890',
+    email: 'james.wilson@healthcare.com',
+    image: '/content/dam/weHealthcare/en/images/doctors/dr-james-wilson.jpg',
+    rating: 4.6,
+    experience: '20 years',
+    languages: ['English'],
+    acceptingNewPatients: true,
+    hospital: 'Houston Heart Center'
+  },
+  {
+    id: '5',
+    name: 'Dr. Lisa Park',
+    specialty: 'Pediatrics',
+    location: 'Seattle, WA',
+    zipCode: '98101',
+    phone: '(555) 567-8901',
+    email: 'lisa.park@healthcare.com',
+    image: '/content/dam/weHealthcare/en/images/doctors/dr-lisa-park.jpg',
+    rating: 4.9,
+    experience: '10 years',
+    languages: ['English', 'Korean'],
+    acceptingNewPatients: true,
+    hospital: 'Seattle Children\'s'
+  },
+  {
+    id: '6',
+    name: 'Dr. Robert Thompson',
+    specialty: 'Orthopedics',
+    location: 'Boston, MA',
+    zipCode: '02101',
+    phone: '(555) 678-9012',
+    email: 'robert.thompson@healthcare.com',
+    image: '/content/dam/weHealthcare/en/images/doctors/dr-robert-thompson.jpg',
+    rating: 4.5,
+    experience: '18 years',
+    languages: ['English', 'French'],
+    acceptingNewPatients: true,
+    hospital: 'Boston Orthopedic Center'
+  }
+];
+*/
 
 // Function to extract unique specialties from doctor data
 function getUniqueSpecialties(doctors) {
@@ -321,12 +418,13 @@ function getCurrentLocation() {
 
 async function fetchDoctorData(config) {
   try {
-    const { dataSourceType, contentFragmentFolder, apiUrl } = config;
+    const { dataSourceType, contentFragmentFolder, apiUrl, damJsonAsset } = config;
     
     console.log('=== FETCH DOCTOR DATA DEBUG ===');
     console.log('Data source type:', dataSourceType);
     console.log('Content Fragment folder:', contentFragmentFolder);
     console.log('API URL:', apiUrl);
+    console.log('DAM JSON Asset:', damJsonAsset);
     console.log('Full config:', config);
     
     switch (dataSourceType) {
@@ -340,11 +438,14 @@ async function fetchDoctorData(config) {
         break;
         
       case 'api':
-        if (apiUrl) {
+        if (damJsonAsset) {
+          console.log('Attempting to fetch from DAM JSON asset:', damJsonAsset);
+          return await fetchFromAPI(damJsonAsset);
+        } else if (apiUrl) {
           console.log('Attempting to fetch from API:', apiUrl);
           return await fetchFromAPI(apiUrl);
         } else {
-          console.warn('API URL not provided, falling back to empty array');
+          console.warn('Neither DAM JSON asset nor API URL provided, falling back to empty array');
         }
         break;
         
@@ -422,8 +523,7 @@ async function fetchFromContentFragmentFolder(folderPath) {
     const decodedFolderPath = decodeURIComponent(folderPath);
     console.log('Decoded folder path:', decodedFolderPath);
 
-    const hostnameFromPlaceholders = await getHostname();
-    const hostname = hostnameFromPlaceholders ? hostnameFromPlaceholders : getMetadata('hostname');
+    const hostname = getMetadata('hostname');
     const aemauthorurl = getMetadata('authorurl') || '';
     const aempublishurl = hostname?.replace('author', 'publish')?.replace(/\/$/, '') || '';
 
@@ -431,7 +531,7 @@ async function fetchFromContentFragmentFolder(folderPath) {
 
     const requestConfig = isAuthor
       ? {
-          url: `${aemauthorurl}${GRAPHQL_DOCTORS_BY_FOLDER_QUERY};path=${decodedFolderPath};ts=${Date.now()}`,
+          url: `${aemauthorurl}${GRAPHQL_DOCTORS_BY_FOLDER_QUERY};Path=${decodedFolderPath};ts=${Date.now()}`,
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
         }
@@ -673,6 +773,7 @@ export default async function decorate(block) {
   let dataSourceType = 'content-fragments';
   let contentFragmentFolder = '';
   let apiUrl = '';
+  let damJsonAsset = '';
   let enableLocationSearch = true;
   let enableSpecialtyFilter = true;
   let enableProviderNameSearch = true;
@@ -705,6 +806,8 @@ export default async function decorate(block) {
               case 'contentfragmentfolder': contentFragmentFolder = value; break;
               case 'api url':
               case 'apiurl': apiUrl = value; break;
+              case 'dam json asset':
+              case 'damjsonasset': damJsonAsset = value; break;
               case 'enable location search':
               case 'enablelocationsearch': enableLocationSearch = value !== 'false'; break;
               case 'enable specialty filter':
@@ -735,6 +838,7 @@ export default async function decorate(block) {
     dataSourceType,
     contentFragmentFolder,
     apiUrl,
+    damJsonAsset,
     enableLocationSearch,
     enableSpecialtyFilter,
     enableProviderNameSearch,
