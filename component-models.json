@@ -6355,17 +6355,6 @@
         "condition": { "==": [{ "var": "dataSourceType" }, "api"] }
       },
       {
-        "component": "aem-content",
-        "name": "damJsonAsset",
-        "label": "DAM JSON Asset",
-        "description": "Select JSON file from DAM as alternative to external API",
-        "valueType": "string",
-        "validation": {
-          "rootPath": "/content/dam"
-        },
-        "condition": { "==": [{ "var": "dataSourceType" }, "api"] }
-      },
-      {
         "component": "boolean",
         "name": "enableLocationSearch",
         "label": "Enable Location Search",
